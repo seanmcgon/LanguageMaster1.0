@@ -49,6 +49,7 @@ describe('the function should add new teacher',() =>{
 
  const { getGoogleTranscription } = require('./googleSpeech.js');
  const fs = require('fs');
+const { describe } = require('node:test');
    
  describe('getGoogleTranscription function should return the string correctly', () => {
    it('transcribes audio file from URL', async () => {
@@ -82,5 +83,32 @@ describe('getClassesStudent', () => {
     expect(classes).toEqual([]);
   });
 });
+
+describe('createAssignment', () => {
+  it('should create an assignment in an existing class', async () => {
+    const className = "English235_JHBWXD";
+    const assignmentName = "Assignment1";
+    const cards = [];
+    const result = await mongo.createAssignment(className, assignmentName, cards);
+    expect(result).toBe(true);
+    try {
+      await client.connect();
+      const ret = await mongo.client.db(className).collection("assignments").find({ name: assignmentName }).toArray();
+      expect(ret.length).toEqual(1);
+      expect(ret[0].assignment).toEqual(assignmentName);
+      expect(ret[0].card).toEqual(0);
+    } finally {
+      await mongo.client.close();
+    }
+  });
+
+  it ('should throw an error if the assignment already exists', async () => {
+    const className = "English235_JHBWXD";
+    const assignmentName = "Assignment1";
+    const cards = [];
+    const result = await mongo.createAssignment(className, assignmentName, cards);
+    expect(result).rejects.toThrow("Assignment already exisits");
+  });
+})
 
 

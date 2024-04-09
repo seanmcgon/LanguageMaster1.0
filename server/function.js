@@ -104,7 +104,7 @@ async function getClassesStudent(studentEmail) {
   }
 }
 
-async function createAssignments(className, assignmentName, assignmentArray) {
+async function createAssignment(className, assignmentName, assignmentArray) {
   let created = false;
   try {
     await client.connect();
@@ -127,5 +127,5 @@ async function createAssignments(className, assignmentName, assignmentArray) {
   }
 }
 
-module.exports = {createTeacher, verifyTeacher, getClassesTeacher, getClassesStudent, createAssignments};
+module.exports = {createTeacher, verifyTeacher, getClassesTeacher, getClassesStudent, createAssignment};
 
