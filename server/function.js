@@ -104,5 +104,28 @@ async function getClassesStudent(studentEmail) {
   }
 }
 
-module.exports = {createTeacher, verifyTeacher, getClassesTeacher, getClassesStudent};
+async function createAssignments(className, assignmentName, assignmentArray) {
+  let created = false;
+  try {
+    await client.connect();
+    const db = client.db(className);
+    const col = db.collection("assignments");
+
+    // Chack if there will a duplicate
+    const existingAssignment = await col.findOne({ name: assignmentName });
+    if (existingAssignment) {
+      throw new Error("Assignment already exisits");
+    }
+
+    // Create a new assignment with the provided cards
+    const newAssignment = { name: assignmentName, cards: assignmentArray };
+    await col.insertOne(newAssignment);
+    created = true;
+  } finally {
+    await client.close();
+    return created;
+  }
+}
+
+module.exports = {createTeacher, verifyTeacher, getClassesTeacher, getClassesStudent, createAssignments};
 
