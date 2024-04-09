@@ -127,5 +127,7 @@ async function createAssignment(className, assignmentName, assignmentArray) {
   }
 }
 
+async function convertAssignmentToDtbForm(array)
+
 module.exports = {createTeacher, verifyTeacher, getClassesTeacher, getClassesStudent, createAssignment};
 
