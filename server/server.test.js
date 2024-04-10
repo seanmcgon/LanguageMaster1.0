@@ -85,30 +85,89 @@ describe('getClassesStudent', () => {
 });
 
 describe('createAssignment', () => {
-  it('should create an assignment in an existing class', async () => {
+  it('should create a new assignment if it does not exist', async () => {
     const className = "English235_JHBWXD";
-    const assignmentName = "Assignment1";
-    const cards = [];
-    const result = await mongo.createAssignment(className, assignmentName, cards);
+    const assignmentName = "Assignment0";
+    const assignmentArray = [
+      {text: 'text0', translation: 'translation0', audio: 'audio0'},
+      {text: 'text1', translation: 'translation1', audio: 'audio1'},
+      {text: 'text2', translation: 'translation2', audio: 'audio2'}
+    ];
+    const result = await mongo.createAssignment(className, assignmentName, assignmentArray);
     expect(result).toBe(true);
     try {
       await client.connect();
-      const ret = await mongo.client.db(className).collection("assignments").find({ name: assignmentName }).toArray();
-      expect(ret.length).toEqual(1);
+      const ret = await mongo.client.db(className).collection('assignments').find({assignment: assignmentName }).toArray();
+      expect(ret.length).toEqual(3);
       expect(ret[0].assignment).toEqual(assignmentName);
       expect(ret[0].card).toEqual(0);
+      expect(ret[0].text).toEqual('text0');
+      expect(ret[0].translation).toEqual('translation0');
+      expect(ret[0].audio).toEqual('audio0');
+
+      expect(ret[1].assignment).toEqual(assignmentName);
+      expect(ret[1].card).toEqual(1);
+      expect(ret[1].text).toEqual('text1');
+      expect(ret[1].translation).toEqual('translation1');
+      expect(ret[1].audio).toEqual('audio1');
+
+      expect(ret[2].assignment).toEqual(assignmentName);
+      expect(ret[2].card).toEqual(2);
+      expect(ret[2].text).toEqual('text2');
+      expect(ret[2].translation).toEqual('translation2');
+      expect(ret[2].audio).toEqual('audio2');
+
+      // Remove the document form the DB
+      await mongo.client.db(className).collection('assignments').deleteOne({
+        text: 'text0', translation: 'translation0', audio: 'audio0'
+      });
+      await mongo.client.db(className).collection('assignments').deleteOne({
+        text: 'text1', translation: 'translation1', audio: 'audio1'
+      });
+      await mongo.client.db(className).collection('assignments').deleteOne({
+        text: 'text2', translation: 'translation2', audio: 'audio2'
+      });
     } finally {
       await mongo.client.close();
     }
   });
 
-  it ('should throw an error if the assignment already exists', async () => {
+  it ('should not create a new assignment if it already exists', async () => {
     const className = "English235_JHBWXD";
-    const assignmentName = "Assignment1";
-    const cards = [];
-    const result = await mongo.createAssignment(className, assignmentName, cards);
-    expect(result).rejects.toThrow("Assignment already exisits");
+    const assignmentName = "arma";
+    const assignmentArray = [
+      {text: 'text0', translation: 'translation0', audio: 'audio0'},
+      {text: 'text1', translation: 'translation1', audio: 'audio1'},
+      {text: 'text2', translation: 'translation2', audio: 'audio2'}
+    ];
+    const result = await mongo.createAssignment(className, assignmentName, assignmentArray);
+    expect(result).toEqual(false);
   });
-})
+
+  it ('should not create a new assignment if assignmentArray is empty', async () => {
+    const className = "English235_JHBWXD";
+    const assignmentName = "Assignment0";
+    const assignmentArray = [];
+    const result = await mongo.createAssignment(className, assignmentName, assignmentArray);
+    expect(result).toEqual(false);
+  });
+});
+
+descrive('convertAssignmentToDtbForm', () => {
+  it ('should convert an assignment array to the correct format', () => {
+    const assignmentName = 'Assignment0';
+    const assignmentArray = [
+      {text: 'text0', translation: 'translation0', audio: 'audio0'},
+      {text: 'text1', translation: 'translation1', audio: 'audio1'},
+      {text: 'text2', translation: 'translation2', audio: 'audio2'}
+    ];
+    const convertedAssignment = mongo.convertAssignmentToDtbForm(assignmentName, assignmentArray);
+    expect(convertedAssignment).toEqual([
+      {assignment: 'Assignment1', card: 0, text: 'text0', translation: 'translation0', audio: 'audio0'},
+      {assignment: 'Assignment1', card: 1, text: 'text1', translation: 'translation1', audio: 'audio1'},
+      {assignment: 'Assignment1', card: 2, text: 'text2', translation: 'translation2', audio: 'audio2'}
+    ]);
+  });
+});
 
 
