@@ -104,30 +104,93 @@ async function getClassesStudent(studentEmail) {
   }
 }
 
+
 async function createAssignment(className, assignmentName, assignmentArray) {
-  let created = false;
+  let createdAssignment = false;
   try {
     await client.connect();
     const db = client.db(className);
     const col = db.collection("assignments");
 
-    // Chack if there will a duplicate
-    const existingAssignment = await col.findOne({ name: assignmentName });
-    if (existingAssignment) {
+    // check if there exisits duplicate
+    const assignmentExists = await col.find({ assignment: assignmentName }).toArray().length > 0;
+    // (!) We can change this part depending on how we want to operate:
+    // (Option 1) If there exist such assignment, we do NOT create a new assignment but add cards to the exisiting asssignment
+    /*
+    if (assignmentExisits) {
+      createdAssignment = addToAssignment(className, assignmentName, assignmentArray);
+    }
+    */
+    // (Option 2) If there exisits such assignment, we throw an error and do NOT add cards to the exisiting assignment
+    if (assignmentExisits) {
       throw new Error("Assignment already exisits");
     }
-
     // Create a new assignment with the provided cards
-    const newAssignment = { name: assignmentName, cards: assignmentArray };
-    await col.insertOne(newAssignment);
-    created = true;
+    // (!) We can change this part depending on how we want to operate:
+    // Assume we are not allowed to use addToAssignment() function here 
+    // Because we don't add any cards to an empty assignment,
+    // We have to initialize the assignment with at least one card.
+    else if (!assignmentExists && assignmentArray.length()> 0) {
+      for(const flashcard of convertAssignmentToDtbForm(assignmentName, assignmentArray)) {
+        await col.insertOne(flashcard);
+      }
+      createdAssignment = true;
+    }
+    else if (!assignmentExists && assignmentArray.length == 0) {
+      throw("Input array is empty")
+    }
+  } catch (err) {
+    console.log(err);
   } finally {
     await client.close();
-    return created;
   }
+  return createdAssignment;
 }
 
-async function convertAssignmentToDtbForm(array)
+function convertAssignmentToDtbForm(assignmentName, assignmentArray) {
+  let convertedAssignmentArray = [];
+  for (let index = 0; index < assignmentArray.length; index++) {
+    const flashcard = assignmentArray[index];
+    convertedAssignmentArray.push({
+      assignment: assignmentName,
+      card: index,
+      text: flashcard.text,
+      translation: flashcard.translation,
+      audio: flashcard.audio
+    });
+  }
+  return convertedAssignmentArray;
+}
+
+async function addToAssignment(className, assignmentName, card){
+  let inserted = false;
+  try{
+    await client.connect();
+    let db = client.db(className);
+    let col = db.collection("teachers");
+    const teachers = await col.find().toArray();
+    if(teachers.length === 0){
+      throw("Class does not exist");
+    }
+    col = db.collection("assignments");
+    const cardNum = (await col.find({assignment: assignmentName}).toArray()).length;
+    // This segment of code might have to be deleted, depends on if you can add cards to empty assignments or not though
+    // it throws an error if an assignment doesn't have any cards in it
+    if(cardNum === 0){
+      throw("Assignment does not exist");
+    }
+    await col.insertOne({assignment: assignmentName, card: cardNum, text: card.text, translation: card.translation, audio: card.audio})
+    inserted = true;
+    
+  }
+  catch(err){
+    console.log(err);
+  }
+  finally{
+    await client.close();
+    return inserted;
+  }
+}
 
 module.exports = {createTeacher, verifyTeacher, getClassesTeacher, getClassesStudent, createAssignment};
 
