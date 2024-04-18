@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import "./NavBar.css";
-import CreateClassPopup from './createClassPopup';
-import JoinClassPopup from './joinClass';
-import AboutComponent from '../About/about';
+import CreateClassPopup from './createClassPopup';  // Ensure the correct path
+import JoinClassPopup from './joinClass';  // Ensure the correct path
+import AboutComponent from '../About/about';  // Ensure the correct path
 
 import { Modal } from 'bootstrap';
 import { Dropdown } from 'react-bootstrap';
 
-function NavBar({ isLoggedIn, userName, onSignOut }) {
+function NavBar({  isLoggedIn, userName, onSignOut, onCreateClass}) {
     const [showCreateClassModal, setCreateClassModal] = useState(false);
     const [showJoinClassModal, setJoinClassModal] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
@@ -43,12 +43,11 @@ function NavBar({ isLoggedIn, userName, onSignOut }) {
 
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav mr-auto">
-                       
                         {!isLoggedIn ? (
                             <>
-                             <li className="nav-item">
-                                <a className="nav-link" href="#about" onClick={() => setShowAbout(!showAbout)}>About</a>
-                            </li>
+                                <li className="nav-item">
+                                    <a className="nav-link" href="#about" onClick={() => setShowAbout(!showAbout)}>About</a>
+                                </li>
                                 <li className="nav-item">
                                     <a className="nav-link login-button" href="#login" onClick={showLogIn}>Login</a>
                                 </li>
@@ -57,21 +56,20 @@ function NavBar({ isLoggedIn, userName, onSignOut }) {
                                 </li>
                             </>
                         ) : (
-                            <>  
-                            
-                            <Dropdown>
-                                <Dropdown.Toggle variant="light" id="dropdown-basic">
-                                    Profile ({userName})
-                                </Dropdown.Toggle>
+                            <>
+                                <Dropdown>
+                                    <Dropdown.Toggle variant="light" id="dropdown-basic">
+                                        Profile ({userName})
+                                    </Dropdown.Toggle>
 
-                                <Dropdown.Menu>
-                                    <Dropdown.Item href="#action/3.1">View Profile</Dropdown.Item>
-                                    <Dropdown.Item href="#action/3.2">Help</Dropdown.Item>
-                                    <Dropdown.Item onClick={onSignOut}>Sign Out</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item href="#action/3.1">View Profile</Dropdown.Item>
+                                        <Dropdown.Item href="#action/3.2">Help</Dropdown.Item>
+                                        <Dropdown.Item onClick={onSignOut}>Sign Out</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
                                 <li className="nav-item-loginAfter">
-                                    <a className="nav-link-color" href="#"onClick={() => setJoinClassModal(true)}>Join Class</a>
+                                    <a className="nav-link-color" href="#" onClick={() => setJoinClassModal(true)}>Join Class</a>
                                 </li>
                                 <li className="nav-item-loginAfter">
                                     <a className="nav-link-color" href="#" onClick={() => setCreateClassModal(true)}>Create Class</a>
@@ -82,7 +80,8 @@ function NavBar({ isLoggedIn, userName, onSignOut }) {
                 </div>
 
                 {/* Modals */}
-                <CreateClassPopup show={showCreateClassModal} onHide={() => setCreateClassModal(false)} />
+                <CreateClassPopup show={showCreateClassModal} onHide={() => setCreateClassModal(false)} handleSubmission={onCreateClass}
+ />
                 <JoinClassPopup show={showJoinClassModal} onHide={() => setJoinClassModal(false)} />
             </nav>
             {showAbout && <AboutComponent />}

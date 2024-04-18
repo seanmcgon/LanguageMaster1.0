@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const { verifyTeacherData, createTeacherAccount, verifyStudentData, createStudentAccount} = require("./userIO");
 //TODO: Add imports for classesIO, and assignmentsIO
+const {createClassIO, getClassesIO} = require("./classesIO")
 
 
 function initSocket(server) {
@@ -28,8 +29,8 @@ function initSocket(server) {
         createTeacherAccount(socket);
         verifyStudentData(socket);
         createStudentAccount(socket);
-        //call the other functions with socket as they become completed
-        
+        createClassIO(socket)     
+        getClassesIO(socket)   
         // socket.on('disconnect', () => {
         //     console.log("numClients connected", --numConnected);
         // });

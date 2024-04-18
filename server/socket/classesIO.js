@@ -7,21 +7,36 @@ const {
 } = require('../src/classes.js')
 
 //TODO:write the IO functions for all functions above
-function enrollClassIO(socket) {
-    //model in userIO for reference NOT USABLE CODE
-    socket.on('teacherInfo', async (teacherEmail, teacherPassword) => {
-      console.log(teacherEmail, teacherPassword)
-        let teacherVerified;
+function createClassIO(socket) {    
+    socket.on('createClass', async (className, userName) => {
+      console.log(className, userName)
+        let classCreated;
         try {
-          teacherVerified = await verifyTeacher(teacherEmail, teacherPassword);
+            classCreated = await createClass(className, userName);
         } catch (error) {
-            console.error('Error verifying student:', error);
-            teacherVerified = false;
+            console.error('Error creating class:', error);
+            classCreated = false;
         }
-        console.log("verifyTeacher was called and returned value:", teacherVerified);
-        socket.emit("teacherVerification", teacherVerified);
-        return teacherVerified;
+        console.log("createClass was called and returned value:", classCreated);
+        socket.emit("Created class", classCreated);
+        return classCreated;
     });
 }
 
-export {enrollClassIO}
+function getClassesIO(socket) {    
+    socket.on('getClasses', async (userName) => {
+      console.log(userName)
+        let classList;
+        try {
+            classList = await getClassesTeacher(userName);
+        } catch (error) {
+            console.error('Error getting classes:', error);
+        }
+        console.log("getClassesIO was called and returned value:", classList);
+        socket.emit("getClassesStatus", classList);
+        return classList;
+    });
+}
+
+
+module.exports =  {createClassIO, getClassesIO}

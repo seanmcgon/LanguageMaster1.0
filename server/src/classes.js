@@ -55,9 +55,9 @@ async function createClass(className, teacherEmail) {
         await client.connect();
         db = client.db("UserData");
         col = await db.collection("teachers");
-        const checkTheValidOfClassName = checkValid(className);
+        const checkTheValidOfClassName = true
         if (checkTheValidOfClassName) {
-            if ((await col.find({ email: teacherEmail }).toArray()).length === 1) {
+            if ((await col.find({ email: teacherEmail }).toArray()).length > 1) {
                 updateClassForGivenTeacher(col, teacherEmail, className);
                 let getTeacherInfo = await col.find({ email: teacherEmail }).toArray();
                 db1 = client.db(className);
@@ -68,6 +68,7 @@ async function createClass(className, teacherEmail) {
                     await col1.deleteOne({ email: teacherEmail });
                     await col1.insertOne(getTeacherInfo[0]);
                 }
+                return true;
             } else {
                 throw("Teacher does not exist");
             }
@@ -96,12 +97,16 @@ async function getClassesTeacher(teacherEmail) {
       const col = db.collection("teachers");
       const result = await col.findOne({email: teacherEmail.trim() });
       if (result) {
+        await client.close();
         return result.courseList || [];
       } else {
+        await client.close();
         return [];
       }
-    } finally {
+    } catch (error) {
       await client.close();
+      return []
+
     }
   }
   

@@ -10,46 +10,68 @@ import "./App.css";
 import { Modal } from 'bootstrap';
 import ClassAsgmts from './components/ClassAssignments/classAsgmts.js';
 import ViewAssignment from './components/viewAssignments/viewAssignments.js';
+import {createClass, getClassesIO} from './components/socket.js'
 
 const App = () => {
-//   //development credentials
-//     const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
-//     const [classList, setClassList] = useState([]);
-//     const [userEmail, setUserEmail] = useState("jyhuang@umass.edu");  // Hardcoded email
-//     const [userName, setUserName] = useState("Jason Huang");  // Hardcoded user name
-
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+  //development credentials
+    const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
     const [classList, setClassList] = useState([]);
-    const [userEmail, setUserEmail] = useState("");
-    const [userName, setUserName] = useState(""); 
+    const [userEmail, setUserEmail] = useState("jyhuang@umass.edu");  // Hardcoded email
+    const [userName, setUserName] = useState("Jason Huang");  // Hardcoded user name
+
+    // const [isLoggedIn, setIsLoggedIn] = useState(false);
+    // const [classList, setClassList] = useState([]);
+    // const [userEmail, setUserEmail] = useState("");
+    // const [userName, setUserName] = useState(""); 
     const [currentClass, setCurrentClass] = useState(""); 
     const [currentAssignments, setCurrentAssignments] = useState([]); 
     const [currentAssignment, setCurrentAssignment] = useState(""); 
     const [currentAssignmentName, setCurrentAssignmentName] = useState(""); 
     const [showCreateAssignment, setShowCreateAssignment] = useState(false);
+    const [showLogoutMessage, setShowLogoutMessage] = useState(false);
 
     useEffect(() => {
       getClassesForUser(userEmail);  // Fetch classes for the hardcoded user
     }, []);  // Empty dependency array to run only on mount
   
-    const [showLogoutMessage, setShowLogoutMessage] = useState(false);
 
     function getClassesHelper(userEmail) {
-        const classesTest = [
-            {
-                title: "Spanish 110",
-                link: null,
-            },
-            {
-                title: "Chinese 187",
-                link: null,
-            },
-            {
-                title: "French 220",
-                link: null,
-            },
-        ];
-        return () => classesTest;
+       let classes  = [
+        {
+            title: "Spanish 110",
+            link: null,
+        },
+        {
+            title: "Chinese 187",
+            link: null,
+        },
+        {
+            title: "French 220",
+            link: null,
+        },
+    ];   
+     
+        try {
+            classes =  getClassesIO(userEmail)
+        } catch (error) {
+            classes = [
+                {
+                    title: "Spanish 110",
+                    link: null,
+                },
+                {
+                    title: "Chinese 187",
+                    link: null,
+                },
+                {
+                    title: "French 220",
+                    link: null,
+                },
+            ];   
+        }
+
+        return () => classes;
+
     }
     
     const getClassesForUser = (userEmail) => {
@@ -60,7 +82,19 @@ const App = () => {
             console.error('Error fetching classes:', error);
         }
     };
-
+    const handleCreateClass = (newClassName) => {
+        // Here you can set the state or perform other actions with the new class name
+        const createClassResult =  createClass(newClassName, userEmail, (createStatus) => {
+            console.log("Trying")
+            if (createClassResult) {
+                console.log("New class created:", newClassName);  // Example action
+            }
+            else {
+                console.log("Class creation failed")
+            }
+        })
+    }
+    
     const handleClassClick = (className) => {
         setCurrentClass(className)
         //getAssignmentsForClass(className)
@@ -127,14 +161,6 @@ const App = () => {
         }, 1000); 
     };
 
-    const goBackToClassView = () => {
-        setCurrentClass(null);  // Or setCurrentClass('');
-    };
-    const goBackToAssignmentList = () => {
-        setCurrentAssignment(null);
-        setCurrentAssignmentName('');
-    };
-    
     const handleShowCreateAssignment = () => {
       setShowCreateAssignment(true);  // Show CreateAssignment component
     };
@@ -143,51 +169,43 @@ const App = () => {
       setShowCreateAssignment(false); // Hide CreateAssignment component
     };
     return (
-            <>
-              
-        <NavBar isLoggedIn={isLoggedIn} userName={userEmail} onSignOut={handleSignOut} />
-        <div>
-        {isLoggedIn ? (
-    showCreateAssignment ? (
-        <CreateAssignment onBack={handleHideCreateAssignment} />
-    ) : currentAssignment ? (
-        <ViewAssignment
-            lessonName={currentAssignmentName}
-            flashcards={currentAssignment}
-            onBack={goBackToAssignmentList}
-        />
-    ) : currentClass ? (
-        <ClassAsgmts
-            className={currentClass}
-            asgmts={currentAssignments}
-            onAssignmentClick={handleAssignmentClick}
-            onBack={goBackToClassView}
-            onCreateAssignmentClick={handleShowCreateAssignment}
-        />
-    ) : (
-        <ClassMenu classes={classList} onClassClick={handleClassClick} />
-    )
-) : (
-                <>
-                    <Login onLoginSuccess={handleLoginSuccess} />
-                    <SignUp onLoginSuccess={handleLoginSuccess} />
-                    <Banner handleClick={() => {
-                        const signUpModal = new Modal(document.getElementById('SignUpForm'));
-                        signUpModal.show();
-                    }} />
-                </>
-            )}
-        </div>
-            {showLogoutMessage && (
-                <div className="logout-message">
-                    Logging out...
-                </div>
-            )}
+        <>
+            <NavBar isLoggedIn={isLoggedIn} userName={userName} onSignOut={handleSignOut} onCreateClass={handleCreateClass} />
+            <div>
+                {isLoggedIn ? (
+                    showCreateAssignment ? (
+                        <CreateAssignment onBack={handleHideCreateAssignment} />
+                    ) : currentAssignment.length ? (
+                        <ViewAssignment
+                            lessonName={currentAssignmentName}
+                            flashcards={currentAssignment}
+                            onBack={() => setCurrentAssignment([])}
+                        />
+                    ) : currentClass ? (
+                        <ClassAsgmts
+                            className={currentClass}
+                            asgmts={currentAssignments}
+                            onAssignmentClick={handleAssignmentClick}
+                            onBack={() => setCurrentClass("")}
+                            onCreateAssignmentClick={handleShowCreateAssignment}
+                        />
+                    ) : (
+                        <ClassMenu classes={classList} onClassClick={handleClassClick} />
+                    )
+                ) : (
+                    <>
+                        <Login onLoginSuccess={handleLoginSuccess} />
+                        <SignUp onLoginSuccess={handleLoginSuccess} />
+                        <Banner handleClick={() => {
+                            const signUpModal = new Modal(document.getElementById('SignUpForm'));
+                            signUpModal.show();
+                        }} />
+                    </>
+                )}
+            </div>
+            {showLogoutMessage && <div className="logout-message">Logging out...</div>}
         </>
     );
-    
-}
-
-
+};
 
 export default App;

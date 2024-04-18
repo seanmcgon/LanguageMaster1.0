@@ -41,3 +41,21 @@ export const createTeacher = (teacherFirstName, teacherLastName, teacherEmail, t
   socket.emit('createTeacher', teacherFirstName, teacherLastName, teacherEmail, teacherPassword);
   socket.on("createTeacherStatus", teacherCreated);
 };
+
+export const createClass = (className, userName, classCreated) => {
+  socket.emit('createClass', className, userName);
+  socket.on("createClassStatus", classCreated);
+  console.log("createClass is emitting")
+  return classCreated
+} 
+
+export const getClassesIO = (userName, classFetched) => {
+  socket.emit('getClasses', userName);
+  try {
+    socket.on("getClassesStatus", classFetched);
+  } catch (error) {
+    return []
+  }
+  console.log("getClasses received in frontend", classFetched)
+  return classFetched
+} 
