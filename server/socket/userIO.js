@@ -25,10 +25,12 @@ function verifyTeacherData(socket) {
 
 
 function createTeacherAccount(socket) {
+  //on listens for createTeacher event ID
   socket.on('createTeacher', async (firstName, lastName, teacherEmail, teacherPassword) => {
     let teacherCreated;
     console.log(firstName, lastName, teacherEmail, teacherPassword);
       try {
+        //boolean
           teacherCreated = await createTeacher(firstName, lastName, teacherEmail, teacherPassword);
       } catch (error) {
           console.error('Error creating teacher:', error);

@@ -26,7 +26,11 @@ export const createStudent = (studentFirstName, studentLastName, studentEmail, s
   //we send the studentName and password and get back the boolean
   //function that checks before emitting
   //if good then send else don't
+
+  //emit sends a message with the id and the parameters
   socket.emit('createStudent', studentFirstName, studentLastName, studentEmail, studentPassword);
+
+  //on listens for a message with the id and the parameters
   socket.on("createStudentStatus", studentCreated);
 };
 
