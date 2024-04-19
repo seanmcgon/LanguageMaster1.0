@@ -1,6 +1,23 @@
+
 {
+  "name": "transcription",
+  "version": "1.0.0",
+  "description": "",
+  "main": "audioToText.js",
+  "scripts": {
+    "test": "node_modules/.bin/jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@google-cloud/speech": "^6.3.0",
-    "axios": "^1.6.8"
+    "@google-cloud/speech": "^6.5.0",
+    "axios": "^1.6.8",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "request-promise-native": "^1.0.9"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
