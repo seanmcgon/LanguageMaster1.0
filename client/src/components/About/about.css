@@ -1,0 +1,55 @@
+.about-container {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .about-container h1 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 28px; /* Increase font size for the title */
+  }
+  
+ 
+.about-container > p { /* This targets only paragraphs directly inside .about-container */
+    margin-bottom: 25px;
+    line-height: 1.6;
+    color: #555;
+    font-size: 22px; /* Adjust the size as needed for the About section */
+  }
+  
+  .team-section {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  
+  .member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .member img {
+  width: 120px;  /* Adjust the width as needed */
+  height: auto;  /* This will ensure the aspect ratio is maintained */
+  border-radius: 50%;
+  object-fit: cover; /* This ensures the image covers the area without being squished */
+}
+  
+  .member > div {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  h2 {
+    grid-column: 1 / -1;
+    text-align: left;
+    margin: 20px 0 10px;
+  }
+  
+  h3, p {
+    margin: 0;
+  }
+  

@@ -1,0 +1,102 @@
+/* Overall form container styling */
+.CreateAsgmts {
+    height: 85vh; /* Set height to full viewport height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Form itself with scrolling */
+.CreateAsgmts form {
+    overflow-y: auto; /* Make form content scrollable */
+    padding: 20px;
+    border: 1px solid #ccc; /* Light border for form */
+}
+
+/* Card entries styling */
+.card-entry {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee; /* Thin line for each card */
+}
+
+/* Label and input enhancements */
+.CreateAsgmts label {
+    font-weight: bold; /* Make labels bold */
+    padding: 14px;
+    font-size: 18px;
+}
+
+.CreateAsgmts input[type="text"],
+.CreateAsgmts input[type="file"] {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+/* Title input specific styling */
+#title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Button styles generalized */
+.CreateAsgmts button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+/* Specific button styles */
+.addCard {
+    background-color: white; /* White background */
+    color: black; /* Black text */
+    border: 1px solid #ccc; /* Defined border */
+}
+
+.submitNewAssignment {
+    background-color: #800000; /* Maroon color */
+    color: white;
+    border-color: maroon;
+}
+
+.submitNewAssignment:hover {
+    background-color: #800000; /* Maroon color */
+    color: white;
+    border-color: maroon;
+  transform: scale(1.05);
+
+}
+
+/* Numbering for cards */
+.card-number {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Hover effects */
+.CreateAsgmts button:hover {
+    opacity: 0.9;
+}
+.removeCardButton {
+    padding: 2.5px 5px !important; /* Smaller padding */
+    font-size: 5px; /* Smaller font size */
+    margin: 2px; /* Reduced margin */
+    background-color: lightgrey !important;
+}
+
+.backButtonCreate {
+    background-color: maroon;
+    color: white;
+}
+
+#assignmentTitle {
+    font-size: 36px; /* Large font size */
+    color: #800000; /* Maroon color */
+    font-weight: bold;
+    margin-bottom: 20px; /* Space below the title */
+}

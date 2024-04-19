@@ -1,0 +1,88 @@
+#classAsgmtsBody {
+  height: 100vh;
+  background-color: #f2f2f2;
+  padding-top: 25px;
+  padding-bottom: 25px;
+  padding-left: 5%;
+  padding-right: 5%;
+  font-family: "Arial", sans-serif;
+  overflow: auto;
+}
+
+#nameOfClass {
+  color: #881c1c;
+  font-weight: bold;
+}
+
+#asgmtsHeader {
+  color: black;
+}
+
+.custom-card {
+  background-color: white; /* Changed from rgb(59, 53, 53) to white */
+  color: black !important;
+  transition: border-color 0.3s ease;
+  cursor: pointer;
+  height: auto;
+  border-width: 3px;
+  border-color: maroon;
+  transition: transform 0.3s ease, border-color 0.3s ease; /* Smooth transition for hover effect */
+
+}
+
+.custom-card:hover {
+  transform: scale(1.05); /* Slightly scale up the card on hover */
+}
+
+.termCount {
+  margin-top: 25px;
+}
+
+.g-4 {
+  margin-top: 5px;
+}
+
+.custom-link {
+  text-decoration: none;
+}
+
+#asgmtsGrid {
+  padding: 2%;
+  padding-top: 0;
+  background-color: lightgray;
+  border-radius: 5px;
+}
+
+.createAssignment {
+  background-color: maroon;
+  color: white;
+  border: none; /* Removes the default border */
+  padding: 10px 15px; /* Adds some padding */
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  transition-duration: 0.4s; /* Smooth transition for hover effect */
+}
+
+.createButton:hover, .createAssignment:hover {
+  transform: scale(1.05);
+    background-color: maroon;
+ 
+  ; /* Darkens the button on hover */
+}
+.backButtonAssView {
+  background-color:maroon;
+  color: white;
+  border-color: maroon;
+  border-style: dashed;
+}
+.backButtonAssView:hover {
+  background-color: darkred;
+  transform: scale(1.02);
+  border-color: maroon;
+
+
+}

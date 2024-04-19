@@ -1,0 +1,40 @@
+.class-card-container {
+  border: 7px solid maroon; /* This sets a maroon red border */
+  position: relative;
+  width: 100%; /* Adjust as needed */
+  height: auto; /* Adjust as needed, or set to a specific height */
+  /* Additional styles */
+  margin-bottom: 1rem; /* Optional: Adds space between the cards */
+  transition: transform 0.3s ease, border-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.class-card-container:hover {
+  transform: scale(1.05); /* Slightly scale up the card on hover */
+}
+
+.class-bg {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.class-txt {
+  font-size: 40px;  
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 100%; /* Ensure the text container takes the full width */
+}
+
+.project h2 {
+  text-align: center;
+  color: black; /* Keeps the text color black */
+  font-size: 26px; /* Increase the font size to make it stand out more */
+  font-weight: bold; /* Make the font weight bold */
+  font-family: 'Arial', sans-serif; /* Use a modern, sans-serif font for a clean look */
+}
+.enrolledClass {
+  color: maroon !important;
+}

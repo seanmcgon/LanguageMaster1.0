@@ -1,0 +1,115 @@
+.modal-content {
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  right: 0;
+  background-color: #fff; /* Ensure the background is white for black text to stand out */
+}
+
+.modal-body {
+  padding: 0;
+  height: 100%;
+}
+
+.btn-close {
+  position: absolute;
+  right: 50%;
+  padding: 1em;
+}
+
+.btn-role {
+  color: #881c1c; /* Maroon color for role button */
+}
+
+h1 {
+  font-size: 2.3em;
+  font-weight: bold;
+  color: #000; /* Black color for headings */
+}
+
+.myform {
+  background-color: white;
+  padding: 8em;
+  max-width: 50%;
+  height: 100%;
+  color: #000; /* Black text color */
+  box-shadow: 0 4px 6px 0 rgba(22, 22, 26, 0.18);
+}
+
+@media (max-width: 576px) {
+  .myform {
+    max-width: 100%; /* Updated to ensure form is visible on smaller screens */
+    margin: 0 auto;
+  }
+}
+
+.form-control:focus {
+  box-shadow: inset 0 -1px 0 #7e7e7e;
+  background-color: #f2f2f2 !important; /* Ensure constant grey background on focus */
+  opacity: 100%;
+  color: #000; /* Black text color on focus */
+}
+
+.form-control {
+  background-color: inherit;
+  color: #000; /* Black text color */
+  padding-left: 0;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid #000; /* Black bottom border */
+}
+
+.myform .btn {
+  width: 100%;
+  font-weight: 800;
+  background-color: #881c1c; /* Maroon background for buttons */
+  color: white; /* White text for buttons */
+  border-radius: 0;
+  padding: 0.5em 0;
+}
+
+.myform .btn:hover {
+  background-color: #520e0e; /* Darker maroon on hover */
+  color: grey; /* Maintain white text on hover */
+}
+
+p {
+  text-align: center;
+  padding-top: 2em;
+  color: #000; /* Black text for paragraphs */
+}
+
+p a {
+  color: #881c1c; /* Maroon color for links */
+  text-decoration: none;
+}
+
+p a:hover {
+  color: #520e0e; /* Darker maroon on hover */
+}
+.btn.btn-role.bg-transparent {
+  color: black; /* Black text color */
+  background-color: white; /* Transparent background */
+  border: 1px solid grey; /* Grey border */
+  font-size: 18px; /* Smaller font size */
+  font-weight: bolder; /* Less bold text */
+  transition: background-color 0.3s; /* Smooth transition for background color */
+}
+
+.btn.btn-role.bg-transparent:hover {
+  background-color: #fff; /* White background on hover */
+  color: #000; /* Maintain black text */
+  border-color: #000; /* Black border on hover */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Shadow on hover */
+}
+.grey-background {
+  background-color: #f2f2f2; /* Slight grey background color */
+}
+
+.text-center {
+  color: maroon
+}
+
+.login-button1 {
+  visibility: hidden;
+}
