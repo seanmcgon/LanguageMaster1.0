@@ -77,6 +77,25 @@ async function viewAssignment(className, assignmentName) {
     return cards.map(e => ({ text: e.text, translation: e.translation, audio: e.audio }));
 }
 
+async function getAllAssignments(className) {
+    let assignments = [];
+    try {
+        await client.connect();
+        const db = client.db(className);
+        const col = db.collection("assignments");
+        assignments = await col.find({}).toArray();
+        if (assignments.length === 0) {
+            throw("No assignments found");
+        }
+    } catch (err) {
+        console.log(err);
+    } finally {
+        await client.close();
+    }
+    return assignments.map(e => ({ text: e.text, translation: e.translation, audio: e.audio }));
+}
+
+
 async function deleteAssignment(className, assignmentName) {
     try {
         await client.connect();
@@ -96,5 +115,5 @@ async function deleteAssignment(className, assignmentName) {
 }
 
 module.exports = {
-    createAssignment, addToAssignment, viewAssignment, deleteAssignment, convertAssignmentToDtbForm
+    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments
 };

@@ -64,7 +64,11 @@ const App = () => {
     const handleClassClick = (className) => {
         setCurrentClass(className)
         //getAssignmentsForClass(className)
-        const testAssignments =[
+
+        //TODO: Call getAssignmentsIO from client/src/components/socket.js and pass in the className
+        //Pass a callback fetchedAssignments as a parameter, setCurrentAssignments with this fetchedAssignments
+        //Instead of our dummy data you should see now the database data 
+        const fetchedAssignments =[
             { name: "Lesson 1: Greetings and Introductions", termCount: 15 },
             { name: "Lesson 2: Numbers and Colors", termCount: 17 },
             { name: "Lesson 3: Family and Relationships", termCount: 25 },
@@ -73,7 +77,7 @@ const App = () => {
             { name: "Lesson 6: Food and Dining", termCount: 12 },
           ]
         try {
-            setCurrentAssignments(testAssignments); 
+            setCurrentAssignments(fetchedAssignments); 
         } catch (error) {
             console.error('Error fetching classes:', error);
         }
@@ -82,6 +86,10 @@ const App = () => {
     const handleAssignmentClick = (assignmentName) => {
         setCurrentAssignmentName(assignmentName)
         //getAssignmentsForClass(className)
+
+         //TODO: Call getAssignmentsIO from client/src/components/socket.js and pass in the assignmentName and className (className is set globally as a state)
+        //Pass a callback fetchedAssignment as a parameter, setCurrentAssignment with this fetchedAssignments
+        //Instead of our dummy data you should see now the database data 
         const testAssignment = [
             { wordName: 'Hola', englishTranslation: 'Hello', audioFile: 'hola.mp3' },
             { wordName: 'Buenos días', englishTranslation: 'Good morning', audioFile: 'buenos_dias.mp3' },
@@ -115,7 +123,11 @@ const App = () => {
         getClassesForUser(email);
     };
 
-   
+   const handleCreateAssignment = (assignmentName, assignFields) => {
+        //TODO: Call handleCreateAssignment from client/src/components/socket.js 
+        //Pass a callback createAssignmentStatus as a parameter, log the result
+        //When we go back to assignments we should see the new assignment
+   }
     const handleSignOut = () => {
         setShowLogoutMessage(true);
         setTimeout(() => {
@@ -143,20 +155,21 @@ const App = () => {
       setShowCreateAssignment(false); // Hide CreateAssignment component
     };
     return (
-            <>
-              
+            <>      
         <NavBar isLoggedIn={isLoggedIn} userName={userEmail} onSignOut={handleSignOut} />
         <div>
         {isLoggedIn ? (
     showCreateAssignment ? (
-        <CreateAssignment onBack={handleHideCreateAssignment} />
-    ) : currentAssignment ? (
+        <CreateAssignment 
+          onBack={handleHideCreateAssignment} 
+          onCreateAssignment={handleCreateAssignment} />
+      ) : currentAssignment ? (
         <ViewAssignment
-            lessonName={currentAssignmentName}
-            flashcards={currentAssignment}
-            onBack={goBackToAssignmentList}
+          lessonName={currentAssignmentName}
+          flashcards={currentAssignment}
+          onBack={goBackToAssignmentList}
         />
-    ) : currentClass ? (
+      ) : currentClass ? (
         <ClassAsgmts
             className={currentClass}
             asgmts={currentAssignments}

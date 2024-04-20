@@ -28,8 +28,10 @@ function initSocket(server) {
         createTeacherAccount(socket);
         verifyStudentData(socket);
         createStudentAccount(socket);
-        //call the other functions with socket as they become completed
-        
+        //TODO: add functions for classes here 
+
+        //TODO: add functions for assignment here 
+
         // socket.on('disconnect', () => {
         //     console.log("numClients connected", --numConnected);
         // });

@@ -41,3 +41,5 @@ export const createTeacher = (teacherFirstName, teacherLastName, teacherEmail, t
   socket.emit('createTeacher', teacherFirstName, teacherLastName, teacherEmail, teacherPassword);
   socket.on("createTeacherStatus", teacherCreated);
 };
+
+//TODO: Add functions for createAssignmentIO, viewAssignmentIO and viewAllAssignmentsIO
