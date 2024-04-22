@@ -191,18 +191,50 @@ async function createTeacher(firstName,lastName,teacherEmail, password){
     finally{
       await client.close();
     }
-
-
-    
-
   }
- async function enrollClass(className, classID, studentEmail){
+  
+async function find_class_based_on_ID(classID){
+    await client.connect();
+    db = client.db("UserData");
+    col = await db.collection("teachers");
+   //console.log(getTeacherInfo[0]);
+    const allCoursesPipeline = [
+      {
+        $unwind: {
+           path: "$courseList",
+           preserveNullAndEmptyArrays: false,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          allCourses: {
+            "$push": "$courseList"
+          }
+        }
+      },
+      {'$addFields': {'courseList': {'$setUnion': ['$fcourseList', []]}}}
+    ];
+  
+  // Use query, set output to courses to be used later
+  let courses = await col.aggregate(allCoursesPipeline);
+  // courses is not a variable or list or anything that js can output, it's a MongoDB cursor
+  // This is part of how to access the info in it
+  c = await courses.next();
+  const test = c.allCourses.filter((e) => {
+    const index = e.indexOf("_");
+   return e.substring(index+1, e.length) == classID;
+  })[0];
+  return test;
+  }
+  
+  async function enrollClass(classID, studentEmail){
   try{
-  await client.connect();
+  const neededData =  await find_class_based_on_ID(classID);
+   if(checkValid(neededData)){
+    await client.connect();
   db = client.db("UserData");
   col = await db.collection("students");
-  const neededData = className + "_" + classID;
-  if(checkValid(neededData)){
     let student_Data = await col.find({email: studentEmail}).toArray();
     let student_courses = student_Data[0].courseList;
     if(student_courses.indexOf(neededData) == -1){
@@ -215,19 +247,19 @@ async function createTeacher(firstName,lastName,teacherEmail, password){
     else{
       throw("The class already exist");
     }
-
+  
   }
   else{
     throw("Invalid class");
   }
-} catch(err){
+  } catch(err){
   console.log(err);
-}
-finally{
+   }
+  finally{
   await client.close();
-}
+  }  
+  }
 
-}
 async function deleteAssignment(className,assignmentName){
   try{
   await client.connect();
