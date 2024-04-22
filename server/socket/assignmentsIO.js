@@ -13,20 +13,51 @@ const {
 //TODO: Create assignment should listen for a create assignment event ID, call createAssignment, send back boolean status to the frontend
 //Parameters to listen for: className, assignmentName, assignmentArray
 function createAssignmentIO(socket) {
-  createAssignment()
+  socket.on("createAssignment", async (className, assignmentName, assignFields) => {
+    let assignmentCreated;
+    try {
+      assignmentCreated = await createAssignment(className, assignmentName, assignFields);
+    } catch (error) {
+      console.log("Error creating assignment");
+      assignmentCreated = false;
+    }
+    socket.emit("createAssignmentStatus", assignmentCreated);
+    return assignmentCreated;
+  })
 }
 
 function getAllAssignmentsIO(socket) {
-  getAllAssignments()
+  socket.on("viewAllAssignments", async (className) => {
+    let assignments;
+    try {
+      assignments = await getAllAssignments(className); // I think this function needs attention (returns wrong array of objects)
+    } catch (error) {
+      console.log("Error fetching assignments");
+      assignments = [];
+    }
+    socket.emit("assignmentsFetched", assignments);
+    return assignments;
+  })
 }
 
 //TODO:View assignment should listen for view assignment event ID, call viewAssignment, send back assignment
 //Parameters to listen for: className, assignmentName
 function viewAssignmentIO(socket) {
-  viewAssignment()
+  socket.on("viewAssignment", async (className, assignmentName) => {
+    let assignment;
+    try {
+      assignment = await viewAssignment(className, assignmentName);
+    } catch (error) {
+      console.log("Error fetching assignment");
+      assignment = [];
+    }
+    socket.emit("assignmentFetched", assignment);
+    return assignment;
+  })
 }
 
 
 
 //Call viewAssignmentIO and createAssignmentIO with the socket in socketManager.js
-export {createAssignmentIO, viewAssignmentIO, getAllAssignmentsIO}
+//export {createAssignmentIO, viewAssignmentIO, getAllAssignmentsIO}
+module.exports = {createAssignmentIO, getAllAssignmentsIO, viewAssignmentIO}

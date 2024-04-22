@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:3000');
+const socket = io('http://localhost:3001');
 
 export const connectSocket = () => {
   socket.on("connect", () => {
@@ -43,3 +43,17 @@ export const createTeacher = (teacherFirstName, teacherLastName, teacherEmail, t
 };
 
 //TODO: Add functions for createAssignmentIO, viewAssignmentIO and viewAllAssignmentsIO
+export const createAssignment = (className, assignmentName, assignFields, assignmentCreated) => {
+  socket.emit("createAssignment", className, assignmentName, assignFields);
+  socket.on("createAssignmentStatus", assignmentCreated);
+}
+
+export const viewAllAssignments = (className, fetchedAssignments) => {
+  socket.emit("viewAllAssignments", className);
+  socket.on("assignmentsFetched", fetchedAssignments);
+}
+
+export const viewAssignment = (className, assignmentName, fetchedAssignment) => {
+  socket.emit("viewAssignment", className, assignmentName);
+  socket.on("assignmentFetched", fetchedAssignment);
+}
