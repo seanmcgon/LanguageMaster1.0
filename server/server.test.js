@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 const request = require('supertest');
 const app = require('./index.js'); 
-const { createTeacher, verifyTeacher, createClass, enrollClass, deleteAssignment, deleteFromAssignment } = require('./databaseUsers.js');
+const { createTeacher, verifyTeacher, createClass, enrollClass, deleteAssignment, deleteFromAssignment, find_class_based_on_ID } = require('./databaseUsers.js');
 jest.mock('mongoose')
 
 describe('the function should add new teacher',() =>{
@@ -87,36 +87,36 @@ describe('the function should add new teacher',() =>{
   expect(testTeacher).toBeGreaterThan(-1);
   });
 });
-describe('this suit will test the function Enroll Class',() =>{
-  it('Add a class to a given student course, and vice versa. In this case, the class is not in the student course yet', async() => {
-    const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
-    const client = new MongoClient(connectionString);
-    try{
-    const email = "Troy.Briggs@yahoo.com";
-    const className ="Latin281";
-    const ID = "RXPILU";
-    const class_Full_Name = className + "_" + ID;
-  await enrollClass(className, ID, email);
-  await client.connect();
-  // Test the class is added to student's collection in UserData
-    db = client.db("UserData");
-    col = await db.collection("students");
-  const test_student_course_list = (await col.find({email: email}).toArray())[0].courseList.indexOf(class_Full_Name);
-  expect(test_student_course_list).toBeGreaterThan(-1);
-  // Test the student is added to class's student's collection
-  db1 = client.db(class_Full_Name);
-  col1 = await db1.collection("students");
-  const test_student_list = await col1.find({email: email}).toArray();
-  expect(test_student_list.length).toEqual(1);
-    }
-    catch(error){
-      throw (error);
-    }
-    finally{
-      await client.close();
-    }
-  });
-});
+ describe('this suit will test the function Enroll Class',() =>{
+        it('Add a class to a given student course, and vice versa. In this case, the class is not in the student course yet', async() => {
+          const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
+          const client = new MongoClient(connectionString);
+          try{
+          const email = "Troy.Briggs@yahoo.com";
+          const ID = "RXPILU";
+        await enrollClass(ID, email);
+        // Test the class is added to student's collection in UserData
+          const class_Full_Name = await find_class_based_on_ID(ID);
+          await client.connect(); 
+          db = client.db("UserData");
+            col = await db.collection("students");
+        const test_student_course_list = (await col.find({email: email}).toArray())[0].courseList.indexOf(class_Full_Name);
+        expect(test_student_course_list).toBeGreaterThan(-1);
+        // Test the student is added to class's student's collection
+        db1 = client.db(class_Full_Name);
+        col1 = await db1.collection("students");
+        const test_student_list = await col1.find({email: email}).toArray();
+        expect(test_student_list.length).toEqual(1);
+          }
+          catch(error){
+            throw (error);
+          }
+          finally{
+            await client.close();
+          }
+        });
+      });
+     
 describe('this suit will test the function delete Assignment',() =>{
   it('check the presence of the assingment in the class first, then delete, and check the presence again. In this case, the assignments are already there', async() => {
     const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
