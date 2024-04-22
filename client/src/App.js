@@ -19,7 +19,7 @@ const App = () => {
 //     const [userEmail, setUserEmail] = useState("jyhuang@umass.edu");  // Hardcoded email
 //     const [userName, setUserName] = useState("Jason Huang");  // Hardcoded user name
 
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [classList, setClassList] = useState([]);
     const [userEmail, setUserEmail] = useState("");
     const [userName, setUserName] = useState(""); 
@@ -84,7 +84,9 @@ const App = () => {
         } catch (error) {
             console.error('Error fetching assignments:', error);
         }
-        setTimeout(() => setCurrentAssignments([{ name: "Lesson 1: Greetings and Introductions", termCount: 15 }]), 2000);        
+        
+        // Used this so there was an assignment to try clicking on (for testing handleAssignmentClick)
+        //setTimeout(() => setCurrentAssignments([{ name: "Lesson 1: Greetings and Introductions", termCount: 15 }]), 2000);        
     };
 
     const handleAssignmentClick = (assignmentName) => {
