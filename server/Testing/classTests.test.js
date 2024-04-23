@@ -1,7 +1,10 @@
-//cd into server and run using "npx jest Testing/classTests"
+// cd into server and run using "npx jest Testing/classTests"
+// can also run with "npm test -- classTests.test.js"
 
 const { MongoClient } = require('mongodb');
-const { getClassesTeacher, getClassesStudent, enrollClass } = require('../src/classes.js');
+const { createClass, getClassesTeacher, getClassesStudent, enrollClass, find_class_based_on_ID } = require('../src/classes.js');
+const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
+const client = new MongoClient(connectionString);
 
 jest.mock('mongoose');
 const mongo = require('../src/classes.js');
@@ -30,16 +33,6 @@ describe('Class Management Tests', () => {
           expect(classes).toEqual([]);
         });
       });
-      
-    describe('enrollClass', () => {
-        it('enroll a student in a class not already enrolled', async () => {
-            const email = "Troy.Briggs@yahoo.com";
-            const className = "Latin281";
-            const ID = "RXPILU";
-            const result = await enrollClass(className, ID, email);
-            expect(result).toBe(true);
-        });
-    });
 
     describe("getStudentsInClass", () => {
         it("Gets students from existing class", async () => {
@@ -73,10 +66,8 @@ describe('Class Management Tests', () => {
         })
       })
 
-      describe('this suit will test the function createClass',() =>{
+      describe('createClass',() =>{
         it('Add a class to a given teacher, and vice versa. In this case, the class already existed', async() => {
-          const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
-          const client = new MongoClient(connectionString);
           const email = "jyhuang@umass.edu";
           const className ="Vietnamese219_VJTCBB"; 
         await createClass(className, email);
@@ -89,14 +80,13 @@ describe('Class Management Tests', () => {
         const testClassDataBase = await col1.find({email:email}).toArray();
         expect(testTeacher).toBeGreaterThan(-1);
         expect(testClassDataBase.length).toBeGreaterThan(0);
+        await client.close();
         });
       
         // test case 2
         
         it('Add a class to a given teacher, and vice versa. In this case, the class does not exist', async() => {
           
-          const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
-          const client = new MongoClient(connectionString);
           await client.connect();
           const email = "jyhuang@umass.edu";
           const className ="LeageOfLegend_101";
@@ -104,6 +94,8 @@ describe('Class Management Tests', () => {
          db = client.db("UserData");
           col = await db.collection("teachers");
           const testTeacher = (await col.find({email: email}).toArray())[0].courseList.indexOf(className);
+          await col.deleteOne({email: email});
+          await client.close();
         
         //const testClassDataBase = await col1.find({email:email}).toArray();
         //await client.close();
@@ -111,27 +103,24 @@ describe('Class Management Tests', () => {
         });
       });
       
-      describe('this suit will test the function Enroll Class',() =>{
+      describe('enrollClass',() => {
         it('Add a class to a given student course, and vice versa. In this case, the class is not in the student course yet', async() => {
-          const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
-          const client = new MongoClient(connectionString);
           try{
-          const email = "Troy.Briggs@yahoo.com";
-          const className ="Latin281";
-          const ID = "RXPILU";
-          const class_Full_Name = className + "_" + ID;
-        await enrollClass(className, ID, email);
-        await client.connect();
-        // Test the class is added to student's collection in UserData
-          db = client.db("UserData");
-          col = await db.collection("students");
-        const test_student_course_list = (await col.find({email: email}).toArray())[0].courseList.indexOf(class_Full_Name);
-        expect(test_student_course_list).toBeGreaterThan(-1);
-        // Test the student is added to class's student's collection
-        db1 = client.db(class_Full_Name);
-        col1 = await db1.collection("students");
-        const test_student_list = await col1.find({email: email}).toArray();
-        expect(test_student_list.length).toEqual(1);
+            const email = "Troy.Briggs@yahoo.com";
+            const ID = "RXPILU";
+            await enrollClass(ID, email);
+            // Test the class is added to student's collection in UserData
+            const class_Full_Name = await find_class_based_on_ID(ID);
+            await client.connect(); 
+            db = client.db("UserData");
+            col = await db.collection("students");
+            const test_student_course_list = (await col.find({email: email}).toArray())[0].courseList.indexOf(class_Full_Name);
+            expect(test_student_course_list).toBeGreaterThan(-1);
+            // Test the student is added to class's student's collection
+            db1 = client.db(class_Full_Name);
+            col1 = await db1.collection("students");
+            const test_student_list = await col1.find({email: email}).toArray();
+            expect(test_student_list.length).toEqual(1);
           }
           catch(error){
             throw (error);
@@ -140,6 +129,5 @@ describe('Class Management Tests', () => {
             await client.close();
           }
         });
-      });
-     
+      });     
 });
