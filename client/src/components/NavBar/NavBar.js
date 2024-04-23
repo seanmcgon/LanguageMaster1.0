@@ -7,7 +7,7 @@ import AboutComponent from '../About/about';
 import { Modal } from 'bootstrap';
 import { Dropdown } from 'react-bootstrap';
 
-function NavBar({ isLoggedIn, userName, onSignOut }) {
+function NavBar({ onCreateClass, isLoggedIn, userName, onSignOut }) {
     const [showCreateClassModal, setCreateClassModal] = useState(false);
     const [showJoinClassModal, setJoinClassModal] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
@@ -82,7 +82,7 @@ function NavBar({ isLoggedIn, userName, onSignOut }) {
                 </div>
 
                 {/* Modals */}
-                <CreateClassPopup show={showCreateClassModal} onHide={() => setCreateClassModal(false)} />
+                <CreateClassPopup onCreateClass={onCreateClass} show={showCreateClassModal} onHide={() => setCreateClassModal(false)} />
                 <JoinClassPopup show={showJoinClassModal} onHide={() => setJoinClassModal(false)} />
             </nav>
             {showAbout && <AboutComponent />}

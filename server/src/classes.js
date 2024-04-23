@@ -5,11 +5,11 @@ const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.t
 const client = new MongoClient(connectionString);
 
 function checkValid(className) {
-    const regex = /^[^ ]+\_[^ ]{1,6}$/;
-    if (className.match(regex)) {
-        return true;
-    }
-    return false;
+    // const regex = /^[^ ]+\_[^ ]{1,6}$/;
+    // if (className.match(regex)) {
+    //     return true;
+    // }
+    return true;
 }
 
 async function getStudentsInClass(className) {
@@ -56,8 +56,8 @@ async function createClass(className, teacherEmail) {
         db = client.db("UserData");
         col = await db.collection("teachers");
         const checkTheValidOfClassName = checkValid(className);
-        if (checkTheValidOfClassName) {
-            if ((await col.find({ email: teacherEmail }).toArray()).length === 1) {
+        if (true) {
+            if ((await col.find({ email: teacherEmail }).toArray()).length >= 1) {
                 updateClassForGivenTeacher(col, teacherEmail, className);
                 let getTeacherInfo = await col.find({ email: teacherEmail }).toArray();
                 db1 = client.db(className);
@@ -68,6 +68,7 @@ async function createClass(className, teacherEmail) {
                     await col1.deleteOne({ email: teacherEmail });
                     await col1.insertOne(getTeacherInfo[0]);
                 }
+            return true;
             } else {
                 throw("Teacher does not exist");
             }
@@ -79,6 +80,7 @@ async function createClass(className, teacherEmail) {
     } finally {
         await client.close();
     }
+    return false;
 }
 
 async function updateClassForGivenTeacher(col, teacherEmail, className) {
@@ -139,6 +141,7 @@ async function getClassesTeacher(teacherEmail) {
             } else {
                 throw("The class already exists");
             }
+            return true;
         } else {
             throw("Invalid class");
         }
@@ -147,6 +150,7 @@ async function getClassesTeacher(teacherEmail) {
     } finally {
         await client.close();
     }
+    return false;
 }
 module.exports = {
     enrollClass, getClassesStudent, getClassesTeacher, createClass, getStudentsInClass, getTeachersInClass, updateClassForGivenTeacher

@@ -2,7 +2,7 @@ const { Server } = require("socket.io");
 const { verifyTeacherData, createTeacherAccount, verifyStudentData, createStudentAccount} = require("./userIO");
 //TODO: Add imports for classesIO, and assignmentsIO
 const {createAssignmentIO, getAllAssignmentsIO, viewAssignmentIO} = require("./assignmentsIO");
-
+const {createClassIO, getClassesIO, enrollClassIO} = require("./classesIO")
 
 function initSocket(server) {
     //create a new WebSocket server, io, that is attached to the existing HTTP server created in index.js
@@ -29,6 +29,10 @@ function initSocket(server) {
         createStudentAccount(socket);
         //TODO: add functions for classes here 
 
+        createClassIO(socket)
+        getClassesIO(socket)
+        enrollClassIO(socket)
+    
         //TODO: add functions for assignment here 
         createAssignmentIO(socket);
         getAllAssignmentsIO(socket);
