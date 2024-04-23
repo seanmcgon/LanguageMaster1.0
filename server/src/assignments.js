@@ -47,8 +47,16 @@ async function addToAssignment(className, assignmentName, card) {
     try {
         await client.connect();
         const db = client.db(className);
-        const col = db.collection("assignments");
+        let col = db.collection("teachers");
+        const teachers = await col.find().toArray();
+        if(teachers.length === 0){
+            throw("Class does not exist");
+        }
+        col = db.collection("assignments");
         const cardNum = (await col.find({ assignment: assignmentName }).toArray()).length;
+        if(cardNum === 0){
+            throw("Assignment does not exist");
+        }
         await col.insertOne({ assignment: assignmentName, card: cardNum, ...card });
         inserted = true;
     } catch (err) {
@@ -100,7 +108,13 @@ async function viewAssignment(className, assignmentName) {
     try {
         await client.connect();
         const db = client.db(className);
-        const col = db.collection("assignments");
+        let col = db.collection("teachers");
+        const teachers = await col.find().toArray();
+        // If there are no teachers assigned to the class, then it doesn't exist
+        if(teachers.length === 0){
+            throw("Class does not exist");
+        }
+        col = db.collection("assignments");
         cards = await col.find({ assignment: assignmentName }).toArray();
         if (cards.length === 0) {
             throw("Assignment does not exist");
@@ -132,6 +146,35 @@ async function deleteAssignment(className, assignmentName) {
     }
 }
 
+async function deleteFromAssignment(className,assignmentName,flashcard_Object){
+    try{
+      await client.connect();
+      if(checkValid(className)){
+        db = client.db(className);
+        col = await db.collection("assignments");
+        const presence = await col.find({assignment: assignmentName}).toArray();
+        if(presence.length >0){
+          await col.deleteMany({$and: [{assignment: assignmentName},{text: flashcard_Object.text}, {translation: flashcard_Object.translation},{audio: flashcard_Object.audio}]})
+        console.log("Done!!!");
+        }
+        else{
+          throw("No data");
+        }
+      }
+      else{
+        throw("Invalid className");
+      }
+
+    }
+    catch(err){
+      console.log(err);
+    }
+    finally{
+      await client.close();
+    }
+
+  }
+
 module.exports = {
-    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments
+    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment
 };
