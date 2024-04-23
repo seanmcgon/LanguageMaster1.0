@@ -36,9 +36,9 @@ function convertAssignmentToDtbForm(assignmentName, assignmentArray) {
     return assignmentArray.map((flashcard, index) => ({
         assignment: assignmentName,
         card: index,
-        text: flashcard.text,
-        translation: flashcard.translation,
-        audio: flashcard.audio
+        text: flashcard.wordName,  // Changed from flashcard.text to flashcard.wordName
+        translation: flashcard.englishTranslation,  // Changed from flashcard.translation to flashcard.englishTranslation
+        audio: flashcard.audioFile  // Changed from flashcard.audio to flashcard.audioFile
     }));
 }
 
@@ -59,6 +59,42 @@ async function addToAssignment(className, assignmentName, card) {
     return inserted;
 }
 
+async function getAllAssignments(className) {
+    let assignmentSummary = [];
+    try {
+        await client.connect();
+        const db = client.db(className);
+        const col = db.collection("assignments");
+
+        // Aggregation pipeline to group by assignment and count terms
+        assignmentSummary = await col.aggregate([
+            {
+                $group: {
+                    _id: "$assignment",  // Grouping by the assignment name
+                    termCount: { $count: {} }  // Counting the number of documents (cards) in each group
+                }
+            },
+            {
+                $project: {
+                    _id: 0, // Excluding the _id from the results
+                    name: "$_id", // Mapping the _id (which is the assignment name) to 'name'
+                    termCount: 1 // Including the term count
+                }
+            }
+        ]).toArray();
+
+        if (assignmentSummary.length === 0) {
+            throw new Error("No assignments found");
+        }
+    } catch (err) {
+        console.log(err);
+    } finally {
+        await client.close();
+    }
+    return assignmentSummary;
+}
+
+
 async function viewAssignment(className, assignmentName) {
     let cards = [];
     try {
@@ -74,25 +110,7 @@ async function viewAssignment(className, assignmentName) {
     } finally {
         await client.close();
     }
-    return cards.map(e => ({ text: e.text, translation: e.translation, audio: e.audio }));
-}
-
-async function getAllAssignments(className) {
-    let assignments = [];
-    try {
-        await client.connect();
-        const db = client.db(className);
-        const col = db.collection("assignments");
-        assignments = await col.find({}).toArray();
-        if (assignments.length === 0) {
-            throw("No assignments found");
-        }
-    } catch (err) {
-        console.log(err);
-    } finally {
-        await client.close();
-    }
-    return assignments.map(e => ({ text: e.text, translation: e.translation, audio: e.audio }));
+    return cards.map(e => ({ wordName: e.text, englishTranslation: e.translation, audioFile: e.audio }));
 }
 
 
