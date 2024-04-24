@@ -62,29 +62,6 @@ const App = () => {
 
     const handleAssignmentClick = (assignmentName) => {
         setCurrentAssignmentName(assignmentName)
-        //getAssignmentsForClass(className)
-
-         //TODO: Call getAssignmentsIO from client/src/components/socket.js and pass in the assignmentName and className (className is set globally as a state)
-        //Pass a callback fetchedAssignment as a parameter, setCurrentAssignment with this fetchedAssignments
-        //Instead of our dummy data you should see now the database data 
-        // const testAssignment = [
-        //     { wordName: 'Hola', englishTranslation: 'Hello', audioFile: 'hola.mp3' },
-        //     { wordName: 'Buenos días', englishTranslation: 'Good morning', audioFile: 'buenos_dias.mp3' },
-        //     { wordName: 'Buenas tardes', englishTranslation: 'Good afternoon', audioFile: 'buenas_tardes.mp3' },
-        //     { wordName: 'Buenas noches', englishTranslation: 'Good night', audioFile: 'buenas_noches.mp3' },
-        //     { wordName: 'Por favor', englishTranslation: 'Please', audioFile: 'por_favor.mp3' },
-        //     { wordName: 'Gracias', englishTranslation: 'Thank you', audioFile: 'gracias.mp3' },
-        //     { wordName: 'De nada', englishTranslation: 'You’re welcome', audioFile: 'de_nada.mp3' },
-        //     { wordName: 'Perdón', englishTranslation: 'Excuse me', audioFile: 'perdon.mp3' },
-        //     { wordName: 'Lo siento', englishTranslation: 'Sorry', audioFile: 'lo_siento.mp3' },
-        //     { wordName: 'Sí', englishTranslation: 'Yes', audioFile: 'si.mp3' },
-        //     { wordName: 'No', englishTranslation: 'No', audioFile: 'no.mp3' },
-        //     { wordName: '¿Cómo te llamas?', englishTranslation: 'What is your name?', audioFile: 'como_te_llamas.mp3' },
-        //     { wordName: 'Me llamo...', englishTranslation: 'My name is...', audioFile: 'me_llamo.mp3' },
-        //     { wordName: '¿Cómo estás?', englishTranslation: 'How are you?', audioFile: 'como_estas.mp3' },
-        //     { wordName: 'Estoy bien, gracias', englishTranslation: 'I’m fine, thank you', audioFile: 'estoy_bien_gracias.mp3' },
-            
-        //   ];
         
         try {
             viewAssignment(currentClass, assignmentName, (fetchedAssignment) => {
@@ -109,7 +86,7 @@ const App = () => {
         createAssignment(currentClass, assignmentObject.title, assignmentObject.assignFields, (createAssignmentStatus) => {
             if (createAssignmentStatus) {
                 console.log("Assignment created successfully"); 
-                handleClassClick(currentClass)               
+                getClassesForUser(userEmail)               
             } else {
                 console.log("Error creating assignment");
             }
