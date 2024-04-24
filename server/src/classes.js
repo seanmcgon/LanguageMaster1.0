@@ -5,11 +5,11 @@ const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.t
 const client = new MongoClient(connectionString);
 
 function checkValid(className) {
-    const regex = /^[^ ]+\_[^ ]{1,6}$/;
-    if (className.match(regex)) {
-        return true;
-    }
-    return false;
+    // const regex = /^[^ ]+\_[^ ]{1,6}$/;
+    // if (className.match(regex)) {
+    //     return true;
+    // }
+    return true;
 }
 
 async function getStudentsInClass(className) {

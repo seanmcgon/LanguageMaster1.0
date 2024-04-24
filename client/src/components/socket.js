@@ -57,3 +57,25 @@ export const viewAssignment = (className, assignmentName, fetchedAssignment) => 
   socket.emit("viewAssignment", className, assignmentName);
   socket.on("assignmentFetched", fetchedAssignment);
 }
+
+
+//TODO: Add functions for classes
+
+export const createClass = (className, teacherEmail, classCreated) => {
+  socket.emit("createClass", className, teacherEmail);
+  socket.on("createClassStatus", classCreated);
+}
+
+export const enrollInClass = (className, classID, studentEmail, enrolledInClass) => {
+  socket.emit("enrollClass", className, classID, studentEmail);
+  socket.on("enrollClassStatus", enrolledInClass);
+}
+
+export const getClasses = (email, teacherBool, fetchedClasses) => {
+  socket.emit("getClasses", email, teacherBool);
+  socket.on("getClassesStatus", fetchedClasses);
+}
+
+
+
+

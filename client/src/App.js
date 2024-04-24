@@ -11,82 +11,53 @@ import { Modal } from 'bootstrap';
 import ClassAsgmts from './components/ClassAssignments/classAsgmts.js';
 import ViewAssignment from './components/viewAssignments/viewAssignments.js';
 import { createAssignment, viewAllAssignments, viewAssignment } from './components/socket.js';
+import { createClass, getClasses, enrollInClass } from './components/socket.js';
 
 const App = () => {
-//   //development credentials
-//     const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
-//     const [classList, setClassList] = useState([]);
-//     const [userEmail, setUserEmail] = useState("jyhuang@umass.edu");  // Hardcoded email
-//     const [userName, setUserName] = useState("Jason Huang");  // Hardcoded user name
+  //development credentials
+    const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
+    const [userEmail, setUserEmail] = useState("jasonhuang1685@umass.edu");  // Hardcoded email
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    // const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [classList, setClassList] = useState([]);
-    const [userEmail, setUserEmail] = useState("");
+    // const [userEmail, setUserEmail] = useState("");
     const [userName, setUserName] = useState(""); 
     const [currentClass, setCurrentClass] = useState(""); 
     const [currentAssignments, setCurrentAssignments] = useState([]); 
     const [currentAssignment, setCurrentAssignment] = useState(""); 
     const [currentAssignmentName, setCurrentAssignmentName] = useState(""); 
     const [showCreateAssignment, setShowCreateAssignment] = useState(false);
+    const [isTeacher, setIsTeacher] = useState(true);
 
     useEffect(() => {
       getClassesForUser(userEmail);  // Fetch classes for the hardcoded user
     }, []);  // Empty dependency array to run only on mount
   
     const [showLogoutMessage, setShowLogoutMessage] = useState(false);
-
-    function getClassesHelper(userEmail) {
-        const classesTest = [
-            {
-                title: "Spanish 110",
-                link: null,
-            },
-            {
-                title: "Chinese 187",
-                link: null,
-            },
-            {
-                title: "French 220",
-                link: null,
-            },
-        ];
-        return () => classesTest;
-    }
     
     const getClassesForUser = (userEmail) => {
-        const testClass = getClassesHelper(userEmail);
-        try {
-            setClassList(testClass()); 
-        } catch (error) {
-            console.error('Error fetching classes:', error);
-        }
+        getClasses(userEmail, true, (fetchedClasses) => {
+            setClassList(()=> fetchedClasses);
+        })
     };
 
-    const handleClassClick = (className) => {
-        setCurrentClass(className)
-        //getAssignmentsForClass(className)
+    useEffect(() => {
+        console.log("Updated currentClass is:", currentClass);
+        // You can perform additional actions here when currentClass updates
+    }, [currentClass]); // This effect runs when currentClass changes
 
-        //TODO: Call getAssignmentsIO from client/src/components/socket.js and pass in the className
-        //Pass a callback fetchedAssignments as a parameter, setCurrentAssignments with this fetchedAssignments
-        //Instead of our dummy data you should see now the database data 
-        // const fetchedAssignments =[
-        //     { name: "Lesson 1: Greetings and Introductions", termCount: 15 },
-        //     { name: "Lesson 2: Numbers and Colors", termCount: 17 },
-        //     { name: "Lesson 3: Family and Relationships", termCount: 25 },
-        //     { name: "Lesson 4: Daily Routines", termCount: 21 },
-        //     { name: "Lesson 5: Describing People and Places", termCount: 10 },
-        //     { name: "Lesson 6: Food and Dining", termCount: 12 },
-        //   ]
+    const handleClassClick = (className) => {
+        setCurrentClass(className);  
+
+        console.log("currentClass set as", className);
+
         try {
-            viewAllAssignments(currentClass, (fetchedAssignments) => {
+            viewAllAssignments(className, (fetchedAssignments) => {
                 setCurrentAssignments(fetchedAssignments);
-            })
+            });
         } catch (error) {
             console.error('Error fetching assignments:', error);
         }
-        
-        // Used this so there was an assignment to try clicking on (for testing handleAssignmentClick)
-        //setTimeout(() => setCurrentAssignments([{ name: "Lesson 1: Greetings and Introductions", termCount: 15 }]), 2000);        
     };
 
     const handleAssignmentClick = (assignmentName) => {
@@ -116,7 +87,7 @@ const App = () => {
         //   ];
         
         try {
-            viewAssignment(currentClass, currentAssignmentName, (fetchedAssignment) => {
+            viewAssignment(currentClass, assignmentName, (fetchedAssignment) => {
                 setCurrentAssignment(fetchedAssignment);
             }) 
         } catch (error) {
@@ -131,13 +102,14 @@ const App = () => {
         getClassesForUser(email);
     };
 
-   const handleCreateAssignment = (assignmentName, assignFields) => {
+   const handleCreateAssignment = (assignmentObject) => {
         //TODO: Call handleCreateAssignment from client/src/components/socket.js 
         //Pass a callback createAssignmentStatus as a parameter, log the result
         //When we go back to assignments we should see the new assignment
-        createAssignment(currentClass, assignmentName, assignFields, (createAssignmentStatus) => {
+        createAssignment(currentClass, assignmentObject.title, assignmentObject.assignFields, (createAssignmentStatus) => {
             if (createAssignmentStatus) {
-                console.log("Assignment created successfully");
+                console.log("Assignment created successfully"); 
+                handleClassClick(currentClass)               
             } else {
                 console.log("Error creating assignment");
             }
@@ -167,46 +139,59 @@ const App = () => {
       setShowCreateAssignment(true);  // Show CreateAssignment component
     };
   
-   const handleHideCreateAssignment = () => {
+    const handleHideCreateAssignment = () => {
       setShowCreateAssignment(false); // Hide CreateAssignment component
     };
+
+    const handleCreateClass = (className) => {
+        try {
+         createClass(className, userEmail, (classCreated) => {
+                console.log("classCreated")
+            })
+        }
+        catch {
+            console.log("error in creating class")
+        }
+    }
+
     return (
-            <>      
-        <NavBar isLoggedIn={isLoggedIn} userName={userEmail} onSignOut={handleSignOut} />
-        <div>
-        {isLoggedIn ? (
-    showCreateAssignment ? (
-        <CreateAssignment 
-          onBack={handleHideCreateAssignment} 
-          onCreateAssignment={handleCreateAssignment} />
-      ) : currentAssignment ? (
-        <ViewAssignment
-          lessonName={currentAssignmentName}
-          flashcards={currentAssignment}
-          onBack={goBackToAssignmentList}
-        />
-      ) : currentClass ? (
-        <ClassAsgmts
-            className={currentClass}
-            asgmts={currentAssignments}
-            onAssignmentClick={handleAssignmentClick}
-            onBack={goBackToClassView}
-            onCreateAssignmentClick={handleShowCreateAssignment}
-        />
-    ) : (
-        <ClassMenu classes={classList} onClassClick={handleClassClick} />
-    )
-) : (
-                <>
-                    <Login onLoginSuccess={handleLoginSuccess} />
-                    <SignUp onLoginSuccess={handleLoginSuccess} />
-                    <Banner handleClick={() => {
-                        const signUpModal = new Modal(document.getElementById('SignUpForm'));
-                        signUpModal.show();
-                    }} />
-                </>
-            )}
-        </div>
+        <>
+            <NavBar onCreateClass = {handleCreateClass} isLoggedIn={isLoggedIn} userName={userEmail} onSignOut={handleSignOut} />
+            <div>
+                {isLoggedIn ? (
+                    showCreateAssignment ? (
+                        <CreateAssignment 
+                            onBack={handleHideCreateAssignment} 
+                            onCreateAssignment={handleCreateAssignment} 
+                        />
+                    ) : currentAssignment ? (
+                        <ViewAssignment
+                            lessonName={currentAssignmentName}
+                            flashcards={currentAssignment}
+                            onBack={goBackToAssignmentList}
+                        />
+                    ) : currentClass ? (
+                        <ClassAsgmts
+                            className={currentClass}
+                            asgmts={currentAssignments}
+                            onAssignmentClick={handleAssignmentClick}
+                            onBack={goBackToClassView}
+                            onCreateAssignmentClick={handleShowCreateAssignment}
+                        />
+                    ) : (
+                        <ClassMenu classes={classList} onClassClick={handleClassClick} />
+                    )
+                ) : (
+                    <>
+                        <Login onLoginSuccess={handleLoginSuccess} />
+                        <SignUp onLoginSuccess={handleLoginSuccess} />
+                        <Banner handleClick={() => {
+                            const signUpModal = new Modal(document.getElementById('SignUpForm'));
+                            signUpModal.show();
+                        }} />
+                    </>
+                )}
+            </div>
             {showLogoutMessage && (
                 <div className="logout-message">
                     Logging out...
@@ -214,9 +199,8 @@ const App = () => {
             )}
         </>
     );
-    
 }
-
+    
 
 
 export default App;

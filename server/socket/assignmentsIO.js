@@ -9,11 +9,13 @@ const {
 //TODO:write the IO functions for all functions above
 //Remember to console log the results in the backend and frontend for testing
 
+//Finished by Sean 4/22/2024
 
 //TODO: Create assignment should listen for a create assignment event ID, call createAssignment, send back boolean status to the frontend
 //Parameters to listen for: className, assignmentName, assignmentArray
 function createAssignmentIO(socket) {
   socket.on("createAssignment", async (className, assignmentName, assignFields) => {
+    console.log("className:", className, "assignmentName", assignmentName, "assignmentArray", assignFields)
     let assignmentCreated;
     try {
       assignmentCreated = await createAssignment(className, assignmentName, assignFields);
@@ -22,12 +24,15 @@ function createAssignmentIO(socket) {
       assignmentCreated = false;
     }
     socket.emit("createAssignmentStatus", assignmentCreated);
+    console.log("createAssignment was called and returned", assignmentCreated)
+
     return assignmentCreated;
   })
 }
 
 function getAllAssignmentsIO(socket) {
   socket.on("viewAllAssignments", async (className) => {
+    console.log(className)
     let assignments;
     try {
       assignments = await getAllAssignments(className); // I think this function needs attention (returns wrong array of objects)
@@ -36,6 +41,8 @@ function getAllAssignmentsIO(socket) {
       assignments = [];
     }
     socket.emit("assignmentsFetched", assignments);
+    console.log("getAllAssignments called and returned", assignments)
+
     return assignments;
   })
 }
@@ -44,6 +51,8 @@ function getAllAssignmentsIO(socket) {
 //Parameters to listen for: className, assignmentName
 function viewAssignmentIO(socket) {
   socket.on("viewAssignment", async (className, assignmentName) => {
+    console.log("className", className, "assignmentName", assignmentName)
+
     let assignment;
     try {
       assignment = await viewAssignment(className, assignmentName);
@@ -52,6 +61,8 @@ function viewAssignmentIO(socket) {
       assignment = [];
     }
     socket.emit("assignmentFetched", assignment);
+    console.log("viewAssignment called and returned", assignment)
+
     return assignment;
   })
 }

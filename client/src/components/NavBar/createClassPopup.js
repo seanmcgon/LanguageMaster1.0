@@ -1,58 +1,36 @@
-import React from "react";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
-import { useState } from "react";
-
-function create(className, setInput, submitToServer, hidePopup, showError) {
-  if (className.length < 1 || className.length > 50) {
-    showError(true);
-    setInput("");
-    return;
-  }
-  // const result = submitToServer(className);
-  // if (result) {
-  //   showError(false);
-  //   setInput("");
-  //   hidePopup();
-  // } else {
-  //   showError(true);
-  //   setInput("");
-  // }
-}
+import React, { useState } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
 
 export default function CreateClassPopup(props) {
   const [input, setInput] = useState("");
   const [showError, setShowError] = useState(false);
-  const { handleSubmission, ...restProps } = props;
+  const { onCreateClass, onHide, ...restProps } = props;
+
+  const handleCreate = (e) => {
+    e.preventDefault();
+    if (input.length < 1 || input.length > 50) {
+      setShowError(true);  // Show error if class name is invalid
+      setInput("");         // Clear the input after showing error
+    } else {
+      onCreateClass(input); // Call the function passed from the parent component
+      setInput("");         // Clear the input on successful creation
+      setShowError(false);  // Reset error state
+      onHide();             // Hide the popup modal
+    }
+  };
 
   return (
-    <Modal
-      {...restProps}
-      centered
-      onEnter={() => {
-        setInput("");
-        setShowError(false);
-      }}
-    >
+    <Modal {...restProps} centered onEnter={() => {
+      setInput("");
+      setShowError(false);
+    }}>
       <Modal.Header closeButton>
         <Modal.Title className="popupTitle" id="contained-modal-title-vcenter">
           Create New Class
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            create(
-              input,
-              setInput,
-              handleSubmission,
-              restProps.onHide,
-              setShowError
-            );
-          }}
-        >
+        <Form onSubmit={handleCreate}>
           <Form.Label htmlFor="className">Name your class:</Form.Label>
           <Form.Control
             type="text"
@@ -63,18 +41,18 @@ export default function CreateClassPopup(props) {
             autoComplete="off"
           />
           {showError && (
-            <p id="invalidClass">
-              Class name is invalid or already exists. Please try again
+            <p id="invalidClass" className="text-danger">
+              Class name is invalid or already exists. Please try again.
             </p>
           )}
           <Form.Text id="helpBlock" muted>
-            {/* Must be 1-50 characters */}
+            Class names must be 1-50 characters long.
           </Form.Text>
-          <br/> <br/>
-          <Button className = "createButton" type="submit">
+          <br/><br/>
+          <Button className="createButton" type="submit">
             Create Class
           </Button>
-        </form>
+        </Form>
       </Modal.Body>
     </Modal>
   );
