@@ -4,6 +4,7 @@ const { TextEncoder } = require('util');
 const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
 const client = new MongoClient(connectionString);
 
+// Quoc
 function checkValid(className) {
     const regex = /^[^ ]+\_[^ ]{1,6}$/;
     if (className.match(regex)) {
@@ -12,6 +13,7 @@ function checkValid(className) {
     return false;
 }
 
+// Shuto
 async function createAssignment(className, assignmentName, assignmentArray) {
     let createdAssignment = false;
     try {
@@ -32,6 +34,7 @@ async function createAssignment(className, assignmentName, assignmentArray) {
     return createdAssignment;
 }
 
+// Shuto
 function convertAssignmentToDtbForm(assignmentName, assignmentArray) {
     return assignmentArray.map((flashcard, index) => ({
         assignment: assignmentName,
@@ -42,6 +45,7 @@ function convertAssignmentToDtbForm(assignmentName, assignmentArray) {
     }));
 }
 
+// Maya
 async function addToAssignment(className, assignmentName, card) {
     let inserted = false;
     try {
@@ -102,7 +106,7 @@ async function getAllAssignments(className) {
     return assignmentSummary;
 }
 
-
+// Maya
 async function viewAssignment(className, assignmentName) {
     let cards = [];
     try {
@@ -127,7 +131,7 @@ async function viewAssignment(className, assignmentName) {
     return cards.map(e => ({ wordName: e.text, englishTranslation: e.translation, audioFile: e.audio }));
 }
 
-
+// Quoc
 async function deleteAssignment(className, assignmentName) {
     try {
         await client.connect();
@@ -146,6 +150,7 @@ async function deleteAssignment(className, assignmentName) {
     }
 }
 
+// Quoc
 async function deleteFromAssignment(className,assignmentName,flashcard_Object){
     try{
       await client.connect();

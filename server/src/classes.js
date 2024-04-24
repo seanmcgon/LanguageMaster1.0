@@ -4,14 +4,16 @@ const { TextEncoder } = require('util');
 const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
 const client = new MongoClient(connectionString);
 
+// Quoc
 function checkValid(className) {
-    // const regex = /^[^ ]+\_[^ ]{1,6}$/;
-    // if (className.match(regex)) {
-    //     return true;
-    // }
+    const regex = /^[^ ]+\_[^ ]{1,6}$/;
+    if (className.match(regex)) {
+        return true;
+    }
     return true;
 }
 
+// Maya
 async function getStudentsInClass(className) {
     let students = [];
     try {
@@ -32,6 +34,7 @@ async function getStudentsInClass(className) {
     return students;
 }
 
+// Maya
 async function getTeachersInClass(className) {
     let teachers = [];
     try {
@@ -50,6 +53,7 @@ async function getTeachersInClass(className) {
     return teachers;
 }
 
+// Quoc
 async function createClass(className, teacherEmail){
     // Add class to the teacher's course List
     try{
@@ -144,6 +148,7 @@ async function createClass(className, teacherEmail){
     }
   }
 
+  // Quoc
 async function updateClassForGivenTeacher(col, teacherEmail, className) {
     let courseL = await col.find({ email: teacherEmail }).toArray();
     let originalCourse = courseL[0].courseList;
@@ -152,6 +157,8 @@ async function updateClassForGivenTeacher(col, teacherEmail, className) {
     }
     await col.updateOne({ email: teacherEmail }, { $set: { courseList: originalCourse } });
 }
+
+// Shuto
 async function getClassesTeacher(teacherEmail) {
     try {
       await client.connect();
@@ -168,6 +175,7 @@ async function getClassesTeacher(teacherEmail) {
     }
   }
   
+  // Shuto
   async function getClassesStudent(studentEmail) {
     try {
       await client.connect();
@@ -184,6 +192,7 @@ async function getClassesTeacher(teacherEmail) {
     }
   }
 
+  // Quoc
   async function find_class_based_on_ID(classID){
     await client.connect();
     db = client.db("UserData");
@@ -219,6 +228,7 @@ async function getClassesTeacher(teacherEmail) {
   return test;
   }
 
+  // Quoc
   async function enrollClass(classID, studentEmail){
     try{
     const neededData =  await find_class_based_on_ID(classID);
