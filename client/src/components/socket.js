@@ -76,6 +76,11 @@ export const getClasses = (email, teacherBool, fetchedClasses) => {
   socket.on("getClassesStatus", fetchedClasses);
 }
 
+//TODO: Sean- Add getFlashcardListForAssignment(className, assignmentName, fetchedAssignment)
+
+//TODO: Sean- Add getFeedback
+
+
 
 
 

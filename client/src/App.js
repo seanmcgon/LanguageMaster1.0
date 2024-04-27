@@ -29,6 +29,11 @@ const App = () => {
     const [showCreateAssignment, setShowCreateAssignment] = useState(false);
     const [isTeacher, setIsTeacher] = useState(true);
 
+    const [curWord, setCurrentWord]= useState("")
+    const [curAverage, setCurrentAverage] = useState("")
+    const [attemptScore, setAttemptScore] = useState("")
+    //TODO: Use these globals for the flashcard IO
+
     useEffect(() => {
       getClassesForUser(userEmail);  // Fetch classes for the hardcoded user
     }, []);  // Empty dependency array to run only on mount
@@ -61,6 +66,9 @@ const App = () => {
     };
 
     const handleAssignmentClick = (assignmentName) => {
+        //TODO: Sean- if isTeacher use current logic, else we want to retrieve student grades
+        //Instead of just three fields (word, translation, audio), we want to have word, translation, audio, and student score (double)
+        //You may just copy assignmentView component and modify it or modify assignmentView itself, whatever you feel is easiest 
         setCurrentAssignmentName(assignmentName)
         
         try {
@@ -72,6 +80,11 @@ const App = () => {
         }
     };
 
+    const handleFeedbackClick = (curWord, audioFile ) => {
+        //TODO: Sean- pass these in, have a callback(s) which will be these three things: attemptScore(double), newAverage(double), transcription(string)
+        //Set the states of these three things, we will link this with the flashcard UI
+    };
+
     const handleLoginSuccess = (email, name) => {
         setIsLoggedIn(true);
         setUserEmail(email);
@@ -80,9 +93,7 @@ const App = () => {
     };
 
    const handleCreateAssignment = (assignmentObject) => {
-        //TODO: Call handleCreateAssignment from client/src/components/socket.js 
-        //Pass a callback createAssignmentStatus as a parameter, log the result
-        //When we go back to assignments we should see the new assignment
+        
         createAssignment(currentClass, assignmentObject.title, assignmentObject.assignFields, (createAssignmentStatus) => {
             if (createAssignmentStatus) {
                 console.log("Assignment created successfully"); 
@@ -113,11 +124,11 @@ const App = () => {
     };
     
     const handleShowCreateAssignment = () => {
-      setShowCreateAssignment(true);  // Show CreateAssignment component
+      setShowCreateAssignment(true);  
     };
   
     const handleHideCreateAssignment = () => {
-      setShowCreateAssignment(false); // Hide CreateAssignment component
+      setShowCreateAssignment(false); 
     };
 
     const handleCreateClass = (className) => {
@@ -131,6 +142,7 @@ const App = () => {
         }
     }
 
+    //TODO: Sean- Add viewAssignmentStudent component if you decide to make a new component, else disregard this
     return (
         <>
             <NavBar onCreateClass = {handleCreateClass} isLoggedIn={isLoggedIn} userName={userEmail} onSignOut={handleSignOut} />

@@ -27,16 +27,19 @@ function initSocket(server) {
         createTeacherAccount(socket);
         verifyStudentData(socket);
         createStudentAccount(socket);
-        //TODO: add functions for classes here 
 
         createClassIO(socket)
         getClassesIO(socket)
         enrollClassIO(socket)
     
-        //TODO: add functions for assignment here 
         createAssignmentIO(socket);
         getAllAssignmentsIO(socket);
         viewAssignmentIO(socket);
+
+        //TODO: add function for getStudentAssignments here 
+
+        //TODO: add function(s) for flashcardIO here 
+
 
         // socket.on('disconnect', () => {
         //     console.log("numClients connected", --numConnected);
