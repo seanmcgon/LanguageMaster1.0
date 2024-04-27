@@ -58,6 +58,11 @@ export const viewAssignment = (className, assignmentName, fetchedAssignment) => 
   socket.on("assignmentFetched", fetchedAssignment);
 }
 
+export const viewAssignmentStudent = (className, assignmentName, fetchedAssignment) => {
+  socket.emit("viewAssignmentStudent", className, assignmentName);
+  socket.on("assignmentFetched", fetchedAssignment);
+}
+
 
 //TODO: Add functions for classes
 

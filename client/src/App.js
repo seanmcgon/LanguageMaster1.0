@@ -10,8 +10,9 @@ import "./App.css";
 import { Modal } from 'bootstrap';
 import ClassAsgmts from './components/ClassAssignments/classAsgmts.js';
 import ViewAssignment from './components/viewAssignments/viewAssignments.js';
-import { createAssignment, viewAllAssignments, viewAssignment } from './components/socket.js';
+import { createAssignment, viewAllAssignments, viewAssignment, viewAssignmentStudent } from './components/socket.js';
 import { createClass, getClasses, enrollInClass } from './components/socket.js';
+import ViewAssignmentStudent from "./components/ViewAssignmentStudent/ViewAssignmentStudent.js";
 
 const App = () => {
   //development credentials
@@ -27,7 +28,7 @@ const App = () => {
     const [currentAssignment, setCurrentAssignment] = useState(""); 
     const [currentAssignmentName, setCurrentAssignmentName] = useState(""); 
     const [showCreateAssignment, setShowCreateAssignment] = useState(false);
-    const [isTeacher, setIsTeacher] = useState(true);
+    const [isTeacher, setIsTeacher] = useState(false);
 
     const [curWord, setCurrentWord]= useState("")
     const [curAverage, setCurrentAverage] = useState("")
@@ -72,9 +73,15 @@ const App = () => {
         setCurrentAssignmentName(assignmentName)
         
         try {
-            viewAssignment(currentClass, assignmentName, (fetchedAssignment) => {
-                setCurrentAssignment(fetchedAssignment);
-            }) 
+            if (isTeacher) {
+                viewAssignment(currentClass, assignmentName, (fetchedAssignment) => {
+                    setCurrentAssignment(fetchedAssignment);
+                }) 
+            } else {
+                viewAssignmentStudent(currentClass, assignmentName, (fetchedAssignment) => {
+                    setCurrentAssignment(fetchedAssignment);
+                })
+            }
         } catch (error) {
             console.error('Error fetching assignment:', error);
         }
@@ -153,8 +160,14 @@ const App = () => {
                             onBack={handleHideCreateAssignment} 
                             onCreateAssignment={handleCreateAssignment} 
                         />
-                    ) : currentAssignment ? (
+                    ) : (currentAssignment && isTeacher) ? (
                         <ViewAssignment
+                            lessonName={currentAssignmentName}
+                            flashcards={currentAssignment}
+                            onBack={goBackToAssignmentList}
+                        />
+                    ) : (currentAssignment && !isTeacher) ? (
+                        <ViewAssignmentStudent
                             lessonName={currentAssignmentName}
                             flashcards={currentAssignment}
                             onBack={goBackToAssignmentList}
