@@ -83,7 +83,7 @@ async function createTeacher(firstName,lastName,teacherEmail, password){
   }
 
   function checkValid(className){
-    const regex = /^[^ ]+\_[^ ]{1,6}$/
+    const regex = /^[^ ]{1,}$/
     if(className.match(regex)){
       return true;
     }
@@ -98,100 +98,94 @@ async function createTeacher(firstName,lastName,teacherEmail, password){
     }
     await col.updateOne({email: teacherEmail}, {$set:{courseList: originalCourse}})
   }
+function create_unique_id_for_class(class_name,c_allCourses){
+  const default_code = "000000";
+  const length_of_array_of_course = c_allCourses.length;
+  const class_code = (length_of_array_of_course + 1) + "";
+  const modified_code = default_code.substring(0,default_code.length - class_code.length) + class_code;
+  const unique_id = class_name + "_" + modified_code;
+  return unique_id; 
+}
 
-  async function createClass(className, teacherEmail){
-    // Add class to the teacher's course List
-    try{
-    await client.connect();
-    db = client.db("UserData");
-    col = await db.collection("teachers");
-   //console.log(getTeacherInfo[0]);
-    const checkTheValidOfClassName = checkValid(className);
-    const allCoursesPipeline = [
-      {
-        $unwind: {
-           path: "$courseList",
-           preserveNullAndEmptyArrays: false,
-        },
+async function createClass(className, teacherEmail, language){
+  // Add class to the teacher's course List
+  try{
+  await client.connect();
+  db = client.db("UserData");
+  col = await db.collection("teachers");
+  const teacher_info = await col.find({email: teacherEmail}).toArray();
+
+ //console.log(getTeacherInfo[0]);
+  const checkTheValidOfClassName = checkValid(className);
+  const allCoursesPipeline = [
+    {
+      $unwind: {
+         path: "$courseList",
+         preserveNullAndEmptyArrays: false,
       },
-      {
-        $group: {
-          _id: null,
-          allCourses: {
-            "$push": "$courseList"
-          }
+    },
+    {
+      $group: {
+        _id: null,
+        allCourses: {
+          "$push": "$courseList"
         }
-      },
-      {'$addFields': {'courseList': {'$setUnion': ['$fcourseList', []]}}}
-    ];
-
-  // Use query, set output to courses to be used later
-  let courses = await col.aggregate(allCoursesPipeline);
-  // courses is not a variable or list or anything that js can output, it's a MongoDB cursor
-  // This is part of how to access the info in it
-  c = await courses.next();
-  //console.log("The index of the given class name is: " + c.allCourses.indexOf(className));
-  //console.log(c.allCourses);
-    
-  if(checkTheValidOfClassName){
-      //create a class data base based on the given name
-      //1) if the class already exist in the database, so we do not need to create a new one, but update the teacher collection of that class database
-     // update class course of the given teacher
-     if(((await col.find({email: teacherEmail}).toArray()).length) === 1){
-     updateClassForGivenTeacher(col, teacherEmail, className);
-     let getTeacherInfo = await col.find({email: teacherEmail}).toArray();
-      if(c.allCourses.indexOf(className) !== -1){
-      db1 =  client.db(className);
-      col1 = await db1.collection("teachers");
-      const teacherInThatClass = await col.find({email: teacherEmail}).toArray();
-      if(teacherInThatClass.length !== 1){
-      await col1.insertOne(getTeacherInfo[0]);
       }
-      else{
-        await col1.deleteOne({email:teacherEmail});
-        await col1.insertOne(getTeacherInfo[0]);
-      } 
-     }
-     //
-     //2) If the given class name does not have dabase for itself, then we need to create a database for it, and add teacher info into that class 
-    //create class db.
-    else{
+    },
+    {'$addFields': {'courseList': {'$setUnion': ['$fcourseList', []]}}}
+  ];
 
-     MongoClient.connect(connectionString).then(async (client) => { 
-  
-      //console.log('Database is being created ... '); 
-        
-      // database name 
-      const db = client.db(className); 
-        
-      // collection name 
-      db.createCollection("assignments");
-      db.createCollection("metrics");
-      db.createCollection("students");
-      db.createCollection("teachers");
-      //console.log("Success!!")
-      //Add teacher to the new class
-      col = db.collection("teachers");
-      await col.insertOne(getTeacherInfo[0]);
-      await client.close();
-  })
-    }
-  }
+// Use query, set output to courses to be used later
+let courses = await col.aggregate(allCoursesPipeline);
+// courses is not a variable or list or anything that js can output, it's a MongoDB cursor
+// This is part of how to access the info in it
+c = await courses.next();
+//console.log("The index of the given class name is: " + c.allCourses.indexOf(className));
+//console.log(c.allCourses);
+
+if(checkTheValidOfClassName && teacher_info.length ==1){
+  await client.connect();
+  db = client.db("UserData");
+  col = await db.collection("teachers");
+  //create a class data base based on the given name
+ 
+  const className_on_data_base = create_unique_id_for_class(className,c.allCourses);
+   await updateClassForGivenTeacher(col, teacherEmail, className_on_data_base);
+   MongoClient.connect(connectionString).then(async (client) => {
+
+    //console.log('Database is being created ... ');
+
+    // database name
+    const db = client.db(className_on_data_base);
+
+    // collection name
+    db.createCollection("assignments");
+    db.createCollection("metrics");
+    db.createCollection("students");
+    db.createCollection("teachers");
+    //console.log("Success!!")
+    //Add teacher to the new class
+    col = db.collection("teachers");
+    await col.insertOne(teacher_info[0]);
+    await col.insertOne({"language_name" : language});
+    await client.close();
+
+
+   })
+}
   else{
-    throw("The teacher does not exist");
+    throw("inValid class name");
   }
-    }
-    else{
-      throw("inValid class name");
-    }
+}
+  catch(err){
+    throw (err);
   }
-    catch(err){
-      throw (err);
-    }
-    finally{
-      await client.close();
-    }
+  finally{
+    await client.close();
   }
+}
+
+  
   
 async function find_class_based_on_ID(classID){
     await client.connect();
