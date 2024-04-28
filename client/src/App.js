@@ -10,7 +10,7 @@ import "./App.css";
 import { Modal } from 'bootstrap';
 import ClassAsgmts from './components/ClassAssignments/classAsgmts.js';
 import ViewAssignment from './components/viewAssignments/viewAssignments.js';
-import { createAssignment, viewAllAssignments, viewAssignment, viewAssignmentStudent } from './components/socket.js';
+import { createAssignment, viewAllAssignments, viewAssignment, viewAssignmentStudent, getFeedback } from './components/socket.js';
 import { createClass, getClasses, enrollInClass } from './components/socket.js';
 import ViewAssignmentStudent from "./components/ViewAssignmentStudent/ViewAssignmentStudent.js";
 
@@ -28,11 +28,12 @@ const App = () => {
     const [currentAssignment, setCurrentAssignment] = useState(""); 
     const [currentAssignmentName, setCurrentAssignmentName] = useState(""); 
     const [showCreateAssignment, setShowCreateAssignment] = useState(false);
-    const [isTeacher, setIsTeacher] = useState(false);
+    const [isTeacher, setIsTeacher] = useState(true);
 
-    const [curWord, setCurrentWord]= useState("")
-    const [curAverage, setCurrentAverage] = useState("")
-    const [attemptScore, setAttemptScore] = useState("")
+    const [curWord, setCurrentWord]= useState("");
+    const [curAverage, setCurrentAverage] = useState("");
+    const [attemptScore, setAttemptScore] = useState("");
+    const [transcription, setTranscription] = useState("");
     //TODO: Use these globals for the flashcard IO
 
     useEffect(() => {
@@ -90,7 +91,19 @@ const App = () => {
     const handleFeedbackClick = (curWord, audioFile ) => {
         //TODO: Sean- pass these in, have a callback(s) which will be these three things: attemptScore(double), newAverage(double), transcription(string)
         //Set the states of these three things, we will link this with the flashcard UI
+        try {
+            getFeedback(curWord, audioFile, (attemptScore, newAverage, transcription) => {
+                setAttemptScore(attemptScore);
+                setCurrentAverage(newAverage);
+                setTranscription(transcription);
+            })
+        } catch (error) {
+            console.log("Error getting feedback:", error);
+        }
     };
+
+    console.log("Attempting feedback click:");
+    handleFeedbackClick("dog", "");
 
     const handleLoginSuccess = (email, name) => {
         setIsLoggedIn(true);

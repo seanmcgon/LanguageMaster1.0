@@ -58,12 +58,6 @@ export const viewAssignment = (className, assignmentName, fetchedAssignment) => 
   socket.on("assignmentFetched", fetchedAssignment);
 }
 
-export const viewAssignmentStudent = (className, assignmentName, fetchedAssignment) => {
-  socket.emit("viewAssignmentStudent", className, assignmentName);
-  socket.on("assignmentFetched", fetchedAssignment);
-}
-
-
 //TODO: Add functions for classes
 
 export const createClass = (className, teacherEmail, classCreated) => {
@@ -82,9 +76,16 @@ export const getClasses = (email, teacherBool, fetchedClasses) => {
 }
 
 //TODO: Sean- Add getFlashcardListForAssignment(className, assignmentName, fetchedAssignment)
+export const viewAssignmentStudent = (className, assignmentName, fetchedAssignment) => {
+  socket.emit("viewAssignmentStudent", className, assignmentName);
+  socket.on("assignmentFetched", fetchedAssignment);
+}
 
 //TODO: Sean- Add getFeedback
-
+export const getFeedback = (curWord, audioFile, feedback) => {
+  socket.emit("getFeedback", curWord, audioFile);
+  socket.on("feedback", feedback);
+}
 
 
 

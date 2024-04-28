@@ -3,6 +3,7 @@ const { verifyTeacherData, createTeacherAccount, verifyStudentData, createStuden
 //TODO: Add imports for classesIO, and assignmentsIO
 const {createAssignmentIO, getAllAssignmentsIO, viewAssignmentIO, viewAssignmentStudentIO} = require("./assignmentsIO");
 const {createClassIO, getClassesIO, enrollClassIO} = require("./classesIO")
+const {getFeedbackIO} = require("./flashCardIO");
 
 function initSocket(server) {
     //create a new WebSocket server, io, that is attached to the existing HTTP server created in index.js
@@ -40,6 +41,7 @@ function initSocket(server) {
         viewAssignmentStudentIO(socket);
 
         //TODO: add function(s) for flashcardIO here 
+        getFeedbackIO(socket);
 
 
         // socket.on('disconnect', () => {
