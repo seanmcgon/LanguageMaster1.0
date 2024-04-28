@@ -102,9 +102,6 @@ const App = () => {
         }
     };
 
-    console.log("Attempting feedback click:");
-    handleFeedbackClick("dog", "");
-
     const handleLoginSuccess = (email, name) => {
         setIsLoggedIn(true);
         setUserEmail(email);
