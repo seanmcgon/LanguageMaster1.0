@@ -10,8 +10,9 @@ import "./App.css";
 import { Modal } from 'bootstrap';
 import ClassAsgmts from './components/ClassAssignments/classAsgmts.js';
 import ViewAssignment from './components/viewAssignments/viewAssignments.js';
-import { createAssignment, viewAllAssignments, viewAssignment } from './components/socket.js';
+import { createAssignment, viewAllAssignments, viewAssignment, viewAssignmentStudent, getFeedback } from './components/socket.js';
 import { createClass, getClasses, enrollInClass } from './components/socket.js';
+import ViewAssignmentStudent from "./components/ViewAssignmentStudent/ViewAssignmentStudent.js";
 
 const App = () => {
   //development credentials
@@ -29,9 +30,10 @@ const App = () => {
     const [showCreateAssignment, setShowCreateAssignment] = useState(false);
     const [isTeacher, setIsTeacher] = useState(true);
 
-    const [curWord, setCurrentWord]= useState("")
-    const [curAverage, setCurrentAverage] = useState("")
-    const [attemptScore, setAttemptScore] = useState("")
+    const [curWord, setCurrentWord]= useState("");
+    const [curAverage, setCurrentAverage] = useState("");
+    const [attemptScore, setAttemptScore] = useState("");
+    const [transcription, setTranscription] = useState("");
     //TODO: Use these globals for the flashcard IO
 
     useEffect(() => {
@@ -72,9 +74,15 @@ const App = () => {
         setCurrentAssignmentName(assignmentName)
         
         try {
-            viewAssignment(currentClass, assignmentName, (fetchedAssignment) => {
-                setCurrentAssignment(fetchedAssignment);
-            }) 
+            if (isTeacher) {
+                viewAssignment(currentClass, assignmentName, (fetchedAssignment) => {
+                    setCurrentAssignment(fetchedAssignment);
+                }) 
+            } else {
+                viewAssignmentStudent(currentClass, assignmentName, (fetchedAssignment) => {
+                    setCurrentAssignment(fetchedAssignment);
+                })
+            }
         } catch (error) {
             console.error('Error fetching assignment:', error);
         }
@@ -83,6 +91,15 @@ const App = () => {
     const handleFeedbackClick = (curWord, audioFile ) => {
         //TODO: Sean- pass these in, have a callback(s) which will be these three things: attemptScore(double), newAverage(double), transcription(string)
         //Set the states of these three things, we will link this with the flashcard UI
+        try {
+            getFeedback(curWord, audioFile, (attemptScore, newAverage, transcription) => {
+                setAttemptScore(attemptScore);
+                setCurrentAverage(newAverage);
+                setTranscription(transcription);
+            })
+        } catch (error) {
+            console.log("Error getting feedback:", error);
+        }
     };
 
     const handleLoginSuccess = (email, name) => {
@@ -153,8 +170,14 @@ const App = () => {
                             onBack={handleHideCreateAssignment} 
                             onCreateAssignment={handleCreateAssignment} 
                         />
-                    ) : currentAssignment ? (
+                    ) : (currentAssignment && isTeacher) ? (
                         <ViewAssignment
+                            lessonName={currentAssignmentName}
+                            flashcards={currentAssignment}
+                            onBack={goBackToAssignmentList}
+                        />
+                    ) : (currentAssignment && !isTeacher) ? (
+                        <ViewAssignmentStudent
                             lessonName={currentAssignmentName}
                             flashcards={currentAssignment}
                             onBack={goBackToAssignmentList}

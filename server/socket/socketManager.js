@@ -1,8 +1,9 @@
 const { Server } = require("socket.io");
 const { verifyTeacherData, createTeacherAccount, verifyStudentData, createStudentAccount} = require("./userIO");
 //TODO: Add imports for classesIO, and assignmentsIO
-const {createAssignmentIO, getAllAssignmentsIO, viewAssignmentIO} = require("./assignmentsIO");
+const {createAssignmentIO, getAllAssignmentsIO, viewAssignmentIO, viewAssignmentStudentIO} = require("./assignmentsIO");
 const {createClassIO, getClassesIO, enrollClassIO} = require("./classesIO")
+const {getFeedbackIO} = require("./flashCardIO");
 
 function initSocket(server) {
     //create a new WebSocket server, io, that is attached to the existing HTTP server created in index.js
@@ -37,8 +38,10 @@ function initSocket(server) {
         viewAssignmentIO(socket);
 
         //TODO: add function for getStudentAssignments here 
+        viewAssignmentStudentIO(socket);
 
         //TODO: add function(s) for flashcardIO here 
+        getFeedbackIO(socket);
 
 
         // socket.on('disconnect', () => {
