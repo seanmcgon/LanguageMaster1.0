@@ -1,13 +1,13 @@
 // Written by Maya Kandeshwarath 4/29/24
-
+const keys = require("./keys.js")
 const AWS = require('aws-sdk');
 const fs = require('fs');
 
 // Connection to s3 bucket
 // access key is written directly into the code is not the safest choice, but...
 const s3 = new AWS.S3({
-  accessKeyId: 'AKIATCKARD4COSRQ3NFA',
-  secretAccessKey: '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'
+  accessKeyId: keys.ACCESS_KEY_ID,
+  secretAccessKey: keys.SECRET_ACCESS_KEY
 });
 
 // function to upload a file to s3 bucket
@@ -50,5 +50,3 @@ s3.getObject(
       }
     }
   );
-
-  
