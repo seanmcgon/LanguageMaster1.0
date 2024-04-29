@@ -90,6 +90,17 @@ async function createTeacher(firstName,lastName,teacherEmail, password){
   }
   }
 
+  // Written by Maya Kandeshwarath
+  // Accepts:
+  // String firstName, student's first name
+  // String lastName, student's last name
+  // String studentEmail, student's email
+  // String password, student's password
+  // The function creates a student document to be inserted into the db
+  // as as long as no fields are invalid and the studentEmail isn't already in the db,
+  // it inserts the following document, 
+  // {name: firstName + lastName, email: studentEmail, password: password, courseList: []}
+  // Then the function returns true if the document is inserted and false if it's not
   async function createStudent(firstName, lastName, studentEmail, password){
     // boolean to return based on whether the student is returned or not
     let inserted = false;
@@ -133,6 +144,9 @@ async function createTeacher(firstName,lastName,teacherEmail, password){
     return inserted;
   }
 
+  // Written by Maya Kandeshwarath
+  // Accepts: String className, name of class
+  // The function returns an array of student documents from the class className
   async function getStudentsInClass(className){
     // array of students to return
     let students = [];
@@ -159,6 +173,9 @@ async function createTeacher(firstName,lastName,teacherEmail, password){
     return students;
   }
 
+  // Written by Maya Kandeshwarath
+  // Accepts: String className, name of class
+  // The function returns an array of teacher documents from the class className
   async function getTeachersInClass(className){
     // array of students to return
     let teachers = [];
@@ -182,6 +199,12 @@ async function createTeacher(firstName,lastName,teacherEmail, password){
     return teachers;
   }
 
+  // Written by Maya Kandeshwarath
+  // Accepts:
+  // String className, name of class
+  // String assignmentName, name of assignment
+  // The function searches for all flashcards 
+  // under assignment assignmentName returns them
   async function viewAssignment(className, assignmentName){
     let cards = [];
     try{
@@ -210,6 +233,14 @@ async function createTeacher(firstName,lastName,teacherEmail, password){
     }
   }
 
+  // Written by Maya Kandeshwarath
+  // Accepts:
+  // String className, name of class
+  // String assignmentName, name of assignment
+  // {String text, String translation, String audio} card, flashcard to be inserted
+  // The function inserts the given flashcard information into the database in the database format,
+  // then inserts blank student grades for the card into the db,
+  // then returns a boolean representing whether or not the card was inserted
   async function addToAssignment(className, assignmentName, card){
     let inserted = false;
     try{
@@ -227,8 +258,20 @@ async function createTeacher(firstName,lastName,teacherEmail, password){
       if(cardNum === 0){
         throw("Assignment does not exist");
       }
-      await col.insertOne({assignment: assignmentName, card: cardNum, text: card.text, translation: card.translation, audio: card.audio})
-      inserted = true;
+      let exists = col.find({assignment: assignmentName, text: card.text}).toArray();
+      if(exists){
+        await col.insertOne({assignment: assignmentName, card: cardNum, text: card.text, translation: card.translation, audio: card.audio});
+        col = db.collection("metrics");
+        let students = await getStudentsInClass(className);
+        try{
+        for(let i = 0; i < students.length; i++){
+          await col.insertOne({studentEmail: students[i].email, assignment: assignmentName, card: cardNum, timesPracticed: 0, score: 0});
+        }
+      }
+      catch(err){console.log(err)}
+        inserted = true;
+      }
+      
       
     }
     catch(err){

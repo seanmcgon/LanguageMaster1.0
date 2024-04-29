@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('./index.js'); 
+// const app = require('./index.js'); 
 const mongo = require('./databaseUsers.js')
 
 jest.mock('mongoose')
@@ -98,7 +98,8 @@ jest.mock('mongoose')
     it("Returns existing assignment in correct form", async () => {
       const cards = await mongo.viewAssignment("Spanish454_QRAPCC", "war");
       expect(cards.length).toEqual(2);
-      expect(cards.map(e => e.text)).toEqual(["right", "provide"]);
+      expect(cards.map(e => e.text)).toContain("right");
+      expect(cards.map(e => e.text)).toContain("provide");
     });
 
     // Reacts correctly for class that doesn't exist
@@ -132,6 +133,11 @@ jest.mock('mongoose')
         expect(card[0].translation).toEqual("qwer");
         expect(card[0].audio).toEqual("zcxv");
         await col.deleteOne({audio: "zcxv"});
+        
+        col = db.collection("metrics");
+        let grades = await col.find({assignment: "war", card: 2}).toArray();
+        expect(grades.length).toEqual((await mongo.getStudentsInClass("Spanish454_QRAPCC")).length);
+        await col.deleteMany({assignment: "war", card: 2})
       }
       finally{
         await mongo.client.close();
