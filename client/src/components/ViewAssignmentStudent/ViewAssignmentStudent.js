@@ -1,11 +1,12 @@
 import React from 'react';
 import './ViewAssignmentStudent.css'; // Make sure this points to the correct CSS file
 
-export default function ViewAssignmentStudent({ lessonName, flashcards, onBack }) {
+export default function ViewAssignmentStudent({ lessonName, flashcards, onBack, onShowFlashcardView }) {
     return (
         <div className="viewAssignment">
             <button onClick={onBack} className="backButton">Back to Assignments</button>
-            <button className="flashCardButton">Go To Flashcard View</button>
+            
+            <button onClick={onShowFlashcardView} className="flashCardButton">Go To Flashcard View</button>
 
             <h1 className="lessonName">{lessonName}</h1>
             <div className="tableContainer">
@@ -26,7 +27,7 @@ export default function ViewAssignmentStudent({ lessonName, flashcards, onBack }
                                 <td>
                                     <audio src={flashcard.audioFile} controls />
                                 </td>
-                                <td id='score'>{(flashcard.score)? flashcard.score : "-"}</td>
+                                <td id='score'>{flashcard.score ? flashcard.score : "-"}</td>
                             </tr>
                         ))}
                     </tbody>

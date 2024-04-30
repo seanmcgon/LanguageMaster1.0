@@ -13,29 +13,29 @@ import ViewAssignment from './components/viewAssignments/viewAssignments.js';
 import { createAssignment, viewAllAssignments, viewAssignment, viewAssignmentStudent, getFeedback } from './components/socket.js';
 import { createClass, getClasses, enrollInClass } from './components/socket.js';
 import ViewAssignmentStudent from "./components/ViewAssignmentStudent/ViewAssignmentStudent.js";
-
+import Flashcard  from './components/Flashcard/Flashcard.js';
 const App = () => {
   //development credentials
-    const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
-    const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
-    const [isTeacher, setIsTeacher] = useState(true);
+    //Teacher
+    // const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
+    // const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
+    // const [isTeacher, setIsTeacher] = useState(true);
 
+    //Student
     // const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
     // const [isTeacher, setIsTeacher] = useState(false);
     // const [isLoggedIn, setIsLoggedIn] = useState(true);
 
-    useEffect(() => {
-        getClassesForUser(userEmail);  // Fetch classes for the hardcoded user
-      }, []);  
-
+  
+    const [isTeacher, setIsTeacher] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [classList, setClassList] = useState([]);
-    // const [userEmail, setUserEmail] = useState("");
+    const [userEmail, setUserEmail] = useState("");
     const [currentClass, setCurrentClass] = useState(""); 
     const [currentAssignments, setCurrentAssignments] = useState([]); 
     const [currentAssignment, setCurrentAssignment] = useState(""); 
     const [currentAssignmentName, setCurrentAssignmentName] = useState(""); 
     const [showCreateAssignment, setShowCreateAssignment] = useState(false);
-
 
     const [curWord, setCurrentWord]= useState("");
     const [curAverage, setCurrentAverage] = useState("");
@@ -43,13 +43,22 @@ const App = () => {
     const [transcription, setTranscription] = useState("");
     //TODO: Use these globals for the flashcard IO
    
-  
+    const [showFlashcardView, setShowFlashcardView] = useState(false);
     const [showLogoutMessage, setShowLogoutMessage] = useState(false);
     
     const getClassesForUser = (userEmail) => {
         getClasses(userEmail, isTeacher, (fetchedClasses) => {
             setClassList(()=> fetchedClasses);
         })
+    };
+    const handleShowFlashcardView = () => {
+        setShowFlashcardView(true);
+        console.log("setFlashcardView", showFlashcardView)
+
+    };
+
+    const handleBackToAssignments = () => {
+        setShowFlashcardView(false);
     };
 
     const handleClassClick = (className) => {
@@ -140,6 +149,11 @@ const App = () => {
         setCurrentAssignment(null);
         setCurrentAssignmentName('');
     };
+
+    const goBackToAssignment = () => {
+        console.log("I am being clicked")
+        setShowFlashcardView(false)
+    };
     
     const handleShowCreateAssignment = () => {
       setShowCreateAssignment(true);  
@@ -177,7 +191,7 @@ const App = () => {
                 }
                 else {
                     console.log("class joined false")
-
+                    getClassesForUser(userEmail)
                     retValue = false;
                 }
                 
@@ -186,28 +200,70 @@ const App = () => {
         return retValue;
     }
 
+    const dummyFlashcards = 
+        [
+            {
+              wordName: "苹果",
+              englishTranslation: "Apple",
+              audioFile: "path/to/apple.mp3", // Ensure you have a valid path for audio files
+              score: 95
+            },
+            {
+              wordName: "书",
+              englishTranslation: "Book",
+              audioFile: "path/to/book.mp3",
+              score: 88
+            },
+            {
+              wordName: "汽车",
+              englishTranslation: "Car",
+              audioFile: "path/to/car.mp3",
+              score: 78
+            }
+        ]
+        const lessonName = "ChineseTest";
+ 
     return (
         <>
-            <NavBar isTeacher={isTeacher} setIsTeacher={setIsTeacher} onJoinClass = {handleJoinClass} onCreateClass = {handleCreateClass} isLoggedIn={isLoggedIn} userName={userEmail} onSignOut={handleSignOut} />
+            <NavBar 
+                isTeacher={isTeacher} 
+                setIsTeacher={setIsTeacher} 
+                onJoinClass={handleJoinClass} 
+                onCreateClass={handleCreateClass} 
+                isLoggedIn={isLoggedIn} 
+                userName={userEmail} 
+                onSignOut={handleSignOut} 
+            />
             <div>
                 {isLoggedIn ? (
+                     showFlashcardView ? (
+                        <Flashcard
+                            flashcards={dummyFlashcards}
+                            onBack= {goBackToAssignment}
+                        />
+                    ) :
                     showCreateAssignment ? (
                         <CreateAssignment 
                             onBack={handleHideCreateAssignment} 
                             onCreateAssignment={handleCreateAssignment} 
                         />
-                    ) : (currentAssignment && isTeacher) ? (
-                        <ViewAssignment
-                            lessonName={currentAssignmentName}
-                            flashcards={currentAssignment}
-                            onBack={goBackToAssignmentList}
-                        />
-                    ) : (currentAssignment && !isTeacher) ? (
-                        <ViewAssignmentStudent
-                            lessonName={currentAssignmentName}
-                            flashcards={currentAssignment}
-                            onBack={goBackToAssignmentList}
-                        />
+                    ) : currentAssignment ? (
+                        isTeacher ? (
+                            <ViewAssignment
+                                lessonName={currentAssignmentName}
+                                flashcards={currentAssignment}
+                                onBack={goBackToAssignmentList}
+                            />
+                        ) : (
+                            <ViewAssignmentStudent
+                                // lessonName={currentAssignmentName}
+                                // flashcards={currentAssignment}
+                                lessonName = {lessonName}
+                                flashcards={ dummyFlashcards}
+                                onBack={goBackToAssignmentList}
+                                onShowFlashcardView={handleShowFlashcardView}
+                            />
+                        )
                     ) : currentClass ? (
                         <ClassAsgmts
                             className={currentClass}
@@ -215,19 +271,29 @@ const App = () => {
                             onAssignmentClick={handleAssignmentClick}
                             onBack={goBackToClassView}
                             onCreateAssignmentClick={handleShowCreateAssignment}
-                            isTeacher={isTeacher}  
-/>
+                            isTeacher={isTeacher}
+                        />
                     ) : (
-                        <ClassMenu classes={classList} onClassClick={handleClassClick} />
+                        <ClassMenu 
+                            classes={classList} 
+                            onClassClick={handleClassClick} 
+                        />
                     )
                 ) : (
                     <>
-                        <Login setIsTeacher={setIsTeacher} onLoginSuccess={handleLoginSuccess} />
-                        <SignUp onLoginSuccess={handleLoginSuccess} />
-                        <Banner handleClick={() => {
-                            const signUpModal = new Modal(document.getElementById('SignUpForm'));
-                            signUpModal.show();
-                        }} />
+                        <Login 
+                            setIsTeacher={setIsTeacher} 
+                            onLoginSuccess={handleLoginSuccess} 
+                        />
+                        <SignUp 
+                            onLoginSuccess={handleLoginSuccess} 
+                        />
+                        <Banner 
+                            handleClick={() => {
+                                const signUpModal = new Modal(document.getElementById('SignUpForm'));
+                                signUpModal.show();
+                            }} 
+                        />
                     </>
                 )}
             </div>

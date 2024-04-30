@@ -24,11 +24,11 @@ function createClassIO(socket) {
 }
 
 function enrollClassIO(socket) {
-  socket.on('enrollClass', async (className, studentEmail) => {
-    console.log(className, studentEmail)
+  socket.on('enrollClass', async (classID, studentEmail) => {
+    console.log(classID, studentEmail)
       let enrolledInClass;
       try {
-        enrolledInClass = await enrollClassStudent(className, studentEmail);
+        enrolledInClass = await enrollClass(classID, studentEmail);
       } catch (error) {
           console.error('Error enrolling in class:', error);
           enrolledInClass = false;

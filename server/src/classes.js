@@ -373,19 +373,18 @@ async function enrollClass(classID, studentEmail){
       else{
         throw("The class already exist");
       }
-
-  }
-  else{
-    throw("Invalid class");
-  }
-  } catch(err){
-  console.log(err);
-   }
-  finally{
-  await client.close();
-  }
-
-  }
-module.exports = { create_unique_id_for_class,
+    
+    }
+    else{
+      throw("Invalid class");
+    }
+    } catch(err){
+    console.log(err);
+     }
+    finally{
+    await client.close();
+    }  
+    }
+module.exports = {
     enrollClass, getClassesStudent, getClassesTeacher, createClass, getStudentsInClass, getTeachersInClass, updateClassForGivenTeacher, find_class_based_on_ID
 };

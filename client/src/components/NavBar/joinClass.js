@@ -41,7 +41,7 @@ function JoinClassPopup(props) {
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleJoin}>
-                    <Form.Label htmlFor="className">Name of the class:</Form.Label>
+                    <Form.Label htmlFor="className">ClassID:</Form.Label>
                     <Form.Control
                         type="text"
                         id="className"
@@ -55,7 +55,7 @@ function JoinClassPopup(props) {
                         </p>
                     )}
                     <Form.Text id="helpBlock" muted>
-                        Class names must be 1-50 characters long and cannot contain spaces.
+                        Contact your teacher for ClassID
                     </Form.Text>
                     <br/><br/>
                     <Button className="joinButton" type="submit">
