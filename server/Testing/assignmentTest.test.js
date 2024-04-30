@@ -1,6 +1,6 @@
 //cd into server and run using "npx jest Testing/assignmentTests"
 const { MongoClient } = require('mongodb');
-const { createAssignment, viewAssignment, addToAssignment, deleteAssignment, deleteFromAssignment, convertAssignmentToDtbForm } = require('../src/assignments.js');
+const { createAssignment, viewAssignment, addToAssignment, deleteAssignment, deleteFromAssignment, convertAssignmentToDtbForm, getAllStudentData, convert} = require('../src/assignments.js');
 
 jest.mock('mongoose');
 const mongo = require('../src/assignments.js');
@@ -180,4 +180,28 @@ describe('Assignment Management Tests', () => {
           expect(console.log).toHaveBeenCalledWith("Assignment does not exist");
         });
       });
+
+      describe("getAllStudentData", () => {
+        it("Returns a correct output for existing assignment", async () => {
+          const grades = await getAllStudentData("Spanish454_QRAPCC", "war");
+          expect(grades.length).toBe(2);
+          expect(grades).toContainEqual({"_id": "Troy.Briggs@yahoo.com", 
+          "grades": [{"card": 0, "score": 0.7, "timesPracticed": 7}, {"card": 1, "score": 0.9, "timesPracticed": 8}]});
+          expect(grades).toContainEqual({"_id": "Kimberly.Cruz@gmail.com", 
+          "grades": [{"card": 0, "score": 0.8, "timesPracticed": 1}, {"card": 1, "score": 0.7, "timesPracticed": 7}]});
+        });
+
+        it("Throws an error for a non-existent class", async () => {
+          console.log = jest.fn();
+          await getAllStudentData("ABCD", "war");
+          expect(console.log).toHaveBeenCalledWith("Class does not exist");
+        });
+      
+        it("Throws an error for a non-existent assignment", async () => {
+          console.log = jest.fn();
+          await getAllStudentData("Spanish454_QRAPCC", "ASDF");
+          expect(console.log).toHaveBeenCalledWith("Assignment does not exist");
+        });
+
+      })
 });

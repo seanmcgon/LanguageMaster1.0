@@ -190,6 +190,45 @@ async function deleteFromAssignment(className,assignmentName,flashcard_Object){
 
   }
 
+//   Maya Kandeshwarath 4/30/2024
+// Input: className: String, exact name of class in the database
+//        assignmentName: String, exact name of assignment in the database
+// Output: array of arrays, the sub arrays are the grades of the students
+//         where each element is a grade for a single flashcard
+async function getAllStudentData(className, assignmentName){
+    let grades = [];
+    try{
+        await client.connect();
+        let db = client.db(className);
+        let col = db.collection("teachers");
+        if((await col.find().toArray()).length === 0){
+            throw("Class does not exist");
+        }
+        col = db.collection("metrics");
+        if((await col.find({assignment: assignmentName}).toArray()).length === 0){
+            throw("Assignment does not exist");
+        }
+        const pipeline = [
+            {$match:{assignment: assignmentName}}, 
+            {$group: 
+                {_id: "$studentEmail", grades: 
+                    {$push: {card: "$card", timesPracticed: "$timesPracticed", score: "$score"}}}}
+        ]
+
+        let g = await col.aggregate(pipeline);
+        while(await g.hasNext()){
+            grades.push(await g.next());
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+    finally{
+        await client.close();
+        return grades;
+    }
+}
+
 module.exports = {
-    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment
+    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment, getAllStudentData
 };
