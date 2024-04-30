@@ -66,8 +66,13 @@ export const createClass = (className, teacherEmail, classCreated) => {
   socket.on("createClassStatus", classCreated);
 }
 
-export const enrollInClass = (className, classID, studentEmail, enrolledInClass) => {
-  socket.emit("enrollClass", className, classID, studentEmail);
+// export const enrollInClass = (className, classID, studentEmail, enrolledInClass) => {
+//   socket.emit("enrollClass", className, classID, studentEmail);
+//   socket.on("enrollClassStatus", enrolledInClass);
+// }
+
+export const enrollInClass = (className, studentEmail, enrolledInClass) => {
+  socket.emit("enrollClass", className, studentEmail);
   socket.on("enrollClassStatus", enrolledInClass);
 }
 

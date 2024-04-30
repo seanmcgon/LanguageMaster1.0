@@ -152,6 +152,35 @@ async function getClassesTeacher(teacherEmail) {
     }
     return false;
 }
+
+async function enrollClassStudent(className, studentEmail) {
+  try {
+      await client.connect();
+      db = client.db("UserData");
+      col = await db.collection("students");
+      if (checkValid(className)) {
+          let student_Data = await col.find({ email: studentEmail }).toArray();
+          let student_courses = student_Data[0].courseList;
+          if (student_courses.indexOf(className) == -1) {
+              student_courses.push(className);
+              await col.updateOne({ email: studentEmail }, { $set: { courseList: student_courses } });
+              db1 = client.db(className);
+              col1 = await db1.collection("students");
+              await col1.insertOne(student_Data[0]);
+          } else {
+              throw("The class already exists");
+          }
+          return true;
+      } else {
+          throw("Invalid class");
+      }
+  } catch (err) {
+      console.log(err);
+  } finally {
+      await client.close();
+  }
+  return false;
+}
 module.exports = {
-    enrollClass, getClassesStudent, getClassesTeacher, createClass, getStudentsInClass, getTeachersInClass, updateClassForGivenTeacher
+    enrollClass, getClassesStudent, getClassesTeacher, createClass, enrollClassStudent, getStudentsInClass, getTeachersInClass, updateClassForGivenTeacher
 };

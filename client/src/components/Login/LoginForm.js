@@ -4,8 +4,8 @@ import "./Login.css";
 import { verifyStudent, verifyTeacher } from '../socket';
 import Bootstrap from 'bootstrap/dist/js/bootstrap.bundle';
 
-function LoginForm(props) {
-  const [isTeach, setTeach] = useState(false);
+function LoginForm({ setIsTeacher, onLoginSuccess }) {
+  const [role, setRole] = useState(false);  // false for student, true for teacher
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');  // State for error message
@@ -13,63 +13,42 @@ function LoginForm(props) {
   const handleCloseClick = () => {
     const modalElement = document.getElementById('LoginForm');
     const loginModal = Modal.getInstance(modalElement);
-    if (loginModal) {
-        loginModal.hide();
-    }
-
-    const backdrop = document.querySelector('.modal-backdrop');
-    if (backdrop) {
-        backdrop.remove();
-    }
-
+    loginModal?.hide();
     document.body.classList.remove('modal-open');
-    document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
   };
 
   const handleSignUpClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-
-    const loginModalElement = document.getElementById('LoginForm');
-    const loginModal = Modal.getInstance(loginModalElement);
-    if (loginModal) {
-      loginModal.hide();
-    }
+    handleCloseClick(); // Close login modal
 
     const signUpModalElement = document.getElementById('SignUpForm');
     let signUpModal = Modal.getInstance(signUpModalElement);
-    if (!signUpModal) {
-        signUpModal = new Modal(signUpModalElement);
-    }
+    signUpModal = signUpModal || new Modal(signUpModalElement);
     signUpModal.show();
-
-    signUpModalElement.querySelector('input')?.focus();
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const verificationFunction = isTeach ? verifyTeacher : verifyStudent;
+    console.log("Login attempt: ", { role: role ? "Teacher" : "Student", email, password });  // Log login attempt details
+    setIsTeacher(role);  // Update the global isTeacher state
+    console.log("setIsTeacher called with: ", role);  // Log when setIsTeacher is called
 
+    const verificationFunction = role ? verifyTeacher : verifyStudent;
     verificationFunction(email, password, (verificationStatus) => {
         if (verificationStatus) {
-            const modalElement = document.getElementById('LoginForm');
-            const loginModal = Bootstrap.Modal.getInstance(modalElement);
-            if (loginModal) {
-                loginModal.hide();
-            }
-
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-                backdrop.remove();
-            }
-            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-
-            document.body.classList.remove('modal-open');
-            props.onLoginSuccess(email);
+            handleCloseClick();  // Hide the login modal on successful login
+            onLoginSuccess(email);  // Call onLoginSuccess with the email
         } else {
             setErrorMessage("Login failed. Please check your email and password.");
+            console.log("Login failed");  // Log when login fails
         }
     });
+  };
+
+  const toggleRole = () => {
+    setRole(!role);
+    console.log("Role changed to: ", !role ? "Teacher" : "Student");  // Log role change
   };
 
   return (
@@ -77,14 +56,14 @@ function LoginForm(props) {
       <div className="modal-header">
         <button type="button" className="btn-close" onClick={handleCloseClick} aria-label="Close"></button>
       </div>
-      <h1 className="text-center">Login for {isTeach ? "Teacher" : "Student"}</h1>
+      <h1 className="text-center">Login for {role ? "Teacher" : "Student"}</h1>
       <form onSubmit={handleSubmit}>
         <button
           type="button"
           className="btn btn-role bg-transparent"
-          onClick={() => setTeach(!isTeach)}
+          onClick={toggleRole}
         >
-          I'm a {isTeach ? "Student" : "Teacher"}
+          I'm a {role ? "Student" : "Teacher"}
         </button>
         <div className="mb-3 mt-4">
           <label htmlFor="InputEmail" className="form-label">
