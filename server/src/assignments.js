@@ -62,6 +62,16 @@ async function addToAssignment(className, assignmentName, card) {
             throw("Assignment does not exist");
         }
         await col.insertOne({ assignment: assignmentName, card: cardNum, ...card });
+
+        col = db.collection("students");
+        let students = await col.find().toArray();
+
+        col = db.collection("metrics");
+
+        for(let i = 0; i < students.length; i++){
+            await col.insertOne({studentEmail: students[i].email, assignment: assignmentName, card: cardNum, timesPracticed: 0, score: 0});
+        }
+
         inserted = true;
     } catch (err) {
         console.log(err);
