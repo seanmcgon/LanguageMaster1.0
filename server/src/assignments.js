@@ -6,7 +6,7 @@ const client = new MongoClient(connectionString);
 
 // Quoc
 function checkValid(className) {
-    const regex = /^[^ ]{1,}$/;
+   const regex = /^[^ ]+\_[^ ]{1,6}$/;
     if (className.match(regex)) {
         return true;
     }
