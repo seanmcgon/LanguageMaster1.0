@@ -2,7 +2,7 @@ import LoginForm from "./LoginForm.js";
 import "./Login.css";
 import Bootstrap from 'bootstrap/dist/js/bootstrap.bundle';
 
-function LoginModal(props) { // Accept props here
+function LoginModal({ setIsTeacher, onLoginSuccess }) {
 
   const handleSignUpInstead = () => {
     // Hide the current Login modal
@@ -40,7 +40,7 @@ function LoginModal(props) { // Accept props here
                 data-bs-dismiss="modal"
                 aria-label="Close"
               ></button>
-              <LoginForm onLoginSuccess={props.onLoginSuccess} />
+               <LoginForm setIsTeacher={setIsTeacher} onLoginSuccess={onLoginSuccess} />
               <button
                 type="button"
                 className="btn btn-link"

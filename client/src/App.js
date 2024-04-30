@@ -16,42 +16,41 @@ import ViewAssignmentStudent from "./components/ViewAssignmentStudent/ViewAssign
 
 const App = () => {
   //development credentials
-    const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
-    const [userEmail, setUserEmail] = useState("jasonhuang1685@umass.edu");  // Hardcoded email
+    // const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
+    // const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
+    // const [isTeacher, setIsTeacher] = useState(true);
 
-    // const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userEmail, setUserEmail] = useState("jStudent@gmail.com");  // Hardcoded email
+    const [isTeacher, setIsTeacher] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+    useEffect(() => {
+        getClassesForUser(userEmail);  // Fetch classes for the hardcoded user
+      }, []);  
+
     const [classList, setClassList] = useState([]);
     // const [userEmail, setUserEmail] = useState("");
-    const [userName, setUserName] = useState(""); 
     const [currentClass, setCurrentClass] = useState(""); 
     const [currentAssignments, setCurrentAssignments] = useState([]); 
     const [currentAssignment, setCurrentAssignment] = useState(""); 
     const [currentAssignmentName, setCurrentAssignmentName] = useState(""); 
     const [showCreateAssignment, setShowCreateAssignment] = useState(false);
-    const [isTeacher, setIsTeacher] = useState(true);
+
 
     const [curWord, setCurrentWord]= useState("");
     const [curAverage, setCurrentAverage] = useState("");
     const [attemptScore, setAttemptScore] = useState("");
     const [transcription, setTranscription] = useState("");
     //TODO: Use these globals for the flashcard IO
-
-    useEffect(() => {
-      getClassesForUser(userEmail);  // Fetch classes for the hardcoded user
-    }, []);  // Empty dependency array to run only on mount
+   
   
     const [showLogoutMessage, setShowLogoutMessage] = useState(false);
     
     const getClassesForUser = (userEmail) => {
-        getClasses(userEmail, true, (fetchedClasses) => {
+        getClasses(userEmail, isTeacher, (fetchedClasses) => {
             setClassList(()=> fetchedClasses);
         })
     };
-
-    useEffect(() => {
-        console.log("Updated currentClass is:", currentClass);
-        // You can perform additional actions here when currentClass updates
-    }, [currentClass]); // This effect runs when currentClass changes
 
     const handleClassClick = (className) => {
         setCurrentClass(className);  
@@ -105,35 +104,37 @@ const App = () => {
     const handleLoginSuccess = (email, name) => {
         setIsLoggedIn(true);
         setUserEmail(email);
-        setUserName(name); // Assume 'name' is passed along with 'email' after successful login
         getClassesForUser(email);
+        console.log("is Teacher", isTeacher)
     };
 
-   const handleCreateAssignment = (assignmentObject) => {
-        
+    const handleCreateAssignment = (assignmentObject) => {
+    
         createAssignment(currentClass, assignmentObject.title, assignmentObject.assignFields, (createAssignmentStatus) => {
             if (createAssignmentStatus) {
                 console.log("Assignment created successfully"); 
-                getClassesForUser(userEmail)               
+                getClassesForUser(userEmail);
+                setShowCreateAssignment(false);
+                handleClassClick(currentClass);
+                return;
             } else {
                 console.log("Error creating assignment");
             }
         });
-   }
+    }
 
     const handleSignOut = () => {
         setShowLogoutMessage(true);
         setTimeout(() => {
             setIsLoggedIn(false);
             setUserEmail("");
-            setUserName("");
             setClassList([]);
             setShowLogoutMessage(false);
         }, 1000); 
     };
 
     const goBackToClassView = () => {
-        setCurrentClass(null);  // Or setCurrentClass('');
+        setCurrentClass(null);  
     };
     const goBackToAssignmentList = () => {
         setCurrentAssignment(null);
@@ -142,9 +143,11 @@ const App = () => {
     
     const handleShowCreateAssignment = () => {
       setShowCreateAssignment(true);  
+      setShowCreateAssignment(true);  
     };
   
     const handleHideCreateAssignment = () => {
+      setShowCreateAssignment(false); 
       setShowCreateAssignment(false); 
     };
 
@@ -152,6 +155,8 @@ const App = () => {
         try {
          createClass(className, userEmail, (classCreated) => {
                 console.log("classCreated")
+                getClassesForUser(userEmail)
+
             })
         }
         catch {
@@ -159,10 +164,24 @@ const App = () => {
         }
     }
 
-    //TODO: Sean- Add viewAssignmentStudent component if you decide to make a new component, else disregard this
+    const handleJoinClass = (className) => {
+        console.log("clicked join class")
+
+        try {
+         enrollInClass(className, userEmail, (classCreated) => {
+                console.log("classCreated")
+                getClassesForUser(userEmail)
+
+            })
+        }
+        catch {
+            console.log("error in joining class")
+        }
+    }
+
     return (
         <>
-            <NavBar onCreateClass = {handleCreateClass} isLoggedIn={isLoggedIn} userName={userEmail} onSignOut={handleSignOut} />
+            <NavBar isTeacher={isTeacher} setIsTeacher={setIsTeacher} onJoinClass = {handleJoinClass} onCreateClass = {handleCreateClass} isLoggedIn={isLoggedIn} userName={userEmail} onSignOut={handleSignOut} />
             <div>
                 {isLoggedIn ? (
                     showCreateAssignment ? (
@@ -189,13 +208,14 @@ const App = () => {
                             onAssignmentClick={handleAssignmentClick}
                             onBack={goBackToClassView}
                             onCreateAssignmentClick={handleShowCreateAssignment}
-                        />
+                            isTeacher={isTeacher}  
+/>
                     ) : (
                         <ClassMenu classes={classList} onClassClick={handleClassClick} />
                     )
                 ) : (
                     <>
-                        <Login onLoginSuccess={handleLoginSuccess} />
+                        <Login setIsTeacher={setIsTeacher} onLoginSuccess={handleLoginSuccess} />
                         <SignUp onLoginSuccess={handleLoginSuccess} />
                         <Banner handleClick={() => {
                             const signUpModal = new Modal(document.getElementById('SignUpForm'));

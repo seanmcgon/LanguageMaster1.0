@@ -8,13 +8,15 @@ export default function CreateClassPopup(props) {
 
   const handleCreate = (e) => {
     e.preventDefault();
-    if (input.length < 1 || input.length > 50) {
+    // Check if input is empty, longer than 50 characters, or contains spaces
+    if (input.length < 1 || input.length > 50 || /\s/.test(input)) {
       setShowError(true);  // Show error if class name is invalid
       setInput('');         // Clear the input after showing error
     } else {
       onCreateClass(input); // Call the function passed from the parent component
       setInput('');         // Clear the input on successful creation
       setShowError(false);  // Reset error state
+      setTimeout(200)
       onHide();             // Hide the popup modal
     }
   };
@@ -42,11 +44,11 @@ export default function CreateClassPopup(props) {
           />
           {showError && (
             <p id="invalidClass" className="text-danger">
-              Class name is invalid or already exists. Please try again.
+              Invalid class name. Please try again.
             </p>
           )}
           <Form.Text id="helpBlock" muted>
-            Class names must be 1-50 characters long.
+            Class names must be 1-50 characters long and cannot contain spaces.
           </Form.Text>
           <br/><br/>
           <Button className="createButton" type="submit">

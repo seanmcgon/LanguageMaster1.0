@@ -2,28 +2,26 @@ import React from "react";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
-import { Link } from "react-router-dom";
 import "./classAsgmts.css";
 
-export default function ClassAsgmts({ className, asgmts, onAssignmentClick, onBack, onCreateAssignmentClick }) {
+export default function ClassAsgmts({ className, asgmts, onAssignmentClick, onBack, onCreateAssignmentClick, isTeacher }) {
   return (
     <div id="classAsgmtsBody">
-      <button onClick={onBack} class= "backButtonAssView" style={{ margin: '10px' }}>Back to Class View</button>
+      <button onClick={onBack} className="backButtonAssView" style={{ margin: '10px' }}>Back to Class View</button>
       <div id="classHeading">
         <h1 id="nameOfClass">{className}</h1>
       </div>
       <br />
       <div id="asgmtsHeaderContainer">
-        <div
-          className="btn btn-primary createAssignment"
-          onClick={onCreateAssignmentClick}  // Now correctly linked to the prop
-        >
-          Create Assignment
-        </div>
-        {/* <div className="btn btn-primary createAssignment">
-          View Students in Class
-        </div> */}
-        {/* <h3 id="asgmtsHeader">Assignments:</h3> */}
+        {isTeacher && (
+          <div
+            className="btn btn-primary createAssignment"
+            onClick={onCreateAssignmentClick}  // Button shows only if isTeacher is true
+          >
+            Create Assignment
+          </div>
+        )}
+        {/* Additional buttons or features for teachers can be conditionally rendered here */}
       </div>
       <div id="asgmtsBody">
         {asgmts.length > 0 ? (
@@ -56,4 +54,3 @@ export default function ClassAsgmts({ className, asgmts, onAssignmentClick, onBa
     </div>
   );
 }
-
