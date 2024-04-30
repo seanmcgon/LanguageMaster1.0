@@ -17,20 +17,27 @@ import Flashcard  from './components/Flashcard/Flashcard.js';
 const App = () => {
   //development credentials
     //Teacher
-    // const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
-    // const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
-    // const [isTeacher, setIsTeacher] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
+    const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
+    const [isTeacher, setIsTeacher] = useState(true);
 
     //Student
     // const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
     // const [isTeacher, setIsTeacher] = useState(false);
     // const [isLoggedIn, setIsLoggedIn] = useState(true);
 
+    //Production
+    // const [isTeacher, setIsTeacher] = useState(false);
+    // const [isLoggedIn, setIsLoggedIn] = useState(false);
+    // const [userEmail, setUserEmail] = useState("");
+
+    useEffect(() => {
+        getClassesForUser(userEmail);  // Fetch classes for the hardcoded user
+      }, []);  // Empty dependency array to run only on mount
   
-    const [isTeacher, setIsTeacher] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+ 
     const [classList, setClassList] = useState([]);
-    const [userEmail, setUserEmail] = useState("");
+
     const [currentClass, setCurrentClass] = useState(""); 
     const [currentAssignments, setCurrentAssignments] = useState([]); 
     const [currentAssignment, setCurrentAssignment] = useState(""); 
