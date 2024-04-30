@@ -6,13 +6,12 @@ const client = new MongoClient(connectionString);
 
 // Quoc
 function checkValid(className) {
-    const regex = /^[^ ]+\_[^ ]{1,6}$/;
+    const regex = /^[^ ]{1,}$/;
     if (className.match(regex)) {
         return true;
     }
     return false;
 }
-
 // Shuto
 async function createAssignment(className, assignmentName, assignmentArray) {
     let createdAssignment = false;
