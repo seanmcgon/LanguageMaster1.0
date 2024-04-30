@@ -13,10 +13,19 @@ function JoinClassPopup(props) {
             setShowError(true);  // Show error if class name is invalid
             setInput('');         // Clear the input after showing error
         } else {
-          onJoinClass(input);  // Call the function passed from the parent component
-            setInput('');             // Clear the input on successful join
-            setShowError(false);      // Reset error state
-            onHide();                 // Hide the popup modal
+            let joinClassStatus = onJoinClass(input)
+            console.log("joinClassStatus",joinClassStatus)
+            if(joinClassStatus)  {
+                console.log("Did not join")
+                setShowError(true);      // Reset error state
+
+            } 
+            else {
+                console.log("Joined Class")
+                setInput('');             // Clear the input on successful join
+                onHide();                 // Hide the popup modal
+
+            }
         }
     };
 

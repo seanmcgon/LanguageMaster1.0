@@ -318,34 +318,45 @@ async function getClassesTeacher(teacherEmail) {
     }  
     }
 
-async function enrollClassStudent(className, studentEmail) {
-  try {
-      await client.connect();
-      db = client.db("UserData");
-      col = await db.collection("students");
-      if (checkValid(className)) {
-          let student_Data = await col.find({ email: studentEmail }).toArray();
-          let student_courses = student_Data[0].courseList;
-          if (student_courses.indexOf(className) == -1) {
-              student_courses.push(className);
-              await col.updateOne({ email: studentEmail }, { $set: { courseList: student_courses } });
-              db1 = client.db(className);
-              col1 = await db1.collection("students");
-              await col1.insertOne(student_Data[0]);
-          } else {
-              throw("The class already exists");
+    async function enrollClassStudent(className, studentEmail) {
+      try {
+          await client.connect();
+          // Check if the className database exists
+          const databases = await client.db().admin().listDatabases();
+          const dbExists = databases.databases.some(db => db.name === className);
+          if (!dbExists) {
+              throw new Error("Invalid class: Database does not exist.");
           }
-          return true;
-      } else {
-          throw("Invalid class");
+          
+          const db = client.db("UserData");
+          const col = await db.collection("students");
+          if (checkValid(className)) {
+              let student_Data = await col.find({ email: studentEmail }).toArray();
+              if (student_Data.length === 0) {
+                  throw new Error("Student not found.");
+              }
+              let student_courses = student_Data[0].courseList;
+              if (!student_courses.includes(className)) {
+                  student_courses.push(className);
+                  await col.updateOne({ email: studentEmail }, { $set: { courseList: student_courses } });
+                  
+                  const db1 = client.db(className);
+                  const col1 = await db1.collection("students");
+                  await col1.insertOne(student_Data[0]);
+              } else {
+                  throw new Error("The class already exists for this student.");
+              }
+              return true;
+          } else {
+              throw new Error("Invalid class configuration.");
+          }
+      } catch (err) {
+          console.error(err);
+          return false;
+      } finally {
+          await client.close();
       }
-  } catch (err) {
-      console.log(err);
-  } finally {
-      await client.close();
   }
-  return false;
-}
 module.exports = {
     enrollClass, getClassesStudent, getClassesTeacher, createClass,enrollClassStudent, getStudentsInClass, getTeachersInClass, updateClassForGivenTeacher, find_class_based_on_ID
 };

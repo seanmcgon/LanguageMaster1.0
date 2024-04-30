@@ -20,7 +20,7 @@ const App = () => {
     // const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
     // const [isTeacher, setIsTeacher] = useState(true);
 
-    const [userEmail, setUserEmail] = useState("jStudent@gmail.com");  // Hardcoded email
+    const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
     const [isTeacher, setIsTeacher] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(true);
 
@@ -153,6 +153,7 @@ const App = () => {
 
     const handleCreateClass = (className) => {
         try {
+            
          createClass(className, userEmail, (classCreated) => {
                 console.log("classCreated")
                 getClassesForUser(userEmail)
@@ -166,17 +167,23 @@ const App = () => {
 
     const handleJoinClass = (className) => {
         console.log("clicked join class")
-
-        try {
+        let retValue = false
          enrollInClass(className, userEmail, (classCreated) => {
-                console.log("classCreated")
-                getClassesForUser(userEmail)
+                if (classCreated) {
+                    getClassesForUser(userEmail)
+                    console.log("class joined true")
+                    retValue = true;
+                    
+                }
+                else {
+                    console.log("class joined false")
 
+                    retValue = false;
+                }
+                
             })
-        }
-        catch {
-            console.log("error in joining class")
-        }
+        
+        return retValue;
     }
 
     return (
