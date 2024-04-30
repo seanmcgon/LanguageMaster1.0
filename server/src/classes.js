@@ -267,6 +267,26 @@ async function enrollClass(classID, studentEmail){
   }
 
   }
+async function updateFlashcardForStudent(className, assignmentName, flashcardName, newScore, studentEmail){
+   try{
+    await client.connect();
+    db1 = client.db(className);
+   col = await db1.collection("assignments");
+   col1 = await db1.collection("metrics");
+   const flash_card = await col.find({$and:[{"assignment": assignmentName},{"text": flashcardName}]}).toArray();
+   const student_flash_card = (await col1.find({$and:[{"assignment": assignmentName},{"card": flash_card[0].card}]}).toArray())[0];
+   const new_time_practice = student_flash_card.timesPracticed + 1;
+   const update_Score = (student_flash_card.score * student_flash_card.timesPracticed + newScore)/new_time_practice;
+   //update flash_card
+   await col1.updateOne({$and:[{"studentEmail" : studentEmail},{"assignment": assignmentName},{"card": flash_card[0].card}]},{$set:{"timesPracticed" : new_time_practice, "score": update_Score}});
+   }
+  catch(err){
+    console.log(err);
+  }
+finally{
+  await client.close();
+}
+  }
 module.exports = { create_unique_id_for_class,
-    enrollClass, getClassesStudent, getClassesTeacher, createClass, getStudentsInClass, getTeachersInClass, updateClassForGivenTeacher, find_class_based_on_ID
+    enrollClass, getClassesStudent, getClassesTeacher, createClass, getStudentsInClass, getTeachersInClass, updateClassForGivenTeacher, find_class_based_on_ID, updateFlashcardForStudent
 };
