@@ -5,6 +5,8 @@ function CreateAssignment() {
   const [assignFields, setAssign] = useState([
     { wordName: "", englishTranslation: "", audioFile: "" },
   ]);
+  // State for assignment title
+  const [title, setTitle] = useState("");
 
   // Update form as user input
   const handleFormChange = (event, index) => {
@@ -13,10 +15,15 @@ function CreateAssignment() {
     setAssign(data);
   };
 
+  // Handle title change
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value);
+  };
+
   //TODO: Handle submission for backend
   const submit = (e) => {
     e.preventDefault();
-    console.log(assignFields);
+    console.log({ title, assignFields });
   };
 
   // Add a card
@@ -26,7 +33,6 @@ function CreateAssignment() {
       englishTranslation: "",
       audioFile: "",
     };
-
     setAssign([...assignFields, object]);
   };
 
@@ -42,6 +48,17 @@ function CreateAssignment() {
     <>
       <div className="CreateAsgmts container d-flex justify-content-center">
         <form onSubmit={submit}>
+          <div className="form-group">
+            <label htmlFor="title">Assignment Title</label>
+            <input
+              type="text"
+              className="form-control"
+              id="title"
+              value={title}
+              onChange={handleTitleChange}
+              placeholder="Enter assignment title"
+            />
+          </div>
           {assignFields.map((form, index) => (
             <div key={index} className="row">
               <div className="form-group col-md-4">
@@ -73,7 +90,7 @@ function CreateAssignment() {
                 />
               </div>
               <div className="form-group col-md-4">
-                <button onClick={() => removeFields(index)}>Remove Card</button>
+                <button type="button" onClick={() => removeFields(index)}>Remove Card</button>
               </div>
             </div>
           ))}

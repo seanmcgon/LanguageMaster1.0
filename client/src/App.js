@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "./components/NavBar/NavBar.js";
 import Login from "./components/Login/Login.js";
 import SignUp from "./components/SignUp/signUp.js";
@@ -13,16 +13,21 @@ import { Modal } from "bootstrap";
 import ClassAsgmts from "./components/ClassAssignments/classAsgmts.js";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
   const [classList, setClassList] = useState([]);
-  const [userEmail, setUserEmail] = useState("");
-  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("jyhuang@umass.edu");  // Hardcoded email
+  const [userName, setUserName] = useState("Jason Huang");  // Hardcoded user name
   const [currentClass, setCurrentClass] = useState("");
   const [currentAssignments, setCurrentAssignments] = useState([]);
   const [currentAssignment, setCurrentAssignment] = useState("");
-
   const [showLogoutMessage, setShowLogoutMessage] = useState(false);
 
+
+  useEffect(() => {
+    getClassesForUser(userEmail);  // Fetch classes for the hardcoded user
+  }, []);  // Empty dependency array to run only on mount
+
+  
   function getClassesHelper(userEmail) {
     const classesTest = [
       {
@@ -67,12 +72,13 @@ const App = () => {
       console.error("Error fetching classes:", error);
     }
   };
-
+  // setUserEmail("jyhuang@umass.edu")
   const handleLoginSuccess = (email, name) => {
+    getClassesForUser(userEmail)
     setIsLoggedIn(true);
     setUserEmail(email);
     setUserName(name); // Assume 'name' is passed along with 'email' after successful login
-    getClassesForUser(email);
+    ;
   };
 
   const handleSignOut = () => {
