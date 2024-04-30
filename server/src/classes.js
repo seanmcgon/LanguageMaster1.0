@@ -6,11 +6,11 @@ const client = new MongoClient(connectionString);
 
 // Quoc
 function checkValid(className) {
-    const regex = /^[^ ]+\_[^ ]{1,6}$/;
+    const regex = /^[^ ]{1,}$/;
     if (className.match(regex)) {
         return true;
     }
-    return true;
+    return false;
 }
 
 // Maya
@@ -52,39 +52,95 @@ async function getTeachersInClass(className) {
     }
     return teachers;
 }
-
-async function createClass(className, teacherEmail) {
-  try {
-      await client.connect();
-      db = client.db("UserData");
-      col = await db.collection("teachers");
-      const checkTheValidOfClassName = checkValid(className);
-      if (true) {
-          if ((await col.find({ email: teacherEmail }).toArray()).length >= 1) {
-              updateClassForGivenTeacher(col, teacherEmail, className);
-              let getTeacherInfo = await col.find({ email: teacherEmail }).toArray();
-              db1 = client.db(className);
-              col1 = await db1.collection("teachers");
-              if ((await col1.find({ email: teacherEmail }).toArray()).length === 0) {
-                  await col1.insertOne(getTeacherInfo[0]);
-              } else {
-                  await col1.deleteOne({ email: teacherEmail });
-                  await col1.insertOne(getTeacherInfo[0]);
-              }
-          return true;
-          } else {
-              throw("Teacher does not exist");
-          }
-      } else {
-          throw("Invalid class name");
-      }
-  } catch (err) {
-      console.log(err);
-  } finally {
-      await client.close();
-  }
-  return false;
+//Quoc
+function create_unique_id_for_class(class_name,c_allCourses){
+  const default_code = "000000";
+  const length_of_array_of_course = c_allCourses.length;
+  const class_code = (length_of_array_of_course + 1) + "";
+  const modified_code = default_code.substring(0,default_code.length - class_code.length) + class_code;
+  const unique_id = class_name + "_" + modified_code;
+  return unique_id;
 }
+
+// Quoc
+async function createClass(className, teacherEmail, language){
+  // Add class to the teacher's course List
+  try{
+  await client.connect();
+  db = client.db("UserData");
+  col = await db.collection("teachers");
+  const teacher_info = await col.find({email: teacherEmail}).toArray();
+
+ //console.log(getTeacherInfo[0]);
+  const checkTheValidOfClassName = checkValid(className);
+  const allCoursesPipeline = [
+    {
+      $unwind: {
+         path: "$courseList",
+         preserveNullAndEmptyArrays: false,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        allCourses: {
+          "$push": "$courseList"
+        }
+      }
+    },
+    {'$addFields': {'courseList': {'$setUnion': ['$fcourseList', []]}}}
+  ];
+
+// Use query, set output to courses to be used later
+let courses = await col.aggregate(allCoursesPipeline);
+// courses is not a variable or list or anything that js can output, it's a MongoDB cursor
+// This is part of how to access the info in it
+c = await courses.next();
+//console.log("The index of the given class name is: " + c.allCourses.indexOf(className));
+//console.log(c.allCourses);
+
+if(checkTheValidOfClassName && teacher_info.length ==1){
+  await client.connect();
+  db = client.db("UserData");
+  col = await db.collection("teachers");
+  //create a class data base based on the given name
+
+  const className_on_data_base = create_unique_id_for_class(className,c.allCourses);
+   await updateClassForGivenTeacher(col, teacherEmail, className_on_data_base);
+   MongoClient.connect(connectionString).then(async (client) => {
+
+    //console.log('Database is being created ... ');
+
+    // database name
+    const db = client.db(className_on_data_base);
+
+    // collection name
+    db.createCollection("assignments");
+    db.createCollection("metrics");
+    db.createCollection("students");
+    db.createCollection("teachers");
+    //console.log("Success!!")
+    //Add teacher to the new class
+    col = db.collection("teachers");
+    await col.insertOne(teacher_info[0]);
+    await col.insertOne({"language_name" : language});
+    await client.close();
+
+
+   })
+}
+  else{
+    throw("inValid class name");
+  }
+}
+  catch(err){
+    throw (err);
+  }
+  finally{
+    await client.close();
+  }
+}
+ 
 
 async function updateClassForGivenTeacher(col, teacherEmail, className) {
   let courseL = await col.find({ email: teacherEmail }).toArray();
@@ -286,17 +342,29 @@ async function getClassesTeacher(teacherEmail) {
   }
 
   // Quoc
-  async function enrollClass(classID, studentEmail){
-    try{
-    const neededData =  await find_class_based_on_ID(classID);
-     if(checkValid(neededData)){
-      await client.connect();
-    db = client.db("UserData");
-    col = await db.collection("students");
-      let student_Data = await col.find({email: studentEmail}).toArray();
-      let student_courses = student_Data[0].courseList;
-      if(student_courses.indexOf(neededData) == -1){
-        student_courses.push(neededData);
+async function enrollClass(classID, studentEmail){
+  try{
+  const neededData =  await find_class_based_on_ID(classID);
+   if(neededData && checkValid(neededData)){
+    await client.connect();
+  db = client.db("UserData");
+  col = await db.collection("students");
+  db1 = client.db(neededData);
+  col1 = await db1.collection("assignments");
+  col2 = await db1.collection("metrics");
+  array_of_assignment = await col1.find().toArray();
+  array_of_assignment = await col1.find().toArray();
+  array_of_assignment = array_of_assignment.map(e => {
+    const object = {"studentEmail": studentEmail, "assignment": e.assignment, "card" : e.card, "timesPracticed": 0, "score": 0}
+    return object;
+   });
+   if(array_of_assignment.length >0){
+  await col2.insertMany(array_of_assignment);
+   }
+     let student_Data = await col.find({email: studentEmail}).toArray();
+     let student_courses = student_Data[0].courseList;
+     if(student_courses.indexOf(neededData) == -1){
+       student_courses.push(neededData);
         await col.updateOne({email:studentEmail}, {$set:{courseList: student_courses}});
         db1 = client.db(neededData);
         col1 = await db1.collection("students");
@@ -305,58 +373,19 @@ async function getClassesTeacher(teacherEmail) {
       else{
         throw("The class already exist");
       }
-    
-    }
-    else{
-      throw("Invalid class");
-    }
-    } catch(err){
-    console.log(err);
-     }
-    finally{
-    await client.close();
-    }  
-    }
 
-    async function enrollClassStudent(className, studentEmail) {
-      try {
-          await client.connect();
-          // Check if the className database exists
-          const databases = await client.db().admin().listDatabases();
-          const dbExists = databases.databases.some(db => db.name === className);
-          if (!dbExists) {
-              throw new Error("Invalid class: Database does not exist.");
-          }
-          
-          const db = client.db("UserData");
-          const col = await db.collection("students");
-          if (checkValid(className)) {
-              let student_Data = await col.find({ email: studentEmail }).toArray();
-              if (student_Data.length === 0) {
-                  throw new Error("Student not found.");
-              }
-              let student_courses = student_Data[0].courseList;
-              if (!student_courses.includes(className)) {
-                  student_courses.push(className);
-                  await col.updateOne({ email: studentEmail }, { $set: { courseList: student_courses } });
-                  
-                  const db1 = client.db(className);
-                  const col1 = await db1.collection("students");
-                  await col1.insertOne(student_Data[0]);
-              } else {
-                  throw new Error("The class already exists for this student.");
-              }
-              return true;
-          } else {
-              throw new Error("Invalid class configuration.");
-          }
-      } catch (err) {
-          console.error(err);
-          return false;
-      } finally {
-          await client.close();
-      }
   }
-module.exports = {
-    enrollClass, getClassesStudent, getClassesTeacher, createClass,enrollClassStudent, getStudentsInClass, getTeachersInClass, updateClassForGivenTeacher, find_class_based_on_ID
+  else{
+    throw("Invalid class");
+  }
+  } catch(err){
+  console.log(err);
+   }
+  finally{
+  await client.close();
+  }
+
+  }
+module.exports = { create_unique_id_for_class,
+    enrollClass, getClassesStudent, getClassesTeacher, createClass, getStudentsInClass, getTeachersInClass, updateClassForGivenTeacher, find_class_based_on_ID
 };
