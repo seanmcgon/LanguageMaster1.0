@@ -1,6 +1,6 @@
 //cd into server and run using "npx jest Testing/assignmentTests"
 const { MongoClient } = require('mongodb');
-const { createAssignment, viewAssignment, addToAssignment, deleteAssignment, deleteFromAssignment, convertAssignmentToDtbForm } = require('../src/assignments.js');
+const { createAssignment, viewAssignment, addToAssignment, deleteAssignment, deleteFromAssignment, convertAssignmentToDtbForm, getAllStudentData, convert} = require('../src/assignments.js');
 
 jest.mock('mongoose');
 const mongo = require('../src/assignments.js');
@@ -26,6 +26,14 @@ describe('Assignment Management Tests', () => {
             expect(card[0].translation).toEqual("qwer");
             expect(card[0].audio).toEqual("zcxv");
             await col.deleteOne({audio: "zcxv"});
+
+            col = db.collection("metrics");
+            const grades = await col.find({assignment: "war", card: 2}).toArray();
+            expect(grades.length).toBe(2);
+            expect(grades.map(e => e.studentEmail)).toContain("Troy.Briggs@yahoo.com");
+            expect(grades.map(e => e.studentEmail)).toContain("Kimberly.Cruz@gmail.com");
+
+            await col.deleteMany({timesPracticed: 0});
           }
           finally{
             await client.close();
@@ -136,9 +144,9 @@ describe('Assignment Management Tests', () => {
         it ('should convert an assignment array to the correct format', () => {
           const assignmentName = 'Assignment0';
           const assignmentArray = [
-            {text: 'text0', translation: 'translation0', audio: 'audio0'},
-            {text: 'text1', translation: 'translation1', audio: 'audio1'},
-            {text: 'text2', translation: 'translation2', audio: 'audio2'}
+            {wordName: 'text0', englishTranslation: 'translation0', audioFile: 'audio0'},
+            {wordName: 'text1', englishTranslation: 'translation1', audioFile: 'audio1'},
+            {wordName: 'text2', englishTranslation: 'translation2', audioFile: 'audio2'}
           ];
           const convertedAssignment = convertAssignmentToDtbForm(assignmentName, assignmentArray);
           expect(convertedAssignment).toEqual([
@@ -154,8 +162,8 @@ describe('Assignment Management Tests', () => {
         it("Returns existing assignment in correct form", async () => {
           const cards = await viewAssignment("Spanish454_QRAPCC", "war");
           expect(cards.length).toEqual(2);
-          expect(cards.map(e => e.text)).toContain("right");
-          expect(cards.map(e => e.text)).toContain("provide");
+          expect(cards.map(e => e.wordName)).toContain("right");
+          expect(cards.map(e => e.wordName)).toContain("provide");
         });
       
         // Reacts correctly for class that doesn't exist
@@ -172,4 +180,28 @@ describe('Assignment Management Tests', () => {
           expect(console.log).toHaveBeenCalledWith("Assignment does not exist");
         });
       });
+
+      describe("getAllStudentData", () => {
+        it("Returns a correct output for existing assignment", async () => {
+          const grades = await getAllStudentData("Spanish454_QRAPCC", "war");
+          expect(grades.length).toBe(2);
+          expect(grades).toContainEqual({"_id": "Troy.Briggs@yahoo.com", 
+          "grades": [{"card": 0, "score": 0.7, "timesPracticed": 7}, {"card": 1, "score": 0.9, "timesPracticed": 8}]});
+          expect(grades).toContainEqual({"_id": "Kimberly.Cruz@gmail.com", 
+          "grades": [{"card": 0, "score": 0.8, "timesPracticed": 1}, {"card": 1, "score": 0.7, "timesPracticed": 7}]});
+        });
+
+        it("Throws an error for a non-existent class", async () => {
+          console.log = jest.fn();
+          await getAllStudentData("ABCD", "war");
+          expect(console.log).toHaveBeenCalledWith("Class does not exist");
+        });
+      
+        it("Throws an error for a non-existent assignment", async () => {
+          console.log = jest.fn();
+          await getAllStudentData("Spanish454_QRAPCC", "ASDF");
+          expect(console.log).toHaveBeenCalledWith("Assignment does not exist");
+        });
+
+      })
 });
