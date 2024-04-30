@@ -1,0 +1,88 @@
+/* General styling for view assignments */
+.viewAssignment {
+    padding: 10px;
+}
+
+/* Button container with flex layout */
+.button-container {
+    display: flex;
+    justify-content: space-between; /* Space buttons out */
+    align-items: center; /* Center buttons vertically */
+    margin-bottom: 20px; /* Add some margin below the container */
+}
+
+/* Styles for the back button */
+.backButton {
+    background-color: maroon; /* Less prominent color for secondary action */
+    color: white;
+    border: none;
+    padding: 5px 10px; /* Smaller padding */
+    font-size: 14px; /* Smaller font size */
+    cursor: pointer;
+    margin: 0 10px; /* Space between buttons */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.4s, transform 0.2s; /* Smooth transitions for interaction */
+}
+
+/* Hover effect for back button */
+.backButton:hover {
+    background-color: darkred; /* Darken on hover */
+    transform: scale(1.05); /* Slight increase in size on hover */
+}
+
+/* Styles for the flashcard button */
+.flashCardButton {
+    background-color: maroon; /* Prominent color for primary action */
+    color: white;
+    border: none;
+    padding: 15px 30px; /* Larger padding for emphasis */
+    font-size: 18px; /* Larger font size */
+    cursor: pointer;
+    margin: 0 10px; /* Space between buttons */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.4s, transform 0.2s; /* Smooth transitions for interaction */
+}
+
+/* Hover effect for flashcard button */
+.flashCardButton:hover {
+    background-color: darkred; /* Darken on hover */
+    transform: scale(1.05); /* Slight increase in size on hover */
+}
+
+/* Styling for lesson names */
+.lessonName {
+    margin-bottom: 20px;
+    color: maroon;
+}
+
+/* Container for tables with scrolling capability */
+.tableContainer {
+    max-height: 800px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+}
+
+/* Styling for flashcard tables */
+.flashcardTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Styling for table headers and cells */
+.flashcardTable th, .flashcardTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+/* Sticky header in table */
+.flashcardTable thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f0f0f0;
+}
+
+/* Full-width audio controls for better usability */
+.audioControl {
+    width: 100%;
+}
