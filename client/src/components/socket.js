@@ -60,8 +60,8 @@ export const viewAssignment = (className, assignmentName, fetchedAssignment) => 
 
 //TODO: Add functions for classes
 
-export const createClass = (className, teacherEmail, classCreated) => {
-  socket.emit("createClass", className, teacherEmail);
+export const createClass = (className, teacherEmail, language, classCreated) => {
+  socket.emit("createClass", className, teacherEmail, language);
   socket.on("createClassStatus", classCreated);
 }
 

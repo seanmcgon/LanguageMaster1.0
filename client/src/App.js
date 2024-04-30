@@ -16,13 +16,13 @@ import ViewAssignmentStudent from "./components/ViewAssignmentStudent/ViewAssign
 
 const App = () => {
   //development credentials
-    // const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
-    // const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
-    // const [isTeacher, setIsTeacher] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
+    const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
+    const [isTeacher, setIsTeacher] = useState(true);
 
-    const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
-    const [isTeacher, setIsTeacher] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    // const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
+    // const [isTeacher, setIsTeacher] = useState(false);
+    // const [isLoggedIn, setIsLoggedIn] = useState(true);
 
     useEffect(() => {
         getClassesForUser(userEmail);  // Fetch classes for the hardcoded user
@@ -151,10 +151,10 @@ const App = () => {
       setShowCreateAssignment(false); 
     };
 
-    const handleCreateClass = (className) => {
+    const handleCreateClass = (className, language) => {
         try {
             
-         createClass(className, userEmail, (classCreated) => {
+         createClass(className, userEmail, language, (classCreated) => {
                 console.log("classCreated")
                 getClassesForUser(userEmail)
 

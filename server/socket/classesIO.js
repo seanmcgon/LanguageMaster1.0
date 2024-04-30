@@ -8,11 +8,11 @@ const {
 
 //TODO:write the IO functions for all functions above
 function createClassIO(socket) {
-    socket.on('createClass', async (className, teacherEmail) => {
-      console.log(className, teacherEmail)
+    socket.on('createClass', async (className, teacherEmail, language) => {
+      console.log(className, teacherEmail, language)
         let classCreated;
         try {
-          classCreated = await createClass(className, teacherEmail);
+          classCreated = await createClass(className, teacherEmail,language);
         } catch (error) {
             console.error('Error creating class:', error);
             classCreated = false;
