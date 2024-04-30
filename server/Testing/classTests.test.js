@@ -2,7 +2,7 @@
 // can also run with "npm test -- classTests.test.js"
 
 const { MongoClient } = require('mongodb');
-const { createClass, getClassesTeacher, getClassesStudent, enrollClass, find_class_based_on_ID } = require('../src/classes.js');
+const { createClass, getClassesTeacher, getClassesStudent, enrollClass, find_class_based_on_ID,create_unique_id_for_class } = require('../src/classes.js');
 const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
 const client = new MongoClient(connectionString);
 
@@ -67,60 +67,81 @@ describe('Class Management Tests', () => {
       })
 
       describe('createClass',() =>{
-        it('Add a class to a given teacher, and vice versa. In this case, the class already existed', async() => {
-          const email = "jyhuang@umass.edu";
-          const className ="Vietnamese219_VJTCBB"; 
-        await createClass(className, email);
-        await client.connect();
+       it('Add a class to a given teacher, and vice versa.', async() => {
+            const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
+            const client = new MongoClient(connectionString);
+            const email = "Stephen.Calderon@gmail.com";
+            const className ="Vietnamese";
+            const language = "Vietnamese";
+            await client.connect();
           db = client.db("UserData");
-          db1 = client.db(className);
           col = await db.collection("teachers");
-          col1 = await db1.collection("teachers");
-        const testTeacher = (await col.find({email: email}).toArray())[0].courseList.indexOf(className);
-        const testClassDataBase = await col1.find({email:email}).toArray();
-        expect(testTeacher).toBeGreaterThan(-1);
-        expect(testClassDataBase.length).toBeGreaterThan(0);
-        await client.close();
-        });
-      
-        // test case 2
-        
-        it('Add a class to a given teacher, and vice versa. In this case, the class does not exist', async() => {
-          
-          await client.connect();
-          const email = "jyhuang@umass.edu";
-          const className ="LeageOfLegend_101";
-        await createClass(className, email);
-         db = client.db("UserData");
-          col = await db.collection("teachers");
-          const testTeacher = (await col.find({email: email}).toArray())[0].courseList.indexOf(className);
-          await col.deleteOne({email: email});
-          await client.close();
-        
-        //const testClassDataBase = await col1.find({email:email}).toArray();
-        //await client.close();
-        expect(testTeacher).toBeGreaterThan(-1);
-        });
+         //console.log(getTeacherInfo[0]);
+          const allCoursesPipeline = [
+            {
+              $unwind: {
+                 path: "$courseList",
+                 preserveNullAndEmptyArrays: false,
+              },
+           },
+           {
+             $group: {
+               _id: null,
+               allCourses: {
+                 "$push": "$courseList"
+               }
+             }
+           },
+           {'$addFields': {'courseList': {'$setUnion': ['$fcourseList', []]}}}
+         ];
+
+       // Use query, set output to courses to be used later
+       let courses = await col.aggregate(allCoursesPipeline);
+       // courses is not a variable or list or anything that js can output, it's a MongoDB cursor
+       // This is part of how to access the info in it
+       c = await courses.next();
+           const test_class_name = create_unique_id_for_class(className,c.allCourses);
+         await createClass(className, email,language);
+       console.log(test_class_name);
+       await client.close();
+       await client.connect();
+           db = client.db("UserData");
+           db1 = client.db(test_class_name);
+           col = await db.collection("teachers");
+           col1 = await db1.collection("teachers");
+         const testTeacher = (await col.find({email: email}).toArray())[0].courseList.indexOf(test_class_name);
+         const testClassDataBase = await col1.find({email:email}).toArray();
+         expect(testTeacher).toBeGreaterThan(-1);
+         expect(testClassDataBase.length).toBeGreaterThan(-1);
+         });
       });
       
       describe('enrollClass',() => {
-        it('Add a class to a given student course, and vice versa. In this case, the class is not in the student course yet', async() => {
+         it('Add a class to a given student course, and vice versa. In this case, the class is not in the student course yet. The class already has assigments', async() => {
+          const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
+          const client = new MongoClient(connectionString);
           try{
-            const email = "Troy.Briggs@yahoo.com";
-            const ID = "RXPILU";
-            await enrollClass(ID, email);
-            // Test the class is added to student's collection in UserData
-            const class_Full_Name = await find_class_based_on_ID(ID);
-            await client.connect(); 
-            db = client.db("UserData");
+          const email = "Antonio.Greene@yahoo.com";
+          const ID = "000023";
+        await enrollClass(ID, email);
+        // Test the class is added to student's collection in UserData
+          const class_Full_Name = await find_class_based_on_ID(ID);
+          console.log(class_Full_Name);
+          await client.connect();
+          db = client.db("UserData");
             col = await db.collection("students");
-            const test_student_course_list = (await col.find({email: email}).toArray())[0].courseList.indexOf(class_Full_Name);
-            expect(test_student_course_list).toBeGreaterThan(-1);
-            // Test the student is added to class's student's collection
-            db1 = client.db(class_Full_Name);
-            col1 = await db1.collection("students");
-            const test_student_list = await col1.find({email: email}).toArray();
-            expect(test_student_list.length).toEqual(1);
+        const test_student_course_list = (await col.find({email: email}).toArray())[0].courseList.indexOf(class_Full_Name);
+        db1 = client.db(class_Full_Name);
+        col1 = await db1.collection("students");
+        col2 = await db1.collection("assignments");
+        col3 = await db1.collection("metrics");
+        const test_student_list = await col1.find({email: email}).toArray();
+        const array_of_assignment_length = (await col2.find().toArray()).length;
+        const metric_of_that_student = (await col3.find({"studentEmail":email}).toArray()).length;
+        expect(test_student_course_list).toBeGreaterThan(0);
+        // Test the student is added to class's student's collectio
+        expect(test_student_list.length).toEqual(1);
+        expect(array_of_assignment_length).toEqual(metric_of_that_student);
           }
           catch(error){
             throw (error);
@@ -129,5 +150,40 @@ describe('Class Management Tests', () => {
             await client.close();
           }
         });
+it('Add a class to a given student course, and vice versa. In this case, the class is not in the student course yet. The class does not have any assignment yet', async() => {
+          const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
+          const client = new MongoClient(connectionString);
+          try{
+          const email = "Antonio.Greene@yahoo.com";
+          const ID = "000024";
+        await enrollClass(ID, email);
+        // Test the class is added to student's collection in UserData
+          const class_Full_Name = await find_class_based_on_ID(ID);
+          console.log(class_Full_Name);
+          await client.connect();
+          db = client.db("UserData");
+            col = await db.collection("students");
+        const test_student_course_list = (await col.find({email: email}).toArray())[0].courseList.indexOf(class_Full_Name);
+        db1 = client.db(class_Full_Name);
+        col1 = await db1.collection("students");
+        col2 = await db1.collection("assignments");
+        col3 = await db1.collection("metrics");
+        const test_student_list = await col1.find({email: email}).toArray();
+        const array_of_assignment_length = (await col2.find().toArray()).length;
+        const metric_of_that_student = (await col3.find({"studentEmail":email}).toArray()).length;
+        expect(test_student_course_list).toBeGreaterThan(0);
+        // Test the student is added to class's student's collectio
+        expect(test_student_list.length).toEqual(1);
+        expect(array_of_assignment_length).toEqual(metric_of_that_student);
+          }
+          catch(error){
+            throw (error);
+          }
+          finally{
+            await client.close();
+          }
+
+       });
+          
       });     
 });
