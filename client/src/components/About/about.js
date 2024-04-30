@@ -31,6 +31,13 @@ const AboutComponent = () => {
             <p>Team Leader and Full Stack Developer</p>
           </div>
         </div>
+        <div className="member">
+          <img src={seanImage} alt="Sean McGonigle" />
+          <div>
+            <h3>Sean McGonigle</h3>
+            <p>Frontend Engineer</p>
+          </div>
+        </div>
 
         <h2>Backend Team</h2>
         <div className="member">
@@ -63,13 +70,7 @@ const AboutComponent = () => {
             <p>Frontend Leader</p>
           </div>
         </div>
-        <div className="member">
-          <img src={seanImage} alt="Sean McGonigle" />
-          <div>
-            <h3>Sean McGonigle</h3>
-            <p>Frontend Engineer</p>
-          </div>
-        </div>
+        
         <div className="member">
           <img src={suhaniImage} alt="Suhani Chawla" />
           <div>

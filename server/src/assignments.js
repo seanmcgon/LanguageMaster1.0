@@ -4,6 +4,7 @@ const { TextEncoder } = require('util');
 const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
 const client = new MongoClient(connectionString);
 
+// Quoc
 function checkValid(className) {
     const regex = /^[^ ]+\_[^ ]{1,6}$/;
     if (className.match(regex)) {
@@ -12,6 +13,7 @@ function checkValid(className) {
     return false;
 }
 
+// Shuto
 async function createAssignment(className, assignmentName, assignmentArray) {
     let createdAssignment = false;
     try {
@@ -32,6 +34,7 @@ async function createAssignment(className, assignmentName, assignmentArray) {
     return createdAssignment;
 }
 
+// Shuto
 function convertAssignmentToDtbForm(assignmentName, assignmentArray) {
     return assignmentArray.map((flashcard, index) => ({
         assignment: assignmentName,
@@ -42,13 +45,22 @@ function convertAssignmentToDtbForm(assignmentName, assignmentArray) {
     }));
 }
 
+// Maya
 async function addToAssignment(className, assignmentName, card) {
     let inserted = false;
     try {
         await client.connect();
         const db = client.db(className);
-        const col = db.collection("assignments");
+        let col = db.collection("teachers");
+        const teachers = await col.find().toArray();
+        if(teachers.length === 0){
+            throw("Class does not exist");
+        }
+        col = db.collection("assignments");
         const cardNum = (await col.find({ assignment: assignmentName }).toArray()).length;
+        if(cardNum === 0){
+            throw("Assignment does not exist");
+        }
         await col.insertOne({ assignment: assignmentName, card: cardNum, ...card });
         inserted = true;
     } catch (err) {
@@ -94,13 +106,19 @@ async function getAllAssignments(className) {
     return assignmentSummary;
 }
 
-
+// Maya
 async function viewAssignment(className, assignmentName) {
     let cards = [];
     try {
         await client.connect();
         const db = client.db(className);
-        const col = db.collection("assignments");
+        let col = db.collection("teachers");
+        const teachers = await col.find().toArray();
+        // If there are no teachers assigned to the class, then it doesn't exist
+        if(teachers.length === 0){
+            throw("Class does not exist");
+        }
+        col = db.collection("assignments");
         cards = await col.find({ assignment: assignmentName }).toArray();
         if (cards.length === 0) {
             throw("Assignment does not exist");
@@ -113,7 +131,7 @@ async function viewAssignment(className, assignmentName) {
     return cards.map(e => ({ wordName: e.text, englishTranslation: e.translation, audioFile: e.audio }));
 }
 
-
+// Quoc
 async function deleteAssignment(className, assignmentName) {
     try {
         await client.connect();
@@ -132,6 +150,36 @@ async function deleteAssignment(className, assignmentName) {
     }
 }
 
+// Quoc
+async function deleteFromAssignment(className,assignmentName,flashcard_Object){
+    try{
+      await client.connect();
+      if(checkValid(className)){
+        db = client.db(className);
+        col = await db.collection("assignments");
+        const presence = await col.find({assignment: assignmentName}).toArray();
+        if(presence.length >0){
+          await col.deleteMany({$and: [{assignment: assignmentName},{text: flashcard_Object.text}, {translation: flashcard_Object.translation},{audio: flashcard_Object.audio}]})
+        console.log("Done!!!");
+        }
+        else{
+          throw("No data");
+        }
+      }
+      else{
+        throw("Invalid className");
+      }
+
+    }
+    catch(err){
+      console.log(err);
+    }
+    finally{
+      await client.close();
+    }
+
+  }
+
 module.exports = {
-    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments
+    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment
 };

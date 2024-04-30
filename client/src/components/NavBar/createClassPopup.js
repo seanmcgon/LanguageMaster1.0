@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import React, { useState } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
 
 export default function CreateClassPopup(props) {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [showError, setShowError] = useState(false);
   const { onCreateClass, onHide, ...restProps } = props;
 
@@ -10,10 +10,10 @@ export default function CreateClassPopup(props) {
     e.preventDefault();
     if (input.length < 1 || input.length > 50) {
       setShowError(true);  // Show error if class name is invalid
-      setInput("");         // Clear the input after showing error
+      setInput('');         // Clear the input after showing error
     } else {
       onCreateClass(input); // Call the function passed from the parent component
-      setInput("");         // Clear the input on successful creation
+      setInput('');         // Clear the input on successful creation
       setShowError(false);  // Reset error state
       onHide();             // Hide the popup modal
     }
@@ -21,10 +21,10 @@ export default function CreateClassPopup(props) {
 
   return (
     <Modal {...restProps} centered onEnter={() => {
-      setInput("");
+      setInput('');
       setShowError(false);
     }}>
-      <Modal.Header closeButton>
+      <Modal.Header closeButton onHide={onHide}>
         <Modal.Title className="popupTitle" id="contained-modal-title-vcenter">
           Create New Class
         </Modal.Title>

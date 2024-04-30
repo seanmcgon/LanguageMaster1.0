@@ -5,6 +5,7 @@ const { TextEncoder } = require('util');
 const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
 const client = new MongoClient(connectionString);
 
+// Quoc
 function checkValidityOfEmail(emailAddress) {
     const regex = /^[^ ]+@[^ ]+\.[a-z]{2,}$/;
     if (emailAddress.match(regex)) {
@@ -13,6 +14,7 @@ function checkValidityOfEmail(emailAddress) {
     return false;
 }
 
+// Quoc
 function checkValidityOfPassword(password) {
     const regex = /^[^ ]{2,15}$/;
     if (password.match(regex)) {
@@ -21,6 +23,7 @@ function checkValidityOfPassword(password) {
     return false;
 }
 
+// Quoc
 async function verifyTeacher(teacherEmail, password) {
     if (!password) {
       return false;
@@ -41,6 +44,7 @@ async function verifyTeacher(teacherEmail, password) {
     }
 }
 
+// Quoc
 async function verifyStudent(studentEmail, password) {
     if (!password) {
       return false;
@@ -61,6 +65,7 @@ async function verifyStudent(studentEmail, password) {
     }
 }
 
+// Quoc
 async function createTeacher(firstName, lastName, teacherEmail, password) {
     let createdTeacher = false;
     const re = verifyTeacher(teacherEmail.trim(), password.trim());
@@ -86,6 +91,7 @@ async function createTeacher(firstName, lastName, teacherEmail, password) {
     return createdTeacher;
 }
 
+// Maya
 async function createStudent(firstName, lastName, studentEmail, password) {
     let inserted = false;
     try {
