@@ -200,14 +200,20 @@ async function getAllStudentData(className, assignmentName){
     try{
         await client.connect();
         let db = client.db(className);
+
+        // Check if there are teachers to tell if the class exists
         let col = db.collection("teachers");
         if((await col.find().toArray()).length === 0){
             throw("Class does not exist");
         }
+
+        // Check that the assignment exists
         col = db.collection("metrics");
         if((await col.find({assignment: assignmentName}).toArray()).length === 0){
             throw("Assignment does not exist");
         }
+
+        // Mongo Query to get the data to return
         const pipeline = [
             {$match:{assignment: assignmentName}}, 
             {$group: 
@@ -215,6 +221,7 @@ async function getAllStudentData(className, assignmentName){
                     {$push: {card: "$card", timesPracticed: "$timesPracticed", score: "$score"}}}}
         ]
 
+        // Parse data so it can be returned as an easily accessible array
         let g = await col.aggregate(pipeline);
         while(await g.hasNext()){
             grades.push(await g.next());
