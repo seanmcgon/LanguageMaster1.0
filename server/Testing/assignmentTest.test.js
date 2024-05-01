@@ -1,4 +1,4 @@
-//cd into server and run using "npx jest Testing/assignmentTests"
+//cd into server and run using "npx jest Testing/assignmentTest"
 const { MongoClient } = require('mongodb');
 const { createAssignment, viewAssignment, addToAssignment, deleteAssignment, deleteFromAssignment, convertAssignmentToDtbForm } = require('../src/assignments.js');
 
@@ -136,9 +136,9 @@ describe('Assignment Management Tests', () => {
         it ('should convert an assignment array to the correct format', () => {
           const assignmentName = 'Assignment0';
           const assignmentArray = [
-            {text: 'text0', translation: 'translation0', audio: 'audio0'},
-            {text: 'text1', translation: 'translation1', audio: 'audio1'},
-            {text: 'text2', translation: 'translation2', audio: 'audio2'}
+            {wordName: 'text0', englishTranslation: 'translation0', audioFile: 'audio0'},
+            {wordName: 'text1', englishTranslation: 'translation1', audioFile: 'audio1'},
+            {wordName: 'text2', englishTranslation: 'translation2', audioFile: 'audio2'}
           ];
           const convertedAssignment = convertAssignmentToDtbForm(assignmentName, assignmentArray);
           expect(convertedAssignment).toEqual([
@@ -171,5 +171,109 @@ describe('Assignment Management Tests', () => {
           await viewAssignment("Spanish454_QRAPCC", "ABCD");
           expect(console.log).toHaveBeenCalledWith("Assignment does not exist");
         });
+      });
+
+      describe("createAssignment", () => {
+        it("Creates a new assignment", async () => {
+          try {
+            const className = "Chinese671_JPYVGX";
+            const assignmentName = "assignment1";
+            const assignmentArray = [
+              { wordName: "text1", englishTranslation: "translation1", audioFile: "audio1"},
+              { wordName: "text2", englishTranslation: "translation2", audioFile: "audio2"}
+            ];
+            const created = await createAssignment(className, assignmentName, assignmentArray);
+            expect(created).toEqual(true);
+
+            // Verify that the assignment was created in the database
+            await client.connect();
+            const db = client.db(className);
+            const col = db.collection("assignments");
+            const assignments = await col.find({ assignment: assignmentName }).toArray();
+            expect(assignments.length).toEqual(2);
+            expect(assignments.map(a => a.text)).toContain("text1");
+            expect(assignments.map(a => a.text)).toContain("text2");
+
+            // Clean up by deleting the created assignment
+            await col.deleteMany({ assignment: assignmentName });
+            await db.collection("metrics").deleteMany({ assignment: assignmentName });
+
+          } catch (err) {
+            throw (err);
+          } finally {
+            await client.close();
+          }
+        });
+
+        it("Inserts only unique objects", async () => {
+          try {
+            const className = "Chinese671_JPYVGX";
+            const assignmentName = "assignment1";
+            const assignmentArray = [
+              { wordName: "text1", englishTranslation: "translation1", audioFile: "audio1"},
+              { wordName: "text2", englishTranslation: "translation2", audioFile: "audio2"},
+              { wordName: "text2", englishTranslation: "translation2", audioFile: "audio2"}
+            ];
+            const created = await createAssignment(className, assignmentName, assignmentArray);
+            expect(created).toEqual(true);
+
+            // Verify that the assignment was created in the database
+            await client.connect();
+            const db = client.db(className);
+            const col = db.collection("assignments");
+            const assignments = await col.find({ assignment: assignmentName }).toArray();
+            expect(assignments.length).toEqual(2);
+            expect(assignments.map(a => a.text)).toContain("text1");
+            expect(assignments.map(a => a.text)).toContain("text2");
+
+            // Clean up by deleting the created assignment
+            await col.deleteMany({ assignment: assignmentName });
+            await db.collection("metrics").deleteMany({ assignment: assignmentName });
+
+          } catch (err) {
+            throw (err);
+          } finally {
+            await client.close();
+          }
+        });
+
+        it("Creates a new assignment with blank grades for every student for every flashcard", async () => {
+          try {
+              const className = "Chinese671_JPYVGX";
+              const assignmentName = "assignment1";
+              const assignmentArray = [
+                  { wordName: "text1", englishTranslation: "translation1", audioFile: "audio1"},
+                  { wordName: "text2", englishTranslation: "translation2", audioFile: "audio2"}
+              ];
+              const created = await createAssignment(className, assignmentName, assignmentArray);
+              expect(created).toEqual(true);
+  
+              // Verify that the assignment was created in the database
+              await client.connect();
+              const db = client.db(className);
+              const col = db.collection("assignments");
+              const assignments = await col.find({ assignment: assignmentName }).toArray();
+              expect(assignments.length).toEqual(2);
+              expect(assignments.map(a => a.text)).toContain("text1");
+              expect(assignments.map(a => a.text)).toContain("text2");
+  
+              // Verify that blank grades were created for every student for every flashcard
+              
+              const grades = await db.collection("metrics").find({assignment: assignmentName}).toArray();
+              expect(grades.length).toEqual(4);
+              expect(grades.map(e => e.studentEmail)).toContain("Michael.Hinton@gmail.com");
+              expect(grades.map(e => e.studentEmail)).toContain("Mark.Wilson@yahoo.com");
+  
+              // Clean up by deleting the created assignment and grades
+              await col.deleteMany({ assignment: assignmentName });
+              await db.collection("metrics").deleteMany({ assignment: assignmentName });
+  
+          } catch (err) {
+              throw (err);
+          } finally {
+              await client.close();
+          }
+        });
+  
       });
 });
