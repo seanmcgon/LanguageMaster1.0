@@ -55,12 +55,30 @@ async function getTeachersInClass(className) {
 //Quoc
 function create_unique_id_for_class(class_name,c_allCourses){
   const default_code = "000000";
+  const arr_of_ID = c_allCourses.filter(e =>{
+    const index_of_underscore = e.indexOf("_");
+    return (index_of_underscore >=0 && Number.isInteger(parseInt(e.substring(index_of_underscore + 1, e.length))));
+  }).map(e =>{
+    const index_of_underscore = e.indexOf("_");
+    return (parseInt(e.substring(index_of_underscore+1, e.length)) - 0);
+  });
   const length_of_array_of_course = c_allCourses.length;
-  const class_code = (length_of_array_of_course + 1) + "";
-  const modified_code = default_code.substring(0,default_code.length - class_code.length) + class_code;
+  let class_code;
+  let i;
+  for(i = 0; i<length_of_array_of_course; i++){
+    if(arr_of_ID.indexOf(i)== -1){
+      class_code = i;
+      break;
+    }
+  }
+  if(i == length_of_array_of_course){
+    class_code = length_of_array_of_course + 1;
+  }
+  const modified_code = default_code.substring(0,default_code.length - (class_code + "").length) + class_code + "";
   const unique_id = class_name + "_" + modified_code;
   return unique_id;
 }
+
 
 // Quoc
 async function createClass(className, teacherEmail, language){
