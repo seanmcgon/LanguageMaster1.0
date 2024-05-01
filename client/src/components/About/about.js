@@ -35,7 +35,7 @@ const AboutComponent = () => {
           <img src={seanImage} alt="Sean McGonigle" />
           <div>
             <h3>Sean McGonigle</h3>
-            <p>Frontend Engineer</p>
+            <p>Full-Stack Developer</p>
           </div>
         </div>
 

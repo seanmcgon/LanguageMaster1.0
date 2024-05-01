@@ -1,69 +1,70 @@
-import React, { useState } from "react";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
+import React, { useState } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
 
-function join(className, setInput, submitToServer, hidePopup, showError) {
-  if (className.length < 1 || className.length > 50) {
-    showError(true);
-    setInput("");
-    return;
-  }
-  // const result = submitToServer(className);
-  // if (result) {
-  //   showError(false);
-  //   setInput("");
-  //   hidePopup();
-  // } else {
-  //   showError(true);
-  //   setInput("");
-  // }
+function JoinClassPopup(props) {
+    const [input, setInput] = useState('');
+    const [showError, setShowError] = useState(false);
+    const { onJoinClass, onHide, ...restProps } = props;
+
+    const handleJoin = (e) => {
+        e.preventDefault();
+        // Check if input is empty, longer than 50 characters, or contains spaces
+        if (input.length < 1 || input.length > 50 || /\s/.test(input)) {
+            setShowError(true);  // Show error if class name is invalid
+            setInput('');         // Clear the input after showing error
+        } else {
+            let joinClassStatus = onJoinClass(input)
+            console.log("joinClassStatus",joinClassStatus)
+            if(joinClassStatus)  {
+                console.log("Did not join")
+                setShowError(true);      // Reset error state
+
+            } 
+            else {
+                console.log("Joined Class")
+                setInput('');             // Clear the input on successful join
+                onHide();                 // Hide the popup modal
+
+            }
+        }
+    };
+
+    return (
+        <Modal {...restProps} centered onHide={onHide} onEnter={() => {
+            setInput('');
+            setShowError(false);
+        }}>
+            <Modal.Header closeButton>
+                <Modal.Title id="contained-modal-title-vcenter">
+                    Join a Class
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form onSubmit={handleJoin}>
+                    <Form.Label htmlFor="className">ClassID:</Form.Label>
+                    <Form.Control
+                        type="text"
+                        id="className"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        autoComplete="off"
+                    />
+                    {showError && (
+                        <p id="invalidClass" className="text-danger">
+                            Invalid class name. Please try again.
+                        </p>
+                    )}
+                    <Form.Text id="helpBlock" muted>
+                        Contact your teacher for ClassID
+                    </Form.Text>
+                    <br/><br/>
+                    <Button className="joinButton" type="submit">
+                        Join Class
+                    </Button>
+                </Form>
+            </Modal.Body>
+        </Modal>
+    );
 }
 
-export default function JoinClassPopup(props) {
-  const [input, setInput] = useState("");
-  const [showError, setShowError] = useState(false);
-  const { handleSubmission, ...restProps } = props;
-
-  return (
-    <Modal {...restProps} centered>
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Join a Class
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form
-          onSubmit={(e) => {
-            e.preventDefault();
-            join(
-              input,
-              setInput,
-              handleSubmission,
-              restProps.onHide,
-              setShowError
-            );
-          }}
-        >
-          <Form.Group controlId="formClassName">
-            <Form.Label>Name of the class:</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter class name"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
-          </Form.Group>
-          {showError && (
-            <p className="text-danger">
-              Class name is invalid or already exists. Please try again.
-            </p>
-          )}
-          <Button variant="primary" type="submit">
-            Join Class
-          </Button>
-        </Form>
-      </Modal.Body>
-    </Modal>
-  );
-}
+export default JoinClassPopup;

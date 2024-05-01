@@ -1,19 +1,58 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 
+const languages = {
+  'Arabic': 'ar-SA',
+  'Chinese (Simplified)': 'zh-CN',
+  'Chinese (Traditional)': 'zh-TW',
+  'Danish': 'da-DK',
+  'Dutch': 'nl-NL',
+  'English (Australia)': 'en-AU',
+  'English (United Kingdom)': 'en-GB',
+  'English (India)': 'en-IN',
+  'English (United States)': 'en-US',
+  'Finnish': 'fi-FI',
+  'French': 'fr-FR',
+  'German': 'de-DE',
+  'Greek': 'el-GR',
+  'Hebrew': 'he-IL',
+  'Hindi': 'hi-IN',
+  'Hungarian': 'hu-HU',
+  'Indonesian': 'id-ID',
+  'Italian': 'it-IT',
+  'Japanese': 'ja-JP',
+  'Korean': 'ko-KR',
+  'Norwegian': 'no-NO',
+  'Polish': 'pl-PL',
+  'Portuguese (Brazil)': 'pt-BR',
+  'Portuguese (Portugal)': 'pt-PT',
+  'Russian': 'ru-RU',
+  'Spanish (Spain)': 'es-ES',
+  'Spanish (Mexico)': 'es-MX',
+  'Swedish': 'sv-SE',
+  'Thai': 'th-TH',
+  'Turkish': 'tr-TR',
+  'Vietnamese': 'vi-VN'
+};
+
 export default function CreateClassPopup(props) {
   const [input, setInput] = useState('');
+  const [selectedLanguage, setSelectedLanguage] = useState('');
   const [showError, setShowError] = useState(false);
   const { onCreateClass, onHide, ...restProps } = props;
 
   const handleCreate = (e) => {
     e.preventDefault();
-    if (input.length < 1 || input.length > 50) {
+    // Check if input is empty, longer than 50 characters, or contains spaces
+    if (input.length < 1 || input.length > 50 || /\s/.test(input)) {
       setShowError(true);  // Show error if class name is invalid
       setInput('');         // Clear the input after showing error
+    } else if (!selectedLanguage) {
+      setShowError(true);  // Show error if language is not selected
     } else {
-      onCreateClass(input); // Call the function passed from the parent component
+      onCreateClass(input, selectedLanguage); // Call the function passed from the parent component
       setInput('');         // Clear the input on successful creation
+      setSelectedLanguage(''); // Clear selected language
       setShowError(false);  // Reset error state
       onHide();             // Hide the popup modal
     }
@@ -22,6 +61,7 @@ export default function CreateClassPopup(props) {
   return (
     <Modal {...restProps} centered onEnter={() => {
       setInput('');
+      setSelectedLanguage('');
       setShowError(false);
     }}>
       <Modal.Header closeButton onHide={onHide}>
@@ -40,13 +80,27 @@ export default function CreateClassPopup(props) {
             onChange={(e) => setInput(e.target.value)}
             autoComplete="off"
           />
+          <Form.Label htmlFor="languageSelect">Select language:</Form.Label>
+          <Form.Select
+            id="languageSelect"
+            value={selectedLanguage}
+            onChange={(e) => setSelectedLanguage(e.target.value)}
+          >
+            <option value="">Choose...</option>
+            {/* Map through the languages object to create dropdown options */}
+            {Object.keys(languages).map((langName) => (
+              <option key={languages[langName]} value={languages[langName]}>
+                {langName}
+              </option>
+            ))}
+          </Form.Select>
           {showError && (
             <p id="invalidClass" className="text-danger">
-              Class name is invalid or already exists. Please try again.
+              Invalid class name or language not selected. Please try again.
             </p>
           )}
           <Form.Text id="helpBlock" muted>
-            Class names must be 1-50 characters long.
+            Class names must be 1-50 characters long and cannot contain spaces.
           </Form.Text>
           <br/><br/>
           <Button className="createButton" type="submit">

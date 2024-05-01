@@ -38,3 +38,12 @@
 .enrolledClass {
   color: maroon !important;
 }
+
+.no-classes-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px; /* Adjust height as needed to fit your layout */
+  font-size: 1.5rem; /* Optional: Adjust font size as desired */
+  color: #666; /* Optional: Adjust text color as desired */
+}

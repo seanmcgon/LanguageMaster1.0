@@ -6,19 +6,33 @@ function CreateAssignment({ onBack, onCreateAssignment }) {
         { wordName: "", englishTranslation: "", audioFile: "" },
     ]);
     const [title, setTitle] = useState("");
+    const [error, setError] = useState(""); // State to store the error message
 
     const handleFormChange = (event, index) => {
         let data = [...assignFields];
         data[index][event.target.name] = event.target.value;
         setAssignFields(data);
+        if (error) setError(""); // Clear error when the user is correcting input
     };
 
     const handleTitleChange = (event) => {
         setTitle(event.target.value);
+        if (error) setError(""); // Clear error when the user is correcting input
     };
 
     const submit = (e) => {
         e.preventDefault(); // Prevent form from submitting via HTTP request
+        
+        // Check if all required fields are filled
+        const allFieldsComplete = assignFields.every(field => 
+            field.wordName && field.englishTranslation
+        );
+        
+        if (!allFieldsComplete) {
+            setError("Please fill out all word and translation fields.");
+            return;
+        }
+
         if (onCreateAssignment) {
             onCreateAssignment({ title, assignFields });
         }
@@ -84,6 +98,7 @@ function CreateAssignment({ onBack, onCreateAssignment }) {
                     <button type="button" className="addCard btn btn-outline-secondary" onClick={addFields}>Add Card</button>
                     <button type="button" className="submitNewAssignment btn btn-primary" onClick={submit}>Create Assignment</button>
                 </div>
+                {error && <p className="text-center text-danger">{error}</p>} {/* Display error message */}
             </form>
         </div>
     );

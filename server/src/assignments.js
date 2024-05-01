@@ -81,6 +81,7 @@ async function addToAssignment(className, assignmentName, card) {
     return inserted;
 }
 
+//Jason
 async function getAllAssignments(className) {
     let assignmentSummary = [];
     try {

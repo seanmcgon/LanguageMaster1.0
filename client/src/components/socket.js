@@ -58,22 +58,38 @@ export const viewAssignment = (className, assignmentName, fetchedAssignment) => 
   socket.on("assignmentFetched", fetchedAssignment);
 }
 
-
 //TODO: Add functions for classes
 
-export const createClass = (className, teacherEmail, classCreated) => {
-  socket.emit("createClass", className, teacherEmail);
+export const createClass = (className, teacherEmail, language, classCreated) => {
+  socket.emit("createClass", className, teacherEmail, language);
   socket.on("createClassStatus", classCreated);
 }
 
-export const enrollInClass = (className, classID, studentEmail, enrolledInClass) => {
-  socket.emit("enrollClass", className, classID, studentEmail);
+// export const enrollInClass = (className, classID, studentEmail, enrolledInClass) => {
+//   socket.emit("enrollClass", className, classID, studentEmail);
+//   socket.on("enrollClassStatus", enrolledInClass);
+// }
+
+export const enrollInClass = (className, studentEmail, enrolledInClass) => {
+  socket.emit("enrollClass", className, studentEmail);
   socket.on("enrollClassStatus", enrolledInClass);
 }
 
 export const getClasses = (email, teacherBool, fetchedClasses) => {
   socket.emit("getClasses", email, teacherBool);
   socket.on("getClassesStatus", fetchedClasses);
+}
+
+//TODO: Sean- Add getFlashcardListForAssignment(className, assignmentName, fetchedAssignment)
+export const viewAssignmentStudent = (className, assignmentName, fetchedAssignment) => {
+  socket.emit("viewAssignmentStudent", className, assignmentName);
+  socket.on("assignmentFetched", fetchedAssignment);
+}
+
+//TODO: Sean- Add getFeedback
+export const getFeedback = (curWord, audioFile, feedback) => {
+  socket.emit("getFeedback", curWord, audioFile);
+  socket.on("feedback", feedback);
 }
 
 

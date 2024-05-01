@@ -3,7 +3,7 @@ const { TextEncoder } = require('util');
 const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
 const client = new MongoClient(connectionString);
 const {
- createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments
+ createAssignment, addToAssignment, viewAssignment, viewAssignmentStudent, deleteAssignment, getAllAssignments
 } = require('../src/assignments.js')
 
 //TODO:write the IO functions for all functions above
@@ -67,8 +67,28 @@ function viewAssignmentIO(socket) {
   })
 }
 
+// New function for student viewing an assignment (so scores are included)
+// Assuming viewAssignmentStudent gets created in assignments.js
+function viewAssignmentStudentIO(socket) {
+  socket.on("viewAssignmentStudent", async (className, assignmentName) => {
+    console.log("className", className, "assignmentName", assignmentName)
+
+    let assignment;
+    try {
+      assignment = await viewAssignmentStudent(className, assignmentName);
+    } catch (error) {
+      console.log("Error fetching assignment");
+      assignment = [];
+    }
+    socket.emit("assignmentFetched", assignment);
+    console.log("viewAssignmentStudent called and returned", assignment)
+
+    return assignment;
+  })
+}
+
 
 
 //Call viewAssignmentIO and createAssignmentIO with the socket in socketManager.js
 //export {createAssignmentIO, viewAssignmentIO, getAllAssignmentsIO}
-module.exports = {createAssignmentIO, getAllAssignmentsIO, viewAssignmentIO}
+module.exports = {createAssignmentIO, getAllAssignmentsIO, viewAssignmentIO, viewAssignmentStudentIO}

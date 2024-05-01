@@ -18,13 +18,19 @@ function ClassMenu({ classes, onClassClick }) {
                   <Tab.Container id="projects-tabs" defaultActiveKey="first">
                     <Nav variant="pills" className="nav-pills mb-5 justify-content-center align-items-center" id="pills-tab" />
                     <Tab.Content id="slideInUp" className={isVisible ? 'animate__animated animate__slideInUp' : ''}>
-                      <Tab.Pane eventKey="first">
-                        <Row>
-                          {classes.map((className, index) => (
-                            <ClassCard key={index} title={className} onClassClick={() => onClassClick(className)} />
-                          ))}
-                        </Row>
-                      </Tab.Pane>
+                      {classes.length > 0 ? (
+                        <Tab.Pane eventKey="first">
+                          <Row>
+                            {classes.map((className, index) => (
+                              <ClassCard key={index} title={className} onClassClick={() => onClassClick(className)} />
+                            ))}
+                          </Row>
+                        </Tab.Pane>
+                      ) : (
+                        <div className="no-classes-message">
+                          No classes yet
+                        </div>
+                      )}
                     </Tab.Content>
                   </Tab.Container>
                 </div>
