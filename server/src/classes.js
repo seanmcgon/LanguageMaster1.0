@@ -141,7 +141,7 @@ if(checkTheValidOfClassName && teacher_info.length ==1){
     //Add teacher to the new class
     col = db.collection("teachers");
     await col.insertOne(teacher_info[0]);
-    await col.insertOne({"language_name" : language});
+    await col.insertOne({"name" : "language","language_name" : language});
     await client.close();
 
 
