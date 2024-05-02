@@ -19,12 +19,35 @@ async function createAssignment(className, assignmentName, assignmentArray) {
         await client.connect();
         const db = client.db(className);
         const col = db.collection("assignments");
-        if ((await col.find({ assignment: assignmentName }).toArray()).length === 0 && assignmentArray.length > 0) {
-            for (const flashcard of convertAssignmentToDtbForm(assignmentName, assignmentArray)) {
+        // Delete any duplicates from assignmentArray
+        const uniqueArray = assignmentArray.reduce((acc, obj) => {
+            if (!acc.some(item => JSON.stringify(item) === JSON.stringify(obj))) {
+                acc.push(obj);
+            }
+            return acc;
+        }, []);
+        // Insert each card in the converted array if the assignment doesn't exist
+        if ((await col.find({ assignment: assignmentName }).toArray()).length === 0 && uniqueArray.length > 0) {  
+            const flashcards = convertAssignmentToDtbForm(assignmentName, uniqueArray);
+            for (const flashcard of flashcards) {
+                let cardNum = 0;
                 await col.insertOne(flashcard);
             }
             createdAssignment = true;
         }
+        if (createAssignment) {
+            // Get all the students in the class
+            let students = await db.collection("students").find().toArray();
+            for (let i = 0; i < uniqueArray.length; i++) {
+                // Create a blank grade for every students for every flashcard
+                for (let j = 0; j < students.length; j++) {
+                    await db.collection("metrics").insertOne({
+                        studentEmail: students[j].email, assignment: assignmentName, card: i, timePracticed: 0, score: 0
+                    });
+                }
+            }
+        }
+
     } catch (err) {
         console.log(err);
     } finally {
