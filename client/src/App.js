@@ -37,17 +37,16 @@ const App = () => {
   
  
     const [classList, setClassList] = useState([]);
-
     const [currentClass, setCurrentClass] = useState(""); 
     const [currentAssignments, setCurrentAssignments] = useState([]); 
     const [currentAssignment, setCurrentAssignment] = useState(""); 
     const [currentAssignmentName, setCurrentAssignmentName] = useState(""); 
     const [showCreateAssignment, setShowCreateAssignment] = useState(false);
-
     const [curWord, setCurrentWord]= useState("");
     const [curAverage, setCurrentAverage] = useState("");
     const [attemptScore, setAttemptScore] = useState("");
     const [transcription, setTranscription] = useState("");
+    const [language, setLanguage] = useState("")
     //TODO: Use these globals for the flashcard IO
    
     const [showFlashcardView, setShowFlashcardView] = useState(false);
@@ -80,6 +79,7 @@ const App = () => {
         } catch (error) {
             console.error('Error fetching assignments:', error);
         }
+        //get current language
     };
 
     const handleAssignmentClick = (assignmentName) => {

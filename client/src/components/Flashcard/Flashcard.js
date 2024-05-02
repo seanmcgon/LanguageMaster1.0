@@ -49,7 +49,7 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
 
   const handleSubmit = () => {
     const word = flashcards[index].wordName;
-    onSubmit(audioBlob, word); // Call onSubmit prop with audio and word
+    onSubmit(word, audioBlob); // Call onSubmit prop with audio and word
   };
 
   const handleStudentListen = () => {
