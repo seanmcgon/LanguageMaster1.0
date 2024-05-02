@@ -139,6 +139,7 @@ async function viewAssignment(className, assignmentName) {
     } finally {
         await client.close();
     }
+    //Additional field- for each card also include the grade
     return cards.map(e => ({ wordName: e.text, englishTranslation: e.translation, audioFile: e.audio }));
 }
 
