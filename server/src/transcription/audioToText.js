@@ -40,16 +40,23 @@ const languageConfigs = {
 
 };
 
-// Function to perform audio transcription
-async function audioRecognition(audioUrl, languageName) {
+async function audioRecognition(audioUrl, languageCode) {
     const response = await axios.get(audioUrl, { responseType: 'arraybuffer' });
-    const config = languageConfigs[languageName] || languageConfigs['English (United States)']; // Default to US English if language not found
+
+    // Configuration using the direct language code
+    const config = {
+        languageCode: languageCode,
+        sampleRate: 16000,
+        encoding: 'LINEAR16'
+    };
+
     const [transcriptionResult] = await client.recognize({
         config,
         audio: {
             content: Buffer.from(response.data, 'binary').toString('base64')
         }
     });
+
     return transcriptionResult.results.map(result => result.alternatives[0].transcript).join('\n');
 }
 
