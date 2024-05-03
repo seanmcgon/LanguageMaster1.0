@@ -5,7 +5,8 @@ async function getFeedback(curWord, audioFile) {
    // Example audio file
     console.log(audioFile)
     const audioUrl = 'https://www2.cs.uic.edu/~i101/SoundFiles/preamble10.wav';
-    audioRecognition(audioUrl)
+    console.log("Transcribed!")
+    audioRecognition(audioFile)
     .then(results => {
         console.log('Transcription:', results);
     })
