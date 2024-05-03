@@ -11,7 +11,7 @@ function getFeedbackIO(socket) {
     //get curScore 
     //Return all three 
     socket.on("getFeedback", async (curWord, audioFile) => {
-        console.log("curWord", curWord, "audioFile?", audioFile? "yes" : "no");
+        console.log("curWord", curWord, "audioFile", audioFile)
 
         let feedback;
         let attemptScore;

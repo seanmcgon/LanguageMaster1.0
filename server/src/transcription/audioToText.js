@@ -2,7 +2,7 @@ const { SpeechClient } = require('@google-cloud/speech').v1p1beta1;
 const axios = require('axios');
 const client = new SpeechClient({
     projectID: 'languagemaster-418508',
-    keyFilename:'./key.json'
+    keyFilename: './key.json'
 });
 
 const languageConfigs = {
@@ -62,9 +62,8 @@ async function audioRecognition(audioUrl, languageCode) {
 
 
 // Example Usage
-// Example audio file
 const audioUrl = 'https://www2.cs.uic.edu/~i101/SoundFiles/preamble10.wav';
-audioRecognition(audioUrl)
+audioRecognition(audioUrl, 'en-US') // Pass the language code directly
     .then(results => {
         console.log('Transcription:', results);
     })
@@ -72,4 +71,4 @@ audioRecognition(audioUrl)
         console.error('Error:', error);
     });
 
-module.exports = { audioRecognition } ;
+module.exports = { audioRecognition };
