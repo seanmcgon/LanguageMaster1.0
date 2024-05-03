@@ -3,6 +3,7 @@ const {audioRecognition} = require("./transcription/audioToText.js");
 
 async function getFeedback(curWord, audioFile) {
    // Example audio file
+    console.log(audioFile)
     const audioUrl = 'https://www2.cs.uic.edu/~i101/SoundFiles/preamble10.wav';
     audioRecognition(audioUrl, 'en-US')
     .then(results => {
