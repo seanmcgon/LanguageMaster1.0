@@ -237,8 +237,29 @@ async function getAllStudentData(className, assignmentName){
     }
 }
 
+async function numToTerm(className, assignmentName, cardNo){
+    let card = [];
+    try{
+        await client.connect();
+        let db = client.db(className);
+        let col = db.collection("teachers");
+        if((await col.find().toArray()).length === 0){
+            throw("Class does not exist");
+        }
+        col = db.collection("assignments");
+        card = await col.find({assignment: assignmentName, card: cardNo}).toArray();
+    }
+    catch(err){
+        console.log(err);
+    }
+    finally{
+        await client.close();
+        return card[0].text;
+    }
+}
+
 module.exports = {
-    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment, getAllStudentData
+    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment, getAllStudentData, numToTerm
 };
 
 // db.metrics.aggregate([{$match:{assignment: "war"}}, {$group: {_id: "$studentEmail", grades: {$push: {card: "$card", timesPracticed: "$timesPracticed", score: "$score"}}}}])

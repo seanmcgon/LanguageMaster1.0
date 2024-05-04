@@ -1,6 +1,6 @@
 //cd into server and run using "npx jest Testing/assignmentTests"
 const { MongoClient } = require('mongodb');
-const { createAssignment, viewAssignment, addToAssignment, deleteAssignment, deleteFromAssignment, convertAssignmentToDtbForm, getAllStudentData, convert} = require('../src/assignments.js');
+const { createAssignment, viewAssignment, addToAssignment, deleteAssignment, deleteFromAssignment, convertAssignmentToDtbForm, getAllStudentData, numToTerm} = require('../src/assignments.js');
 
 jest.mock('mongoose');
 const mongo = require('../src/assignments.js');
@@ -29,9 +29,10 @@ describe('Assignment Management Tests', () => {
 
             col = db.collection("metrics");
             const grades = await col.find({assignment: "war", card: 2}).toArray();
-            expect(grades.length).toBe(2);
+            expect(grades.length).toBe(3);
             expect(grades.map(e => e.studentEmail)).toContain("Troy.Briggs@yahoo.com");
             expect(grades.map(e => e.studentEmail)).toContain("Kimberly.Cruz@gmail.com");
+            expect(grades.map(e => e.studentEmail)).toContain("jStudent@gmail.com");
 
             await col.deleteMany({timesPracticed: 0});
           }
@@ -203,5 +204,12 @@ describe('Assignment Management Tests', () => {
           expect(console.log).toHaveBeenCalledWith("Assignment does not exist");
         });
 
-      })
+      });
+
+      // describe("numToTerm", () => {
+      //   it("works", async () => {
+      //     expect(await numToTerm("Spanish454_QRAPCC", "leave", 0)).toBe("fire");
+      //     expect(await numToTerm("Vietnamese636_RJREJB", "industry", 1)).toBe("small");
+      //   })
+      // })
 });
