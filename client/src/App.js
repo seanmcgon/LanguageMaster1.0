@@ -17,14 +17,14 @@ import Flashcard  from './components/Flashcard/Flashcard.js';
 const App = () => {
   //development credentials
     //Teacher
-    const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
-    const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
-    const [isTeacher, setIsTeacher] = useState(true);
+    // const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
+    // const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
+    // const [isTeacher, setIsTeacher] = useState(true);
 
     //Student
-    // const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
-    // const [isTeacher, setIsTeacher] = useState(false);
-    // const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
+    const [isTeacher, setIsTeacher] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(true);
 
     //Production
     // const [isTeacher, setIsTeacher] = useState(false);

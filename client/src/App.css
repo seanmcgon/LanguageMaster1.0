@@ -177,3 +177,18 @@ body {
   color: white;
   z-index: 1050; /* Ensure it's on top of other content */
 }
+
+.backButton {
+  background-color:maroon;
+  color: white;
+  border-color: maroon;
+  border-style: dashed;
+  margin: 10px;
+  
+  
+}
+.backButton:hover {
+  background-color: darkred;
+  transform: scale(1.02);
+  border-color: maroon;
+}
