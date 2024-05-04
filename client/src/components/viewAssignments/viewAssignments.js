@@ -5,7 +5,8 @@ export default function ViewAssignment({ lessonName, flashcards, onBack }) {
     return (
         <div className="viewAssignment">
             <button onClick={onBack} className="backButton">Back to Assignments</button>
-            <button className="flashCardButton">Go To Flashcard View</button>
+            {/* Removed flashcard view for teachers */}
+            {/* <button className="flashCardButton">Go To Flashcard View</button> */}
 
             <h1 className="lessonName">{lessonName}</h1>
             <div className="tableContainer">

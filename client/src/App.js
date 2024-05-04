@@ -17,14 +17,14 @@ import Flashcard  from './components/Flashcard/Flashcard.js';
 const App = () => {
   //development credentials
     //Teacher
-    // const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
-    // const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
-    // const [isTeacher, setIsTeacher] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
+    const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
+    const [isTeacher, setIsTeacher] = useState(true);
 
     //Student
-    const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
-    const [isTeacher, setIsTeacher] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    // const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
+    // const [isTeacher, setIsTeacher] = useState(false);
+    // const [isLoggedIn, setIsLoggedIn] = useState(true);
 
     //Production
     // const [isTeacher, setIsTeacher] = useState(false);
@@ -51,6 +51,8 @@ const App = () => {
    
     const [showFlashcardView, setShowFlashcardView] = useState(false);
     const [showLogoutMessage, setShowLogoutMessage] = useState(false);
+
+    const [hideBanner, setHideBanner] = useState(false);
     
     const getClassesForUser = (userEmail) => {
         getClasses(userEmail, isTeacher, (fetchedClasses) => {
@@ -240,6 +242,7 @@ const App = () => {
                 isLoggedIn={isLoggedIn} 
                 userName={userEmail} 
                 onSignOut={handleSignOut} 
+                hideBanner={setHideBanner}
             />
             <div>
                 {isLoggedIn ? (
@@ -296,12 +299,12 @@ const App = () => {
                         <SignUp 
                             onLoginSuccess={handleLoginSuccess} 
                         />
-                        <Banner 
+                        {!hideBanner && <Banner 
                             handleClick={() => {
                                 const signUpModal = new Modal(document.getElementById('SignUpForm'));
                                 signUpModal.show();
                             }} 
-                        />
+                        />}
                     </>
                 )}
             </div>

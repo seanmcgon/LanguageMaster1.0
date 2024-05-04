@@ -7,7 +7,7 @@ import AboutComponent from '../About/about';
 import { Modal } from 'bootstrap';
 import { Dropdown } from 'react-bootstrap';
 
-function NavBar({ onCreateClass, onJoinClass, isLoggedIn, userName, onSignOut, isTeacher }) {
+function NavBar({ onCreateClass, onJoinClass, isLoggedIn, userName, onSignOut, isTeacher, hideBanner }) {
     const [showCreateClassModal, setCreateClassModal] = useState(false);
     const [showJoinClassModal, setJoinClassModal] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
@@ -28,6 +28,11 @@ function NavBar({ onCreateClass, onJoinClass, isLoggedIn, userName, onSignOut, i
         loginModal.show();
     };
 
+    function about () {
+        hideBanner(!showAbout);
+        setShowAbout(!showAbout);
+    }
+
     return (
         <>
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -41,7 +46,7 @@ function NavBar({ onCreateClass, onJoinClass, isLoggedIn, userName, onSignOut, i
                         {!isLoggedIn ? (
                             <>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="#about" onClick={() => setShowAbout(!showAbout)}>About</a>
+                                    <a className="nav-link" href="#about" onClick={about}>About</a>
                                 </li>
                                 <li className="nav-item">
                                     <a className="nav-link login-button" href="#login" onClick={showLogIn}>Login</a>
