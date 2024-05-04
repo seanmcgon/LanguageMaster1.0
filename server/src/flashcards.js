@@ -48,21 +48,29 @@ async function generateSignedUrl(bucketName, fileName) {
 async function getFeedback(audioBuffer) {
     try {
         const fileName = await uploadAudioToBucket(audioBuffer, 'languagemaster');
-        console.log(fileName)
-        const signedUrl = await generateSignedUrl('languagemaster', "gettysburg.wav");
-        console.log('Signed URL:', signedUrl);
-        audioRecognition(signedUrl,'en-US' )
-        .then(results => {
-            console.log('Transcription:', results);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        const signedUrl = await generateSignedUrl('languagemaster', fileName);
+
+        const encodings = ['LINEAR16', 'FLAC', 'MULAW', 'AMR', 'AMR_WB', 'OGG_OPUS', 'SPEEX_WITH_HEADER_BYTE'];
+        const sampleRatesHertz = [8000, 12000, 16000, 24000, 48000];
+
+        for (let encoding of encodings) {
+            for (let sampleRateHertz of sampleRatesHertz) {
+                console.log("-----------------------------------------------------");
+                console.log(`Testing Encoding: ${encoding}, Sample Rate: ${sampleRateHertz}`);
+                try {
+                    const results = await audioRecognition(signedUrl, 'en-US', encoding, sampleRateHertz);
+                    console.log('Transcription results:', results);
+                } catch (error) {
+                    console.error(`Error with Encoding: ${encoding}, Sample Rate: ${sampleRateHertz}:`, error.message);
+                }
+            }
+        }
     } catch (error) {
         console.error('Error in getting feedback:', error);
     }
 
     return {};
 }
+
 
 module.exports = { getFeedback };
