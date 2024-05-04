@@ -18,7 +18,7 @@ function getFeedbackIO(socket) {
         let newAverage;
         let transcription;
         try {
-            feedback = await getFeedback(curWord, audioFile); // Assuming this function is implemented in flashcards.js
+            feedback = await getFeedback(audioFile); // Assuming this function is implemented in flashcards.js
             attemptScore = feedback.attemptScore;
             newAverage = feedback.newAverage;
             transcription = feedback.transcription;

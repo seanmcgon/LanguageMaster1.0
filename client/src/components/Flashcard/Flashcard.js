@@ -24,28 +24,32 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
 
   const handleRecord = () => {
     if (!recording) {
-      navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-          const mediaRecorder = new MediaRecorder(stream);
-          mediaRecorderRef.current = mediaRecorder;
-          mediaRecorder.start();
-          setRecording(true);
-          const audioChunks = [];
-          mediaRecorder.addEventListener("dataavailable", event => {
-            audioChunks.push(event.data);
-          });
-          mediaRecorder.addEventListener("stop", () => {
-            const audioBlob = new Blob(audioChunks);
-            setAudioBlob(audioBlob);
-            stream.getTracks().forEach(track => track.stop()); // Stop the stream
-            handleSubmit(); // Automatically submit after stopping
-          });
-        });
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                const options = {
+                    mimeType: 'audio/webm', // You can change this to 'audio/wav' if supported
+                    bitsPerSecond: 256000 // Increase the bitrate for better quality
+                };
+                const mediaRecorder = new MediaRecorder(stream, options);
+                mediaRecorderRef.current = mediaRecorder;
+                mediaRecorder.start();
+                setRecording(true);
+                const audioChunks = [];
+                mediaRecorder.addEventListener("dataavailable", event => {
+                    audioChunks.push(event.data);
+                });
+                mediaRecorder.addEventListener("stop", () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); // Match the mimeType here
+                    setAudioBlob(audioBlob);
+                    stream.getTracks().forEach(track => track.stop()); // Stop the stream
+                    handleSubmit(); // Automatically submit after stopping
+                });
+            });
     } else {
-      mediaRecorderRef.current.stop();
-      setRecording(false);
+        mediaRecorderRef.current.stop();
+        setRecording(false);
     }
-  };
+};
 
   const handleSubmit = () => {
     const word = flashcards[index].wordName;

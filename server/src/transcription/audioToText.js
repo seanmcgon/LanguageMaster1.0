@@ -14,7 +14,7 @@ const languageConfigs = {
     'English (Australia)': { languageCode: 'en-AU', sampleRate: 16000, encoding: 'LINEAR16' },
     'English (United Kingdom)': { languageCode: 'en-GB', sampleRate: 16000, encoding: 'LINEAR16' },
     'English (India)': { languageCode: 'en-IN', sampleRate: 16000, encoding: 'LINEAR16' },
-    'English (United States)': { languageCode: 'en-US', sampleRate: 16000, encoding: 'LINEAR16' },
+    'English (United States)': { languageCode: 'en-US', sampleRate: 25050, encoding: 'LINEAR16' },
     'Finnish': { languageCode: 'fi-FI', sampleRate: 16000, encoding: 'LINEAR16' },
     'French': { languageCode: 'fr-FR', sampleRate: 16000, encoding: 'LINEAR16' },
     'German': { languageCode: 'de-DE', sampleRate: 16000, encoding: 'LINEAR16' },
