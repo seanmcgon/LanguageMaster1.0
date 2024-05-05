@@ -253,8 +253,24 @@ async function getAllStudentData(className, assignmentName){
     }
 }
 
+// Sean 5/5: Dummy function for returning student grades in the form expected by Suhani's component
+async function getStudentGrades(className, assignmentName) {
+    return [
+        { studentName: 'Suhani', wordName: 'Apple', englishTranslation: 'Apple', grade: 20 },
+        { studentName: 'Jason', wordName: 'Apple', englishTranslation: 'Apple', grade: 70 },
+        { studentName: 'Bach', wordName: 'Apple', englishTranslation: 'Apple', grade: 85 },
+        { studentName: 'Suhani', wordName: 'Banana', englishTranslation: 'Banana', grade: 30 },
+        { studentName: 'Jason', wordName: 'Banana', englishTranslation: 'Banana', grade: 60 },
+        { studentName: 'Bach', wordName: 'Banana', englishTranslation: 'Banana', grade: 90 },
+        { studentName: 'Suhani', wordName: 'Orange', englishTranslation: 'Orange', grade: 40 },
+        { studentName: 'Jason', wordName: 'Orange', englishTranslation: 'Orange', grade: 50 },
+        { studentName: 'Bach', wordName: 'Orange', englishTranslation: 'Orange', grade: 80 },
+    ];
+}
+
 module.exports = {
-    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment, getAllStudentData
+    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm,
+    deleteFromAssignment, getAllStudentData, getStudentGrades
 };
 
 // db.metrics.aggregate([{$match:{assignment: "war"}}, {$group: {_id: "$studentEmail", grades: {$push: {card: "$card", timesPracticed: "$timesPracticed", score: "$score"}}}}])

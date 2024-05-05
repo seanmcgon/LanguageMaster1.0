@@ -7,12 +7,12 @@ import "./classAsgmts.css";
 export default function ClassAsgmts({ className, asgmts, onAssignmentClick, onBack, onCreateAssignmentClick, isTeacher }) {
   return (
     <div id="classAsgmtsBody">
-      <button onClick={onBack} className="backButtonAssView" style={{ margin: '10px' }}>Back to Class View</button>
-      <div id="classHeading">
-        <h1 id="nameOfClass">{className}</h1>
-      </div>
+      <button onClick={onBack} className="backButton" style={{ margin: '10px' }}>Back to Class View</button>
       <br />
       <div id="asgmtsHeaderContainer">
+        <div id="classHeading">
+          <h1 id="nameOfClass">{className}</h1>
+        </div>
         {isTeacher && (
           <div
             className="btn btn-primary createAssignment"

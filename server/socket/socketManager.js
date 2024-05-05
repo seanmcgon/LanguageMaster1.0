@@ -1,7 +1,7 @@
 const { Server } = require("socket.io");
 const { verifyTeacherData, createTeacherAccount, verifyStudentData, createStudentAccount} = require("./userIO");
 //TODO: Add imports for classesIO, and assignmentsIO
-const {createAssignmentIO, getAllAssignmentsIO, viewAssignmentIO, viewAssignmentStudentIO} = require("./assignmentsIO");
+const {createAssignmentIO, getAllAssignmentsIO, viewAssignmentIO, viewAssignmentStudentIO, getStudentGradesIO} = require("./assignmentsIO");
 const {createClassIO, getClassesIO, enrollClassIO} = require("./classesIO")
 const {getFeedbackIO} = require("./flashCardIO");
 
@@ -36,6 +36,7 @@ function initSocket(server) {
         createAssignmentIO(socket);
         getAllAssignmentsIO(socket);
         viewAssignmentIO(socket);
+        getStudentGradesIO(socket);
 
         //TODO: add function for getStudentAssignments here 
         viewAssignmentStudentIO(socket);

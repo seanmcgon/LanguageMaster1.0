@@ -1,7 +1,7 @@
 /* General styling for view assignments */
-.viewAssignment {
+/* .viewAssignment {
     padding: 10px;
-}
+} */
 
 /* Button container with flex layout */
 .button-container {
@@ -12,47 +12,50 @@
 }
 
 /* Styles for the back button */
-.backButton {
-    background-color: maroon; /* Less prominent color for secondary action */
+/* .backButton {
+    background-color: maroon;
     color: white;
     border: none;
-    padding: 5px 10px; /* Smaller padding */
-    font-size: 14px; /* Smaller font size */
+    padding: 5px 10px;
+    font-size: 14px;
     cursor: pointer;
-    margin: 0 10px; /* Space between buttons */
-    border-radius: 5px; /* Rounded corners */
-    transition: background-color 0.4s, transform 0.2s; /* Smooth transitions for interaction */
-}
+    margin: 0 10px;
+    border-radius: 5px;
+    transition: background-color 0.4s, transform 0.2s;
+} */
 
 /* Hover effect for back button */
-.backButton:hover {
-    background-color: darkred; /* Darken on hover */
-    transform: scale(1.05); /* Slight increase in size on hover */
-}
+/* .backButton:hover {
+    background-color: darkred;
+    transform: scale(1.05);
+} */
 
-/* Styles for the flashcard button */
 .flashCardButton {
-    background-color: maroon; /* Prominent color for primary action */
+    background-color: maroon;
     color: white;
-    border: none;
-    padding: 15px 30px; /* Larger padding for emphasis */
-    font-size: 18px; /* Larger font size */
+    border: none; /* Removes the default border */
+    padding: 10px 15px; /* Adds some padding */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
     cursor: pointer;
-    margin: 0 10px; /* Space between buttons */
-    border-radius: 5px; /* Rounded corners */
-    transition: background-color 0.4s, transform 0.2s; /* Smooth transitions for interaction */
-}
-
-/* Hover effect for flashcard button */
-.flashCardButton:hover {
-    background-color: darkred; /* Darken on hover */
-    transform: scale(1.05); /* Slight increase in size on hover */
-}
+    transition-duration: 0.4s; /* Smooth transition for hover effect */
+  }
+  
+  .flashCardButton:hover {
+    transform: scale(1.05);
+      background-color: maroon;
+   
+    ; /* Darkens the button on hover */
+  }
 
 /* Styling for lesson names */
 .lessonName {
     margin-bottom: 20px;
     color: maroon;
+    margin-left: 3%;
 }
 
 /* Container for tables with scrolling capability */
@@ -60,6 +63,8 @@
     max-height: 800px;
     overflow-y: auto;
     border: 1px solid #ddd;
+    margin-left: 3%;
+    margin-right: 3%;
 }
 
 /* Styling for flashcard tables */
@@ -89,4 +94,12 @@
 
 #score {
     text-align: center;
+}
+
+#assignmentStudentHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-left: 3%;
+    margin-right: 3%;
 }

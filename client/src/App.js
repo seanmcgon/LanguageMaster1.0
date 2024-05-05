@@ -11,20 +11,21 @@ import { Modal } from 'bootstrap';
 import ClassAsgmts from './components/ClassAssignments/classAsgmts.js';
 import ViewAssignment from './components/viewAssignments/viewAssignments.js';
 import { createAssignment, viewAllAssignments, viewAssignment, viewAssignmentStudent, getFeedback } from './components/socket.js';
-import { createClass, getClasses, enrollInClass } from './components/socket.js';
+import { createClass, getClasses, enrollInClass, getStudentGrades } from './components/socket.js';
 import ViewAssignmentStudent from "./components/ViewAssignmentStudent/ViewAssignmentStudent.js";
 import Flashcard  from './components/Flashcard/Flashcard.js';
+import StudentGrades from './components/StudentGrades/studentGrades.js';
 const App = () => {
   //development credentials
     //Teacher
-    // const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
-    // const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
-    // const [isTeacher, setIsTeacher] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
+    const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
+    const [isTeacher, setIsTeacher] = useState(true);
 
     //Student
-    const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
-    const [isTeacher, setIsTeacher] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    // const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
+    // const [isTeacher, setIsTeacher] = useState(false);
+    // const [isLoggedIn, setIsLoggedIn] = useState(true);
 
     //Production
     // const [isTeacher, setIsTeacher] = useState(false);
@@ -51,6 +52,9 @@ const App = () => {
    
     const [showFlashcardView, setShowFlashcardView] = useState(false);
     const [showLogoutMessage, setShowLogoutMessage] = useState(false);
+
+    const [hideBanner, setHideBanner] = useState(false);
+    const [curGrades, setCurGrades] = useState(null);
     
     const getClassesForUser = (userEmail) => {
         getClasses(userEmail, isTeacher, (fetchedClasses) => {
@@ -116,6 +120,16 @@ const App = () => {
             console.log("Error getting feedback:", error);
         }
     };
+
+    const handleGradesClick = () => {
+        try {
+            getStudentGrades(currentClass, currentAssignmentName, (grades) => {
+                setCurGrades(grades);
+            })
+        } catch (error) {
+            console.log("Error fetching student grades:", error);
+        }
+    }
 
     const handleLoginSuccess = (email, name) => {
         setIsLoggedIn(true);
@@ -240,6 +254,7 @@ const App = () => {
                 isLoggedIn={isLoggedIn} 
                 userName={userEmail} 
                 onSignOut={handleSignOut} 
+                hideBanner={setHideBanner}
             />
             <div>
                 {isLoggedIn ? (
@@ -248,6 +263,12 @@ const App = () => {
                             flashcards={dummyFlashcards}
                             onBack= {goBackToAssignment}
                             onSubmit = {handleFeedbackClick}
+                        />
+                    ) : curGrades ? (
+                        <StudentGrades
+                            lessonName={currentAssignmentName}
+                            onBack={() => setCurGrades(null)}
+                            studentGrades={curGrades}
                         />
                     ) :
                     showCreateAssignment ? (
@@ -261,6 +282,7 @@ const App = () => {
                                 lessonName={currentAssignmentName}
                                 flashcards={currentAssignment}
                                 onBack={goBackToAssignmentList}
+                                viewGrades={handleGradesClick}
                             />
                         ) : (
                             <ViewAssignmentStudent
@@ -296,12 +318,12 @@ const App = () => {
                         <SignUp 
                             onLoginSuccess={handleLoginSuccess} 
                         />
-                        <Banner 
+                        {!hideBanner && <Banner 
                             handleClick={() => {
                                 const signUpModal = new Modal(document.getElementById('SignUpForm'));
                                 signUpModal.show();
                             }} 
-                        />
+                        />}
                     </>
                 )}
             </div>
