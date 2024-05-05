@@ -1,18 +1,18 @@
 import React from 'react';
 import './studentGrades.css';
 
-export default function StudentGrades({ lessonName, onBack }) {
-  const studentGrades = [
-    { studentName: 'Suhani', wordName: 'Apple', englishTranslation: 'Apple', grade: 20 },
-    { studentName: 'Jason', wordName: 'Apple', englishTranslation: 'Apple', grade: 70 },
-    { studentName: 'Bach', wordName: 'Apple', englishTranslation: 'Apple', grade: 85 },
-    { studentName: 'Suhani', wordName: 'Banana', englishTranslation: 'Banana', grade: 30 },
-    { studentName: 'Jason', wordName: 'Banana', englishTranslation: 'Banana', grade: 60 },
-    { studentName: 'Bach', wordName: 'Banana', englishTranslation: 'Banana', grade: 90 },
-    { studentName: 'Suhani', wordName: 'Orange', englishTranslation: 'Orange', grade: 40 },
-    { studentName: 'Jason', wordName: 'Orange', englishTranslation: 'Orange', grade: 50 },
-    { studentName: 'Bach', wordName: 'Orange', englishTranslation: 'Orange', grade: 80 },
-  ];
+export default function StudentGrades({ lessonName, onBack, studentGrades }) {
+//   const studentGrades = [
+//     { studentName: 'Suhani', wordName: 'Apple', englishTranslation: 'Apple', grade: 20 },
+//     { studentName: 'Jason', wordName: 'Apple', englishTranslation: 'Apple', grade: 70 },
+//     { studentName: 'Bach', wordName: 'Apple', englishTranslation: 'Apple', grade: 85 },
+//     { studentName: 'Suhani', wordName: 'Banana', englishTranslation: 'Banana', grade: 30 },
+//     { studentName: 'Jason', wordName: 'Banana', englishTranslation: 'Banana', grade: 60 },
+//     { studentName: 'Bach', wordName: 'Banana', englishTranslation: 'Banana', grade: 90 },
+//     { studentName: 'Suhani', wordName: 'Orange', englishTranslation: 'Orange', grade: 40 },
+//     { studentName: 'Jason', wordName: 'Orange', englishTranslation: 'Orange', grade: 50 },
+//     { studentName: 'Bach', wordName: 'Orange', englishTranslation: 'Orange', grade: 80 },
+//   ];
 
   // Transpose the data
   const terms = [...new Set(studentGrades.map(grade => grade.wordName))];

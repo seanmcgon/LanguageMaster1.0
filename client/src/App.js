@@ -11,7 +11,7 @@ import { Modal } from 'bootstrap';
 import ClassAsgmts from './components/ClassAssignments/classAsgmts.js';
 import ViewAssignment from './components/viewAssignments/viewAssignments.js';
 import { createAssignment, viewAllAssignments, viewAssignment, viewAssignmentStudent, getFeedback } from './components/socket.js';
-import { createClass, getClasses, enrollInClass } from './components/socket.js';
+import { createClass, getClasses, enrollInClass, getStudentGrades } from './components/socket.js';
 import ViewAssignmentStudent from "./components/ViewAssignmentStudent/ViewAssignmentStudent.js";
 import Flashcard  from './components/Flashcard/Flashcard.js';
 import StudentGrades from './components/StudentGrades/studentGrades.js';
@@ -122,8 +122,13 @@ const App = () => {
     };
 
     const handleGradesClick = () => {
-        // Dummy for now
-        setCurGrades([1]);
+        try {
+            getStudentGrades(currentClass, currentAssignmentName, (grades) => {
+                setCurGrades(grades);
+            })
+        } catch (error) {
+            console.log("Error fetching student grades:", error);
+        }
     }
 
     const handleLoginSuccess = (email, name) => {
@@ -263,6 +268,7 @@ const App = () => {
                         <StudentGrades
                             lessonName={currentAssignmentName}
                             onBack={() => setCurGrades(null)}
+                            studentGrades={curGrades}
                         />
                     ) :
                     showCreateAssignment ? (

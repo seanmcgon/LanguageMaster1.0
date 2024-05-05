@@ -92,6 +92,9 @@ export const getFeedback = (curWord, audioFile, feedback) => {
   socket.on("feedback", feedback);
 }
 
-
+export const getStudentGrades = (className, assignmentName, grades) => {
+  socket.emit("getStudentGrades", className, assignmentName);
+  socket.on("studentGrades", grades);
+}
 
 
