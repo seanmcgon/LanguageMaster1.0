@@ -65,7 +65,7 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
       <button className="backButton" onClick={onBack}>Return to Assignments</button>
       <div className="card-container">
         <button className="left" onClick={handleLeft} disabled={index <= 0}>Left</button>
-        <div className={`card ${flip ? "flip" : ""}`} onClick={() => setFlip(!flip)}>
+        <div className={`flashcard ${flip ? "flip" : ""}`} onClick={() => setFlip(!flip)}>
           <div className="front">{flashcards[index].wordName}</div>
           <div className="back">{flashcards[index].englishTranslation}</div>
         </div>
