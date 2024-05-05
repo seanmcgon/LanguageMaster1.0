@@ -6,6 +6,7 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
   const [index, setIndex] = useState(0);
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
+  const [recordingId, setRecordingId] = useState(0);
   const mediaRecorderRef = useRef(null);
 
   const handleLeft = () => {
@@ -24,36 +25,37 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
 
   const handleRecord = () => {
     if (!recording) {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-                const options = {
-                    mimeType: 'audio/webm', // You can change this to 'audio/wav' if supported
-                    bitsPerSecond: 256000 // Increase the bitrate for better quality
-                };
-                const mediaRecorder = new MediaRecorder(stream, options);
-                mediaRecorderRef.current = mediaRecorder;
-                mediaRecorder.start();
-                setRecording(true);
-                const audioChunks = [];
-                mediaRecorder.addEventListener("dataavailable", event => {
-                    audioChunks.push(event.data);
-                });
-                mediaRecorder.addEventListener("stop", () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); // Match the mimeType here
-                    setAudioBlob(audioBlob);
-                    stream.getTracks().forEach(track => track.stop()); // Stop the stream
-                    handleSubmit(); // Automatically submit after stopping
-                });
-            });
+      navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(stream => {
+              const options = {
+                  mimeType: 'audio/webm',
+                  bitsPerSecond: 256000
+              };
+              const mediaRecorder = new MediaRecorder(stream, options);
+              mediaRecorderRef.current = mediaRecorder;
+              mediaRecorder.start();
+              setRecording(true);
+              const audioChunks = [];
+              mediaRecorder.addEventListener("dataavailable", event => {
+                  audioChunks.push(event.data);
+              });
+              mediaRecorder.addEventListener("stop", () => {
+                  const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                  setAudioBlob(audioBlob);
+                  stream.getTracks().forEach(track => track.stop());
+                  handleSubmit();
+              });
+          });
     } else {
-        mediaRecorderRef.current.stop();
-        setRecording(false);
+      mediaRecorderRef.current.stop();
+      setRecording(false);
     }
-};
+  };
 
-  const handleSubmit = () => {
+  const handleSubmit = (blob = audioBlob) => {
     const word = flashcards[index].wordName;
-    onSubmit(word, audioBlob); // Call onSubmit prop with audio and word
+    onSubmit(word, blob, recordingId); // Pass recordingId along with other data
+    setRecordingId(recordingId + 1); // Increment the recording ID after submission
   };
 
   const handleStudentListen = () => {
@@ -62,6 +64,10 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
       const audio = new Audio(audioUrl);
       audio.play();
     }
+  };
+
+  const handleDebugSubmit = () => {
+    handleSubmit(undefined); // Submit with undefined audioBlob for debugging
   };
 
   return (
@@ -80,6 +86,7 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
           {recording ? 'Stop Recording' : 'Record'}
         </button>
         <button className="actionButtons" onClick={handleStudentListen} disabled={!audioBlob}>Hear My Attempt</button>
+        <button className="actionButtons debugButton" onClick={handleDebugSubmit}>Submit</button> {/* Debugging Button */}
       </div>
     </div>
   );

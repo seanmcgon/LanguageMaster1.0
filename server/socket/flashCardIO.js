@@ -10,7 +10,10 @@ function getFeedbackIO(socket) {
     //get newAverage
     //get curScore 
     //Return all three 
+    let i = 0
+  
     socket.on("getFeedback", async (curWord, audioFile) => {
+        console.log(i++, "rd Request")
         console.log("curWord", curWord, "audioFile?", audioFile? "yes" : "no");
 
         let feedback;
@@ -19,6 +22,7 @@ function getFeedbackIO(socket) {
         let transcription;
         try {
             feedback = await getFeedback(audioFile); // Assuming this function is implemented in flashcards.js
+            
             attemptScore = feedback.attemptScore;
             newAverage = feedback.newAverage;
             transcription = feedback.transcription;
@@ -33,9 +37,18 @@ function getFeedbackIO(socket) {
     })
 }
 
-
+function adderIO(socket) {
+    socket.on("adder", async(number1, number2) => {
+        console.log("adderIO called in the backend with", number1, number2)
+        let result = function adder (number1, number2) {
+            return number1 * number2;
+        }(number1, number2)
+        console.log(result)
+        socket.emit("adderResult", result)
+    })
+}
 
 
 
 //TODO: export functions
-module.exports = {getFeedbackIO};
+module.exports = {getFeedbackIO, adderIO};

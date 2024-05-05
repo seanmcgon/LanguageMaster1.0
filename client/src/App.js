@@ -11,7 +11,7 @@ import { Modal } from 'bootstrap';
 import ClassAsgmts from './components/ClassAssignments/classAsgmts.js';
 import ViewAssignment from './components/viewAssignments/viewAssignments.js';
 import { createAssignment, viewAllAssignments, viewAssignment, viewAssignmentStudent, getFeedback } from './components/socket.js';
-import { createClass, getClasses, enrollInClass } from './components/socket.js';
+import { createClass, getClasses, enrollInClass, adderIO } from './components/socket.js';
 import ViewAssignmentStudent from "./components/ViewAssignmentStudent/ViewAssignmentStudent.js";
 import Flashcard  from './components/Flashcard/Flashcard.js';
 const App = () => {
@@ -51,6 +51,25 @@ const App = () => {
    
     const [showFlashcardView, setShowFlashcardView] = useState(false);
     const [showLogoutMessage, setShowLogoutMessage] = useState(false);
+
+
+    const [number1, setNumber1] = useState(0);
+    const [number2, setNumber2] = useState(0);
+    const [result, setResult] = useState(null);
+    const handleNumberChange1 = (event) => {
+        setNumber1(event.target.value);
+    };
+
+    const handleNumberChange2 = (event) => {
+        setNumber2(event.target.value);
+    };
+
+    const handleCompute = () => {
+        console.log("handle compute is clicked!")
+        adderIO(number1, number2, (computedResult) => {
+            setResult(computedResult);
+        });
+    };
     
     const getClassesForUser = (userEmail) => {
         getClasses(userEmail, isTeacher, (fetchedClasses) => {
@@ -103,11 +122,11 @@ const App = () => {
         }
     };
 
-    const handleFeedbackClick = (curWord, audioFile ) => {
+    const handleFeedbackClick = (curWord, audioFile, id ) => {
         //TODO: Sean- pass these in, have a callback(s) which will be these three things: attemptScore(double), newAverage(double), transcription(string)
         //Set the states of these three things, we will link this with the flashcard UI
         try {
-            getFeedback(curWord, audioFile, (attemptScore, newAverage, transcription) => {
+            getFeedback(curWord, audioFile, id, (attemptScore, newAverage, transcription) => {
                 setAttemptScore(attemptScore);
                 setCurrentAverage(newAverage);
                 setTranscription(transcription);
@@ -232,6 +251,12 @@ const App = () => {
  
     return (
         <>
+        <div>
+                        <input type="number" value={number1} onChange={handleNumberChange1} placeholder="Enter first number" />
+                        <input type="number" value={number2} onChange={handleNumberChange2} placeholder="Enter second number" />
+                        <button onClick={handleCompute}>Add Numbers</button>
+                        {result !== null && <p>Result: {result}</p>}
+                    </div>
             <NavBar 
                 isTeacher={isTeacher} 
                 setIsTeacher={setIsTeacher} 
@@ -243,6 +268,7 @@ const App = () => {
             />
             <div>
                 {isLoggedIn ? (
+                    
                      showFlashcardView ? (
                         <Flashcard
                             flashcards={dummyFlashcards}

@@ -46,27 +46,38 @@ async function generateSignedUrl(bucketName, fileName) {
 }
 
 async function getFeedback(audioBuffer) {
+    if (audioBuffer === null) {
+        return;
+    }
     try {
         const fileName = await uploadAudioToBucket(audioBuffer, 'languagemaster');
-        const signedUrl = await generateSignedUrl('languagemaster', fileName);
-
-        const encodings = ['LINEAR16', 'FLAC', 'MULAW', 'AMR', 'AMR_WB', 'OGG_OPUS', 'SPEEX_WITH_HEADER_BYTE'];
-        const sampleRatesHertz = [8000, 12000, 16000, 24000, 48000];
+        let signedUrl = await generateSignedUrl('languagemaster', fileName);
+        
+        // const encodings = ['LINEAR16', 'FLAC', 'MULAW', 'AMR', 'AMR_WB', 'OGG_OPUS', 'SPEEX_WITH_HEADER_BYTE'];
+        // const sampleRatesHertz = [8000, 12000, 16000, 24000, 48000];
+        const encodings = ['LINEAR16'];
+        const sampleRatesHertz = [8000]
 
         for (let encoding of encodings) {
             for (let sampleRateHertz of sampleRatesHertz) {
                 console.log("-----------------------------------------------------");
                 console.log(`Testing Encoding: ${encoding}, Sample Rate: ${sampleRateHertz}`);
                 try {
-                    const results = await audioRecognition(signedUrl, 'en-US', encoding, sampleRateHertz);
+                    const results = await audioRecognition(signedUrl, 'Chinese (Traditional)', encoding, sampleRateHertz);
+                    const results1 = await audioRecognition(signedUrl, 'Chinese (Traditional)', encoding, sampleRateHertz);
+
                     console.log('Transcription results:', results);
+                    console.log('Transcription results:', results1);
+                    return;
                 } catch (error) {
                     console.error(`Error with Encoding: ${encoding}, Sample Rate: ${sampleRateHertz}:`, error.message);
+                    return;
                 }
             }
         }
     } catch (error) {
         console.error('Error in getting feedback:', error);
+        return;
     }
 
     return {};
