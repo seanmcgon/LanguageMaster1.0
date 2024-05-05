@@ -80,16 +80,22 @@ export const getClasses = (email, teacherBool, fetchedClasses) => {
   socket.on("getClassesStatus", fetchedClasses);
 }
 
-//TODO: Sean- Add getFlashcardListForAssignment(className, assignmentName, fetchedAssignment)
 export const viewAssignmentStudent = (className, assignmentName, fetchedAssignment) => {
   socket.emit("viewAssignmentStudent", className, assignmentName);
   socket.on("assignmentFetched", fetchedAssignment);
 }
 
-//TODO: Sean- Add getFeedback
 export const getFeedback = (curWord, audioFile, feedback) => {
+  console.log("get feedback called with", audioFile)
   socket.emit("getFeedback", curWord, audioFile);
-  socket.on("feedback", feedback);
+  
+
+  socket.once("feedback", feedback);
+}
+
+export const adderIO = (number1, number2, feedback) => {
+  socket.emit("adder", number1, number2);
+  socket.once("adderResult", feedback);
 }
 
 export const getStudentGrades = (className, assignmentName, grades) => {

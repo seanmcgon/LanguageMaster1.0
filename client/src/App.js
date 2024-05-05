@@ -246,6 +246,7 @@ const App = () => {
  
     return (
         <>
+
             <NavBar 
                 isTeacher={isTeacher} 
                 setIsTeacher={setIsTeacher} 
@@ -258,6 +259,7 @@ const App = () => {
             />
             <div>
                 {isLoggedIn ? (
+                    
                      showFlashcardView ? (
                         <Flashcard
                             flashcards={dummyFlashcards}

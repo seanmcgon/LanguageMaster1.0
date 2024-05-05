@@ -14,7 +14,7 @@ const languageConfigs = {
     'English (Australia)': { languageCode: 'en-AU', sampleRate: 16000, encoding: 'LINEAR16' },
     'English (United Kingdom)': { languageCode: 'en-GB', sampleRate: 16000, encoding: 'LINEAR16' },
     'English (India)': { languageCode: 'en-IN', sampleRate: 16000, encoding: 'LINEAR16' },
-    'English (United States)': { languageCode: 'en-US', sampleRate: 16000, encoding: 'LINEAR16' },
+    'English (United States)': { languageCode: 'en-US', sampleRate: 25050, encoding: 'LINEAR16' },
     'Finnish': { languageCode: 'fi-FI', sampleRate: 16000, encoding: 'LINEAR16' },
     'French': { languageCode: 'fr-FR', sampleRate: 16000, encoding: 'LINEAR16' },
     'German': { languageCode: 'de-DE', sampleRate: 16000, encoding: 'LINEAR16' },
@@ -40,29 +40,42 @@ const languageConfigs = {
 
 };
 
-// Function to perform audio transcription
-async function audioRecognition(audioUrl, languageName) {
-    const response = await axios.get(audioUrl, { responseType: 'arraybuffer' });
-    const config = languageConfigs[languageName] || languageConfigs['English (United States)']; // Default to US English if language not found
-    const [transcriptionResult] = await client.recognize({
-        config,
-        audio: {
-            content: Buffer.from(response.data, 'binary').toString('base64')
-        }
-    });
-    return transcriptionResult.results.map(result => result.alternatives[0].transcript).join('\n');
-}
 
+
+async function audioRecognition(audioUrl, languageName, sampleRateHertz = null, encoding = null) {
+    const response = await axios.get(audioUrl, { responseType: 'arraybuffer' });
+
+    // Get configuration from languageConfigs or use the default if not specified
+    const defaultConfig = languageConfigs[languageName] || languageConfigs['English (United States)'];
+    const config = {
+        languageCode: defaultConfig.languageCode,
+        sampleRateHertz: sampleRateHertz || defaultConfig.sampleRate,
+        encoding: encoding || defaultConfig.encoding,
+    };
+
+    try {
+        const [transcriptionResult] = await client.recognize({
+            config,
+            audio: {
+                content: Buffer.from(response.data, 'binary').toString('base64')
+            }
+        });
+        return transcriptionResult.results.map(result => result.alternatives[0].transcript).join('\n');
+    } catch (error) {
+        console.error('Failed to transcribe audio:', error);
+        return "Transcription failed";
+    }
+}
 
 // Example Usage
 // Example audio file
-const audioUrl = 'https://www2.cs.uic.edu/~i101/SoundFiles/preamble10.wav';
-audioRecognition(audioUrl)
-    .then(results => {
-        console.log('Transcription:', results);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+// const audioUrl = 'https://www2.cs.uic.edu/~i101/SoundFiles/preamble10.wav';
+// audioRecognition(audioUrl)
+//     .then(results => {
+//         console.log('Transcription:', results);
+//     })
+//     .catch(error => {
+//         console.error('Error:', error);
+//     });
 
 module.exports = { audioRecognition } ;
