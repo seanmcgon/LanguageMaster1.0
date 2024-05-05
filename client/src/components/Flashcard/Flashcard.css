@@ -96,4 +96,6 @@ button:hover {
   
   .recording {
     animation: flash 1s infinite;
+    color: white;
+    background-color: red!important;
   }

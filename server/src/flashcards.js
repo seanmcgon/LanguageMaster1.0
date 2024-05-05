@@ -63,11 +63,9 @@ async function getFeedback(audioBuffer) {
                 console.log("-----------------------------------------------------");
                 console.log(`Testing Encoding: ${encoding}, Sample Rate: ${sampleRateHertz}`);
                 try {
-                    const results = await audioRecognition(signedUrl, 'Chinese (Traditional)', encoding, sampleRateHertz);
-                    const results1 = await audioRecognition(signedUrl, 'Chinese (Traditional)', encoding, sampleRateHertz);
+                    const results = await audioRecognition(signedUrl, 'English (United States)', encoding, sampleRateHertz);
 
                     console.log('Transcription results:', results);
-                    console.log('Transcription results:', results1);
                     return;
                 } catch (error) {
                     console.error(`Error with Encoding: ${encoding}, Sample Rate: ${sampleRateHertz}:`, error.message);

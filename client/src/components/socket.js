@@ -85,9 +85,9 @@ export const viewAssignmentStudent = (className, assignmentName, fetchedAssignme
   socket.on("assignmentFetched", fetchedAssignment);
 }
 
-export const getFeedback = (curWord, audioFile, id, feedback) => {
+export const getFeedback = (curWord, audioFile, feedback) => {
   console.log("get feedback called with", audioFile)
-  socket.emit("getFeedback", curWord, audioFile, id);
+  socket.emit("getFeedback", curWord, audioFile);
   
 
   socket.once("feedback", feedback);

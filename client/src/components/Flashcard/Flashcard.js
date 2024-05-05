@@ -6,7 +6,11 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
   const [index, setIndex] = useState(0);
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
-  const [recordingId, setRecordingId] = useState(0);
+  const [submitEnabled, setSubmitEnabled] = useState(false);  // State to enable/disable submit
+  const [currentScore, setCurrentScore] = useState(0);  // State for the current attempt score
+  const [averageScore, setAverageScore] = useState(0);  // State for the average score
+  const [totalScores, setTotalScores] = useState(0);  // Accumulate scores to calculate average
+  const [scoreCount, setScoreCount] = useState(0);  // Count of attempts for average calculation
   const mediaRecorderRef = useRef(null);
 
   const handleLeft = () => {
@@ -25,7 +29,7 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
 
   const handleRecord = () => {
     if (!recording) {
-      navigator.mediaDevices.getUserMedia({ audio: true })
+      setTimeout(() => {navigator.mediaDevices.getUserMedia({ audio: true })
           .then(stream => {
               const options = {
                   mimeType: 'audio/webm',
@@ -43,19 +47,29 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
                   const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                   setAudioBlob(audioBlob);
                   stream.getTracks().forEach(track => track.stop());
-                  handleSubmit();
+                  setSubmitEnabled(true);  // Enable the submit button when recording stops
               });
           });
+        })
     } else {
-      mediaRecorderRef.current.stop();
-      setRecording(false);
+      // Adding a 1-second delay to the stop recording process
+      setTimeout(() => {
+        mediaRecorderRef.current.stop();
+        setRecording(false);
+      }, 500);
     }
   };
 
   const handleSubmit = (blob = audioBlob) => {
     const word = flashcards[index].wordName;
-    onSubmit(word, blob, recordingId); // Pass recordingId along with other data
-    setRecordingId(recordingId + 1); // Increment the recording ID after submission
+    const score = Math.random() * 100;  // Simulate score calculation
+    setCurrentScore(score);
+    const newTotalScores = totalScores + score;
+    setTotalScores(newTotalScores);
+    setScoreCount(scoreCount + 1);
+    setAverageScore(newTotalScores / (scoreCount + 1));
+    onSubmit(word, blob);  // Call onSubmit prop
+    setSubmitEnabled(false);  // Disable submit after submitting
   };
 
   const handleStudentListen = () => {
@@ -67,7 +81,7 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
   };
 
   const handleDebugSubmit = () => {
-    handleSubmit(undefined); // Submit with undefined audioBlob for debugging
+    handleSubmit(undefined);  // Submit with undefined audioBlob for debugging
   };
 
   return (
@@ -86,7 +100,11 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
           {recording ? 'Stop Recording' : 'Record'}
         </button>
         <button className="actionButtons" onClick={handleStudentListen} disabled={!audioBlob}>Hear My Attempt</button>
-        <button className="actionButtons debugButton" onClick={handleDebugSubmit}>Submit</button> {/* Debugging Button */}
+        <button className="actionButtons debugButton" onClick={handleDebugSubmit} disabled={!submitEnabled}>Submit</button>
+      </div>
+      <div className="scores-container">
+        <p>Current Attempt Score: {currentScore.toFixed(2)}</p>
+        <p>Average Score: {averageScore.toFixed(2)}</p>
       </div>
     </div>
   );
