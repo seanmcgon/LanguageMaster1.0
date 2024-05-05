@@ -1,7 +1,7 @@
 /* General styling for view assignments */
-/* .viewAssignment {
-    padding: 10px;
-} */
+.viewAssignment {
+    padding-top: 10px;
+}
 
 /* Button container with flex layout */
 .button-container {
@@ -89,3 +89,33 @@
 .audioControl {
     width: 100%;
 }
+
+#viewAssignmentHeader {
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+    margin-left: 3%;
+    margin-right: 3%;
+    justify-content: space-between;
+}
+
+#gradesButton {
+    background-color: maroon;
+    color: white;
+    border: none; /* Removes the default border */
+    padding: 10px 15px; /* Adds some padding */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    transition-duration: 0.4s; /* Smooth transition for hover effect */
+  }
+  
+  #gradesButton:hover {
+    transform: scale(1.05);
+      background-color: maroon;
+   
+    ; /* Darkens the button on hover */
+  }
