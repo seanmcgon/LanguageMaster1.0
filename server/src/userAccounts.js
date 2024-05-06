@@ -2,7 +2,7 @@ const { assert } = require('console');
 const { MongoClient } = require('mongodb');
 const { TextEncoder } = require('util');
 
-const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
+const connectionString = "mongodb+srv://mkandeshwara:1234@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const client = new MongoClient(connectionString);
 
 // Quoc

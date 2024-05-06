@@ -2,7 +2,7 @@ const { MongoClient } = require('mongodb');
 const request = require('supertest');
 // const app = require('../index.js');
 const { createTeacher, createStudent, verifyTeacher, verifyStudent } = require('../src/userAccounts.js');
-const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
+const connectionString = "mongodb+srv://mkandeshwara:1234@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const client = new MongoClient(connectionString);
 
 jest.mock('mongoose');

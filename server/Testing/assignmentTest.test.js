@@ -1,13 +1,13 @@
 //cd into server and run using "npx jest Testing/assignmentTest"
 const { MongoClient } = require('mongodb');
-const { createAssignment, viewAssignment, addToAssignment, deleteAssignment, deleteFromAssignment, convertAssignmentToDtbForm, getAllStudentData, convert} = require('../src/assignments.js');
+const { createAssignment, viewAssignment, addToAssignment, deleteAssignment, deleteFromAssignment, convertAssignmentToDtbForm, getStudentGrades} = require('../src/assignments.js');
 
 jest.mock('mongoose');
 const mongo = require('../src/assignments.js');
 
 describe('Assignment Management Tests', () => {
 
-      const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
+      const connectionString = "mongodb+srv://mkandeshwara:1234@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
       const client = new MongoClient(connectionString);
 
       describe("addToAssignment", () => {
@@ -29,7 +29,7 @@ describe('Assignment Management Tests', () => {
 
             col = db.collection("metrics");
             const grades = await col.find({assignment: "war", card: 2}).toArray();
-            expect(grades.length).toBe(2);
+            expect(grades.length).toBe(3);
             expect(grades.map(e => e.studentEmail)).toContain("Troy.Briggs@yahoo.com");
             expect(grades.map(e => e.studentEmail)).toContain("Kimberly.Cruz@gmail.com");
 
@@ -283,5 +283,26 @@ describe('Assignment Management Tests', () => {
           }
         });
   
+      });
+
+      describe("getStudentGrades", () => {
+        it("returns the correct output for assignments in class Spanish454_QRAPCC", async () => {
+          expect(await getStudentGrades("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "fire", englishTranslation: "beautiful", grade: 0.3});
+          expect(await getStudentGrades("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "fire", englishTranslation: "beautiful", grade: 0.7});
+          expect(await getStudentGrades("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "fight", englishTranslation: "but", grade: 0.7});
+          expect(await getStudentGrades("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "fight", englishTranslation: "but", grade: 0});
+          expect(await getStudentGrades("Spanish454_QRAPCC", "leave")).toHaveLength(4);
+
+          expect(await getStudentGrades("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "right", englishTranslation: "along", grade: 0.7});
+          expect(await getStudentGrades("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "right", englishTranslation: "along", grade: 0.8});
+          expect(await getStudentGrades("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "provide", englishTranslation: "power", grade: 0.9});
+          expect(await getStudentGrades("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "provide", englishTranslation: "power", grade: 0.7});
+          expect(await getStudentGrades("Spanish454_QRAPCC", "war")).toHaveLength(4);
+        });
+
+        it("returns the correct output for assignmetns in class BestClass_000035", async () => {
+          expect(await getStudentGrades("BestClass_000035", "Best Assignment ")).toEqual([{studentEmail: "studentJason@gmail.com", wordName: "Best", englishTranslation: "Ever", grade: 0}])
+        })
+
       });
 });
