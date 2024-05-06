@@ -230,10 +230,45 @@ async function getAllStudentData(className, assignmentName){
     }
 }
 
+async function viewStudentAssignment(className, assignmentName, email){
+    let grades = [];
+    try{
+        await client.connect();
+        let db = client.db(className);
+
+        // Check if there are teachers to tell if the class exists
+        let col = db.collection("teachers");
+        if((await col.find().toArray()).length === 0){
+            throw("Class does not exist");
+        }
+
+        // Check that the assignment exists
+        col = db.collection("metrics");
+        if((await col.find({assignment: assignmentName}).toArray()).length === 0){
+            throw("Assignment does not exist");
+        }
+        const pipeline = [{$match: {studentEmail: email}}, {$lookup: {from: "assignments", pipeline: [{$match: {assignment: assignmentName}}], localField: "card", foreignField: "card", as: "grades"}}, {$replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$grades", 0 ] }, "$$ROOT" ] } }}, {$match: {assignment: assignmentName}}, {$project: {_id: 0, grades: 0, assignment: 0, card: 0, studentEmail: 0}}];
+
+        let g = await col.aggregate(pipeline);
+        while(await g.hasNext()){
+            grades.push(await g.next());
+        }
+
+    }
+    catch(err){
+        console.log(err);
+    }
+    finally{
+        await client.close();
+        return grades;
+        // return grades.map(e => {return {studentEmail: e.studentEmail, wordName: e.text, englishTranslation: e.translation, grade: e.score};});
+    }
+}
+
 
 
 module.exports = {
-    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment, getAllStudentData
+    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment, getAllStudentData, viewStudentAssignment
 };
 
 
