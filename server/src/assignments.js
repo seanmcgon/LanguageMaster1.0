@@ -1,7 +1,8 @@
+const e = require('cors');
 const { MongoClient } = require('mongodb');
 const { TextEncoder } = require('util');
 
-const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
+const connectionString = "mongodb+srv://mkandeshwara:1234@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const client = new MongoClient(connectionString);
 
 // Quoc
@@ -194,8 +195,7 @@ async function deleteFromAssignment(className,assignmentName,flashcard_Object){
 //   Maya Kandeshwarath 4/30/2024
 // Input: className: String, exact name of class in the database
 //        assignmentName: String, exact name of assignment in the database
-// Output: array of arrays, the sub arrays are the grades of the students
-//         where each element is a grade for a single flashcard
+// Output: array of objects {studentEmail, wordName, englishTranslation, grade}
 async function getAllStudentData(className, assignmentName){
     let grades = [];
     try{
@@ -213,53 +213,33 @@ async function getAllStudentData(className, assignmentName){
         if((await col.find({assignment: assignmentName}).toArray()).length === 0){
             throw("Assignment does not exist");
         }
+        const pipeline = [{$lookup: {from: "assignments", pipeline: [{$match: {assignment: assignmentName}}], localField: "card", foreignField: "card", as: "grades"}}, {$replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$grades", 0 ] }, "$$ROOT" ] } }}, {$match: {assignment: assignmentName}}, {$project: {_id: 0, grades: 0, audio: 0, timesPracticed: 0, assignment: 0, card: 0}}];
 
-        // Mongo Query to get the data to return
-        const pipeline = [
-            {$match:{assignment: assignmentName}}, 
-            {$group: 
-                {_id: "$studentEmail", grades: 
-                    {$push: {card: "$card", timesPracticed: "$timesPracticed", score: "$score"}}}}
-        ]
-
-        // Parse data so it can be returned as an easily accessible array
         let g = await col.aggregate(pipeline);
         while(await g.hasNext()){
             grades.push(await g.next());
         }
+
     }
     catch(err){
         console.log(err);
     }
     finally{
         await client.close();
-        return grades;
+        return grades.map(e => {return {studentEmail: e.studentEmail, wordName: e.text, englishTranslation: e.translation, grade: e.score};});
     }
 }
 
-async function numToTerm(className, assignmentName, cardNo){
-    let card = [];
-    try{
-        await client.connect();
-        let db = client.db(className);
-        let col = db.collection("teachers");
-        if((await col.find().toArray()).length === 0){
-            throw("Class does not exist");
-        }
-        col = db.collection("assignments");
-        card = await col.find({assignment: assignmentName, card: cardNo}).toArray();
-    }
-    catch(err){
-        console.log(err);
-    }
-    finally{
-        await client.close();
-        return card[0].text;
-    }
-}
+
 
 module.exports = {
-    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment, getAllStudentData, numToTerm
+    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment, getAllStudentData
 };
 
-// db.metrics.aggregate([{$match:{assignment: "war"}}, {$group: {_id: "$studentEmail", grades: {$push: {card: "$card", timesPracticed: "$timesPracticed", score: "$score"}}}}])
+
+
+/*
+db.metrics.aggregate([{$lookup: {from: "assignments", pipeline: [{$match: {assignment: "war"}}], localField: "card", foreignField: "card", as: "grades"}}, {$replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$grades", 0 ] }, "$$ROOT" ] } }}, {$match: {assignment: "war"}}, {$project: {_id: 0, grades: 0, audio: 0, timesPracticed: 0, assignment: 0, card: 0}}])
+*/
+
+// .map(e => {return {studentEmail: e.studentEmail, wordName: e.text, englishTranslation: e.translation, grade: e.score};});

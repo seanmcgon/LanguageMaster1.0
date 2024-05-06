@@ -16,6 +16,7 @@
     "@google-cloud/speech": "^6.5.0",
     "aws-sdk": "^2.1613.0",
     "axios": "^1.6.8",
+    "mongodb": "^6.6.0",
     "socket.io": "^4.7.5"
   },
   "devDependencies": {
