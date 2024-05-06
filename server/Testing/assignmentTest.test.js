@@ -1,6 +1,6 @@
-//cd into server and run using "npx jest Testing/assignmentTest"
+//cd into server and run using "npx jest Testing/assignmentTests"
 const { MongoClient } = require('mongodb');
-const { createAssignment, viewAssignment, addToAssignment, deleteAssignment, deleteFromAssignment, convertAssignmentToDtbForm, getStudentGrades} = require('../src/assignments.js');
+const { createAssignment, viewAssignment, addToAssignment, deleteAssignment, deleteFromAssignment, convertAssignmentToDtbForm, getAllStudentData, viewStudentAssignment} = require('../src/assignments.js');
 
 jest.mock('mongoose');
 const mongo = require('../src/assignments.js');
@@ -32,6 +32,7 @@ describe('Assignment Management Tests', () => {
             expect(grades.length).toBe(3);
             expect(grades.map(e => e.studentEmail)).toContain("Troy.Briggs@yahoo.com");
             expect(grades.map(e => e.studentEmail)).toContain("Kimberly.Cruz@gmail.com");
+            expect(grades.map(e => e.studentEmail)).toContain("jStudent@gmail.com");
 
             await col.deleteMany({timesPracticed: 0});
           }
@@ -181,128 +182,45 @@ describe('Assignment Management Tests', () => {
         });
       });
 
-      describe("createAssignment", () => {
-        it("Creates a new assignment", async () => {
-          try {
-            const className = "Chinese671_JPYVGX";
-            const assignmentName = "assignment1";
-            const assignmentArray = [
-              { wordName: "text1", englishTranslation: "translation1", audioFile: "audio1"},
-              { wordName: "text2", englishTranslation: "translation2", audioFile: "audio2"}
-            ];
-            const created = await createAssignment(className, assignmentName, assignmentArray);
-            expect(created).toEqual(true);
-
-            // Verify that the assignment was created in the database
-            await client.connect();
-            const db = client.db(className);
-            const col = db.collection("assignments");
-            const assignments = await col.find({ assignment: assignmentName }).toArray();
-            expect(assignments.length).toEqual(2);
-            expect(assignments.map(a => a.text)).toContain("text1");
-            expect(assignments.map(a => a.text)).toContain("text2");
-
-            // Clean up by deleting the created assignment
-            await col.deleteMany({ assignment: assignmentName });
-            await db.collection("metrics").deleteMany({ assignment: assignmentName });
-
-          } catch (err) {
-            throw (err);
-          } finally {
-            await client.close();
-          }
+      describe("getAllStudentData", () => {
+        it("returns the correct output for the assignment leave in class Spanish454_QRAPCC", async () => {
+          expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "fire", englishTranslation: "beautiful", grade: 0.3});
+          expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "fire", englishTranslation: "beautiful", grade: 0.7});
+          expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "fight", englishTranslation: "but", grade: 0.7});
+          expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "fight", englishTranslation: "but", grade: 0});
+          expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toHaveLength(4);
         });
 
-        it("Inserts only unique objects", async () => {
-          try {
-            const className = "Chinese671_JPYVGX";
-            const assignmentName = "assignment1";
-            const assignmentArray = [
-              { wordName: "text1", englishTranslation: "translation1", audioFile: "audio1"},
-              { wordName: "text2", englishTranslation: "translation2", audioFile: "audio2"},
-              { wordName: "text2", englishTranslation: "translation2", audioFile: "audio2"}
-            ];
-            const created = await createAssignment(className, assignmentName, assignmentArray);
-            expect(created).toEqual(true);
-
-            // Verify that the assignment was created in the database
-            await client.connect();
-            const db = client.db(className);
-            const col = db.collection("assignments");
-            const assignments = await col.find({ assignment: assignmentName }).toArray();
-            expect(assignments.length).toEqual(2);
-            expect(assignments.map(a => a.text)).toContain("text1");
-            expect(assignments.map(a => a.text)).toContain("text2");
-
-            // Clean up by deleting the created assignment
-            await col.deleteMany({ assignment: assignmentName });
-            await db.collection("metrics").deleteMany({ assignment: assignmentName });
-
-          } catch (err) {
-            throw (err);
-          } finally {
-            await client.close();
-          }
-        });
-
-        it("Creates a new assignment with blank grades for every student for every flashcard", async () => {
-          try {
-              const className = "Chinese671_JPYVGX";
-              const assignmentName = "assignment1";
-              const assignmentArray = [
-                  { wordName: "text1", englishTranslation: "translation1", audioFile: "audio1"},
-                  { wordName: "text2", englishTranslation: "translation2", audioFile: "audio2"}
-              ];
-              const created = await createAssignment(className, assignmentName, assignmentArray);
-              expect(created).toEqual(true);
-  
-              // Verify that the assignment was created in the database
-              await client.connect();
-              const db = client.db(className);
-              const col = db.collection("assignments");
-              const assignments = await col.find({ assignment: assignmentName }).toArray();
-              expect(assignments.length).toEqual(2);
-              expect(assignments.map(a => a.text)).toContain("text1");
-              expect(assignments.map(a => a.text)).toContain("text2");
-  
-              // Verify that blank grades were created for every student for every flashcard
-              
-              const grades = await db.collection("metrics").find({assignment: assignmentName}).toArray();
-              expect(grades.length).toEqual(4);
-              expect(grades.map(e => e.studentEmail)).toContain("Michael.Hinton@gmail.com");
-              expect(grades.map(e => e.studentEmail)).toContain("Mark.Wilson@yahoo.com");
-  
-              // Clean up by deleting the created assignment and grades
-              await col.deleteMany({ assignment: assignmentName });
-              await db.collection("metrics").deleteMany({ assignment: assignmentName });
-  
-          } catch (err) {
-              throw (err);
-          } finally {
-              await client.close();
-          }
-        });
-  
-      });
-
-      describe("getStudentGrades", () => {
-        it("returns the correct output for assignments in class Spanish454_QRAPCC", async () => {
-          expect(await getStudentGrades("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "fire", englishTranslation: "beautiful", grade: 0.3});
-          expect(await getStudentGrades("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "fire", englishTranslation: "beautiful", grade: 0.7});
-          expect(await getStudentGrades("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "fight", englishTranslation: "but", grade: 0.7});
-          expect(await getStudentGrades("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "fight", englishTranslation: "but", grade: 0});
-          expect(await getStudentGrades("Spanish454_QRAPCC", "leave")).toHaveLength(4);
-
-          expect(await getStudentGrades("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "right", englishTranslation: "along", grade: 0.7});
-          expect(await getStudentGrades("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "right", englishTranslation: "along", grade: 0.8});
-          expect(await getStudentGrades("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "provide", englishTranslation: "power", grade: 0.9});
-          expect(await getStudentGrades("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "provide", englishTranslation: "power", grade: 0.7});
-          expect(await getStudentGrades("Spanish454_QRAPCC", "war")).toHaveLength(4);
-        });
+        it("returns the correct output for the assignment war in class Spanish454_QRAPCC", async () => {
+          expect(await getAllStudentData("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "right", englishTranslation: "along", grade: 0.7});
+          expect(await getAllStudentData("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "right", englishTranslation: "along", grade: 0.8});
+          expect(await getAllStudentData("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "provide", englishTranslation: "power", grade: 0.9});
+          expect(await getAllStudentData("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "provide", englishTranslation: "power", grade: 0.7});
+          expect(await getAllStudentData("Spanish454_QRAPCC", "war")).toHaveLength(4);
+        })
 
         it("returns the correct output for assignmetns in class BestClass_000035", async () => {
-          expect(await getStudentGrades("BestClass_000035", "Best Assignment ")).toEqual([{studentEmail: "studentJason@gmail.com", wordName: "Best", englishTranslation: "Ever", grade: 0}])
+          expect(await getAllStudentData("BestClass_000035", "Best Assignment ")).toEqual([{studentEmail: "studentJason@gmail.com", wordName: "Best", englishTranslation: "Ever", grade: 0}])
         })
 
       });
+
+      describe("viewStudentAssignment", () => {
+        it("returns the correct output for a student and assignment in class Spanish454_QRAPCC", async() => {
+          // 1: provide, power, 0: right, along
+          expect(await viewStudentAssignment("Spanish454_QRAPCC", "war", "Troy.Briggs@yahoo.com")).toContainEqual({wordName: "right", englishTranslation: "along", audioFile: "http://rodriguez.com/", score: 0.7});
+          expect(await viewStudentAssignment("Spanish454_QRAPCC", "war", "Troy.Briggs@yahoo.com")).toContainEqual({wordName: "provide", englishTranslation: "power", audioFile: "https://www.bowen-newman.com/", score: 0.9});
+          expect(await viewStudentAssignment("Spanish454_QRAPCC", "war", "Troy.Briggs@yahoo.com")).toHaveLength(2);
+        });
+        
+        it("returns the correct output for a different student and assignment in class Spanish454_QRAPCC", async () => {
+          expect(await viewStudentAssignment("Spanish454_QRAPCC", "leave", "Kimberly.Cruz@gmail.com")).toContainEqual({wordName: "fire", englishTranslation: "beautiful", audioFile: "https://weiss.net/", score: 0.7});
+          expect(await viewStudentAssignment("Spanish454_QRAPCC", "leave", "Kimberly.Cruz@gmail.com")).toContainEqual({wordName: "fight", englishTranslation: "but", audioFile: "https://www.wilson.com/", score: 0});
+          expect(await viewStudentAssignment("Spanish454_QRAPCC", "leave", "Kimberly.Cruz@gmail.com")).toHaveLength(2);
+        });
+
+        it("it returns the correct output for a class with one student and one flashcard", async () => {
+          expect(await viewStudentAssignment("BestClass_000035", "Best Assignment ", "studentJason@gmail.com")).toEqual([{wordName: "Best", englishTranslation: "Ever", audioFile: "", score: 0}])
+        });
+      })
 });

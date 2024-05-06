@@ -1,3 +1,4 @@
+const e = require('cors');
 const { MongoClient } = require('mongodb');
 const { TextEncoder } = require('util');
 
@@ -6,12 +7,13 @@ const client = new MongoClient(connectionString);
 
 // Quoc
 function checkValid(className) {
-   const regex = /^[^ ]+\_[^ ]{1,6}$/;
+    const regex = /^[^ ]+\_[^ ]{1,6}$/;
     if (className.match(regex)) {
         return true;
     }
     return false;
 }
+
 // Shuto
 async function createAssignment(className, assignmentName, assignmentArray) {
     let createdAssignment = false;
@@ -19,35 +21,12 @@ async function createAssignment(className, assignmentName, assignmentArray) {
         await client.connect();
         const db = client.db(className);
         const col = db.collection("assignments");
-        // Delete any duplicates from assignmentArray
-        const uniqueArray = assignmentArray.reduce((acc, obj) => {
-            if (!acc.some(item => JSON.stringify(item) === JSON.stringify(obj))) {
-                acc.push(obj);
-            }
-            return acc;
-        }, []);
-        // Insert each card in the converted array if the assignment doesn't exist
-        if ((await col.find({ assignment: assignmentName }).toArray()).length === 0 && uniqueArray.length > 0) {  
-            const flashcards = convertAssignmentToDtbForm(assignmentName, uniqueArray);
-            for (const flashcard of flashcards) {
-                let cardNum = 0;
+        if ((await col.find({ assignment: assignmentName }).toArray()).length === 0 && assignmentArray.length > 0) {
+            for (const flashcard of convertAssignmentToDtbForm(assignmentName, assignmentArray)) {
                 await col.insertOne(flashcard);
             }
             createdAssignment = true;
         }
-        if (createAssignment) {
-            // Get all the students in the class
-            let students = await db.collection("students").find().toArray();
-            for (let i = 0; i < uniqueArray.length; i++) {
-                // Create a blank grade for every students for every flashcard
-                for (let j = 0; j < students.length; j++) {
-                    await db.collection("metrics").insertOne({
-                        studentEmail: students[j].email, assignment: assignmentName, card: i, timePracticed: 0, score: 0
-                    });
-                }
-            }
-        }
-
     } catch (err) {
         console.log(err);
     } finally {
@@ -161,7 +140,6 @@ async function viewAssignment(className, assignmentName) {
     } finally {
         await client.close();
     }
-    //Additional field- for each card also include the grade
     return cards.map(e => ({ wordName: e.text, englishTranslation: e.translation, audioFile: e.audio }));
 }
 
@@ -217,48 +195,8 @@ async function deleteFromAssignment(className,assignmentName,flashcard_Object){
 //   Maya Kandeshwarath 4/30/2024
 // Input: className: String, exact name of class in the database
 //        assignmentName: String, exact name of assignment in the database
-// Output: array of arrays, the sub arrays are the grades of the students
-//         where each element is a grade for a single flashcard
-async function getAllStudentData(className, assignmentName){
-    let grades = [];
-    try{
-        await client.connect();
-        let db = client.db(className);
-        let col = db.collection("teachers");
-        if((await col.find().toArray()).length === 0){
-            throw("Class does not exist");
-        }
-        col = db.collection("metrics");
-        if((await col.find({assignment: assignmentName}).toArray()).length === 0){
-            throw("Assignment does not exist");
-        }
-        const pipeline = [
-            {$match:{assignment: assignmentName}}, 
-            {$group: 
-                {_id: "$studentEmail", grades: 
-                    {$push: {card: "$card", timesPracticed: "$timesPracticed", score: "$score"}}}}
-        ]
-
-        let g = await col.aggregate(pipeline);
-        while(await g.hasNext()){
-            grades.push(await g.next());
-        }
-    }
-    catch(err){
-        console.log(err);
-    }
-    finally{
-        await client.close();
-        return grades;
-    }
-}
-
-// Sean 5/5: Dummy function for returning student grades in the form expected by Suhani's component
-//   Maya Kandeshwarath 4/30/2024
-// Input: className: String, exact name of class in the database
-//        assignmentName: String, exact name of assignment in the database
 // Output: array of objects {studentEmail, wordName, englishTranslation, grade}
-async function getStudentGrades(className, assignmentName){
+async function getAllStudentData(className, assignmentName){
     let grades = [];
     try{
         await client.connect();
@@ -292,9 +230,42 @@ async function getStudentGrades(className, assignmentName){
     }
 }
 
-module.exports = {
-    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm,
-    deleteFromAssignment, getAllStudentData, getStudentGrades
-};
+async function viewStudentAssignment(className, assignmentName, email){
+    let grades = [];
+    try{
+        await client.connect();
+        let db = client.db(className);
 
-// db.metrics.aggregate([{$match:{assignment: "war"}}, {$group: {_id: "$studentEmail", grades: {$push: {card: "$card", timesPracticed: "$timesPracticed", score: "$score"}}}}])
+        // Check if there are teachers to tell if the class exists
+        let col = db.collection("teachers");
+        if((await col.find().toArray()).length === 0){
+            throw("Class does not exist");
+        }
+
+        // Check that the assignment exists
+        col = db.collection("metrics");
+        if((await col.find({assignment: assignmentName}).toArray()).length === 0){
+            throw("Assignment does not exist");
+        }
+        const pipeline = [{$match: {studentEmail: email}}, {$lookup: {from: "assignments", pipeline: [{$match: {assignment: assignmentName}}], localField: "card", foreignField: "card", as: "grades"}}, {$replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$grades", 0 ] }, "$$ROOT" ] } }}, {$match: {assignment: assignmentName}}, {$project: {_id: 0, grades: 0, assignment: 0, card: 0, studentEmail: 0, timesPracticed: 0}}];
+
+        let g = await col.aggregate(pipeline);
+        while(await g.hasNext()){
+            grades.push(await g.next());
+        }
+
+    }
+    catch(err){
+        console.log(err);
+    }
+    finally{
+        await client.close();
+        return grades.map(e => {return {wordName: e.text, englishTranslation: e.translation, audioFile: e.audio, score: e.score};});
+    }
+}
+
+
+
+module.exports = {
+    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment, getAllStudentData, viewStudentAssignment
+};
