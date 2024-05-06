@@ -183,19 +183,21 @@ describe('Assignment Management Tests', () => {
       });
 
       describe("getAllStudentData", () => {
-        it("returns the correct output for assignments in class Spanish454_QRAPCC", async () => {
+        it("returns the correct output for the assignment leave in class Spanish454_QRAPCC", async () => {
           expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "fire", englishTranslation: "beautiful", grade: 0.3});
           expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "fire", englishTranslation: "beautiful", grade: 0.7});
           expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "fight", englishTranslation: "but", grade: 0.7});
           expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "fight", englishTranslation: "but", grade: 0});
           expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toHaveLength(4);
+        });
 
+        it("returns the correct output for the assignment war in class Spanish454_QRAPCC", async () => {
           expect(await getAllStudentData("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "right", englishTranslation: "along", grade: 0.7});
           expect(await getAllStudentData("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "right", englishTranslation: "along", grade: 0.8});
           expect(await getAllStudentData("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "provide", englishTranslation: "power", grade: 0.9});
           expect(await getAllStudentData("Spanish454_QRAPCC", "war")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "provide", englishTranslation: "power", grade: 0.7});
           expect(await getAllStudentData("Spanish454_QRAPCC", "war")).toHaveLength(4);
-        });
+        })
 
         it("returns the correct output for assignmetns in class BestClass_000035", async () => {
           expect(await getAllStudentData("BestClass_000035", "Best Assignment ")).toEqual([{studentEmail: "studentJason@gmail.com", wordName: "Best", englishTranslation: "Ever", grade: 0}])
@@ -204,21 +206,21 @@ describe('Assignment Management Tests', () => {
       });
 
       describe("viewStudentAssignment", () => {
-        it("works", async() => {
+        it("returns the correct output for a student and assignment in class Spanish454_QRAPCC", async() => {
           // 1: provide, power, 0: right, along
-          expect(await viewStudentAssignment("Spanish454_QRAPCC", "war", "Troy.Briggs@yahoo.com")).toContainEqual({text: "right", translation: "along", audio: "http://rodriguez.com/", timesPracticed: 7, score: 0.7});
-          expect(await viewStudentAssignment("Spanish454_QRAPCC", "war", "Troy.Briggs@yahoo.com")).toContainEqual({text: "provide", translation: "power", audio: "https://www.bowen-newman.com/", timesPracticed: 8, score: 0.9});
+          expect(await viewStudentAssignment("Spanish454_QRAPCC", "war", "Troy.Briggs@yahoo.com")).toContainEqual({wordName: "right", englishTranslation: "along", audioFile: "http://rodriguez.com/", score: 0.7});
+          expect(await viewStudentAssignment("Spanish454_QRAPCC", "war", "Troy.Briggs@yahoo.com")).toContainEqual({wordName: "provide", englishTranslation: "power", audioFile: "https://www.bowen-newman.com/", score: 0.9});
           expect(await viewStudentAssignment("Spanish454_QRAPCC", "war", "Troy.Briggs@yahoo.com")).toHaveLength(2);
         });
         
-        it("still works", async () => {
-          expect(await viewStudentAssignment("Spanish454_QRAPCC", "leave", "Kimberly.Cruz@gmail.com")).toContainEqual({text: "fire", translation: "beautiful", audio: "https://weiss.net/", timesPracticed: 10, score: 0.7});
-          expect(await viewStudentAssignment("Spanish454_QRAPCC", "leave", "Kimberly.Cruz@gmail.com")).toContainEqual({text: "fight", translation: "but", audio: "https://www.wilson.com/", timesPracticed: 3, score: 0});
+        it("returns the correct output for a different student and assignment in class Spanish454_QRAPCC", async () => {
+          expect(await viewStudentAssignment("Spanish454_QRAPCC", "leave", "Kimberly.Cruz@gmail.com")).toContainEqual({wordName: "fire", englishTranslation: "beautiful", audioFile: "https://weiss.net/", score: 0.7});
+          expect(await viewStudentAssignment("Spanish454_QRAPCC", "leave", "Kimberly.Cruz@gmail.com")).toContainEqual({wordName: "fight", englishTranslation: "but", audioFile: "https://www.wilson.com/", score: 0});
           expect(await viewStudentAssignment("Spanish454_QRAPCC", "leave", "Kimberly.Cruz@gmail.com")).toHaveLength(2);
         });
 
-        it("it continues to work", async () => {
-          expect(await viewStudentAssignment("BestClass_000035", "Best Assignment ", "studentJason@gmail.com")).toEqual([{text: "Best", translation: "Ever", audio: "", timesPracticed: 0, score: 0}])
+        it("it returns the correct output for a class with one student and one flashcard", async () => {
+          expect(await viewStudentAssignment("BestClass_000035", "Best Assignment ", "studentJason@gmail.com")).toEqual([{wordName: "Best", englishTranslation: "Ever", audioFile: "", score: 0}])
         });
       })
 });

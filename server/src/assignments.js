@@ -247,7 +247,7 @@ async function viewStudentAssignment(className, assignmentName, email){
         if((await col.find({assignment: assignmentName}).toArray()).length === 0){
             throw("Assignment does not exist");
         }
-        const pipeline = [{$match: {studentEmail: email}}, {$lookup: {from: "assignments", pipeline: [{$match: {assignment: assignmentName}}], localField: "card", foreignField: "card", as: "grades"}}, {$replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$grades", 0 ] }, "$$ROOT" ] } }}, {$match: {assignment: assignmentName}}, {$project: {_id: 0, grades: 0, assignment: 0, card: 0, studentEmail: 0}}];
+        const pipeline = [{$match: {studentEmail: email}}, {$lookup: {from: "assignments", pipeline: [{$match: {assignment: assignmentName}}], localField: "card", foreignField: "card", as: "grades"}}, {$replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$grades", 0 ] }, "$$ROOT" ] } }}, {$match: {assignment: assignmentName}}, {$project: {_id: 0, grades: 0, assignment: 0, card: 0, studentEmail: 0, timesPracticed: 0}}];
 
         let g = await col.aggregate(pipeline);
         while(await g.hasNext()){
@@ -260,8 +260,7 @@ async function viewStudentAssignment(className, assignmentName, email){
     }
     finally{
         await client.close();
-        return grades;
-        // return grades.map(e => {return {studentEmail: e.studentEmail, wordName: e.text, englishTranslation: e.translation, grade: e.score};});
+        return grades.map(e => {return {wordName: e.text, englishTranslation: e.translation, audioFile: e.audio, score: e.score};});
     }
 }
 
