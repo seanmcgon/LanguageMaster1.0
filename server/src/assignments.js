@@ -254,18 +254,42 @@ async function getAllStudentData(className, assignmentName){
 }
 
 // Sean 5/5: Dummy function for returning student grades in the form expected by Suhani's component
-async function getStudentGrades(className, assignmentName) {
-    return [
-        { studentName: 'Suhani', wordName: 'Apple', englishTranslation: 'Apple', grade: 20 },
-        { studentName: 'Jason', wordName: 'Apple', englishTranslation: 'Apple', grade: 70 },
-        { studentName: 'Bach', wordName: 'Apple', englishTranslation: 'Apple', grade: 85 },
-        { studentName: 'Suhani', wordName: 'Banana', englishTranslation: 'Banana', grade: 30 },
-        { studentName: 'Jason', wordName: 'Banana', englishTranslation: 'Banana', grade: 60 },
-        { studentName: 'Bach', wordName: 'Banana', englishTranslation: 'Banana', grade: 90 },
-        { studentName: 'Suhani', wordName: 'Orange', englishTranslation: 'Orange', grade: 40 },
-        { studentName: 'Jason', wordName: 'Orange', englishTranslation: 'Orange', grade: 50 },
-        { studentName: 'Bach', wordName: 'Orange', englishTranslation: 'Orange', grade: 80 },
-    ];
+//   Maya Kandeshwarath 4/30/2024
+// Input: className: String, exact name of class in the database
+//        assignmentName: String, exact name of assignment in the database
+// Output: array of objects {studentEmail, wordName, englishTranslation, grade}
+async function getStudentGrades(className, assignmentName){
+    let grades = [];
+    try{
+        await client.connect();
+        let db = client.db(className);
+
+        // Check if there are teachers to tell if the class exists
+        let col = db.collection("teachers");
+        if((await col.find().toArray()).length === 0){
+            throw("Class does not exist");
+        }
+
+        // Check that the assignment exists
+        col = db.collection("metrics");
+        if((await col.find({assignment: assignmentName}).toArray()).length === 0){
+            throw("Assignment does not exist");
+        }
+        const pipeline = [{$lookup: {from: "assignments", pipeline: [{$match: {assignment: assignmentName}}], localField: "card", foreignField: "card", as: "grades"}}, {$replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$grades", 0 ] }, "$$ROOT" ] } }}, {$match: {assignment: assignmentName}}, {$project: {_id: 0, grades: 0, audio: 0, timesPracticed: 0, assignment: 0, card: 0}}];
+
+        let g = await col.aggregate(pipeline);
+        while(await g.hasNext()){
+            grades.push(await g.next());
+        }
+
+    }
+    catch(err){
+        console.log(err);
+    }
+    finally{
+        await client.close();
+        return grades.map(e => {return {studentEmail: e.studentEmail, wordName: e.text, englishTranslation: e.translation, grade: e.score};});
+    }
 }
 
 module.exports = {
