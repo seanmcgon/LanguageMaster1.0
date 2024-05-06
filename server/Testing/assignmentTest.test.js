@@ -183,27 +183,6 @@ describe('Assignment Management Tests', () => {
       });
 
       describe("getAllStudentData", () => {
-        // it("Returns a correct output for existing assignment", async () => {
-        //   const grades = await getAllStudentData("Spanish454_QRAPCC", "war");
-        //   expect(grades.length).toBe(2);
-        //   expect(grades).toContainEqual({"_id": "Troy.Briggs@yahoo.com", 
-        //   "grades": [{"card": 0, "score": 0.7, "timesPracticed": 7}, {"card": 1, "score": 0.9, "timesPracticed": 8}]});
-        //   expect(grades).toContainEqual({"_id": "Kimberly.Cruz@gmail.com", 
-        //   "grades": [{"card": 0, "score": 0.8, "timesPracticed": 1}, {"card": 1, "score": 0.7, "timesPracticed": 7}]});
-        // });
-
-        // it("Throws an error for a non-existent class", async () => {
-        //   console.log = jest.fn();
-        //   await getAllStudentData("ABCD", "war");
-        //   expect(console.log).toHaveBeenCalledWith("Class does not exist");
-        // });
-      
-        // it("Throws an error for a non-existent assignment", async () => {
-        //   console.log = jest.fn();
-        //   await getAllStudentData("Spanish454_QRAPCC", "ASDF");
-        //   expect(console.log).toHaveBeenCalledWith("Assignment does not exist");
-        // });
-
         it("returns the correct output for assignments in class Spanish454_QRAPCC", async () => {
           expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Troy.Briggs@yahoo.com", wordName: "fire", englishTranslation: "beautiful", grade: 0.3});
           expect(await getAllStudentData("Spanish454_QRAPCC", "leave")).toContainEqual({studentEmail: "Kimberly.Cruz@gmail.com", wordName: "fire", englishTranslation: "beautiful", grade: 0.7});
