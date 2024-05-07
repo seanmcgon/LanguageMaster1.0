@@ -58,12 +58,12 @@ async function getFeedback(curWord, audioBuffer, currentAssignment, currentClass
         let signedUrl = await generateSignedUrl('languagemaster', fileName);
         // const encodings = ['LINEAR16', 'FLAC', 'MULAW', 'AMR', 'AMR_WB', 'OGG_OPUS', 'SPEEX_WITH_HEADER_BYTE'];
         // const sampleRatesHertz = [8000, 12000, 16000, 24000, 48000];
-        const results = await audioRecognition(signedUrl, 'English (United States)', 'LINEAR16', 16000);
-        console.log(results)
-        let newScore = await stringComparisonPercentage(results, curWord);
+        const transcription = await audioRecognition(signedUrl, 'English (United States)', 'LINEAR16', 16000);
+        console.log(transcription)
+        let newScore = await stringComparisonPercentage(transcription, curWord);
         console.log(newScore)
-        updateFlashcardForStudent(currentClass, currentAssignment, curWord, newScore, studentEmail)
-
+        newAverage = await updateFlashcardForStudent(currentClass, currentAssignment, curWord, newScore, studentEmail)
+        return {attemptScore: newScore, newAverage: newAverage, transcription: transcription}
                    
     } catch (error) {
         console.error('Error in getting feedback:', error);

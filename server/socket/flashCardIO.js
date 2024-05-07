@@ -14,7 +14,7 @@ function getFeedbackIO(socket) {
   
     socket.on("getFeedback", async (curWord, audioFile, currentAssignment, currentClass, studentEmail) => {
         console.log(i++, "rd Request")
-        console.log("curWord", curWord, "audioFile?", audioFile? "yes" : "no");
+        console.log("curWord", curWord, "audioFile", audioFile, "currentAssignment",currentAssignment, "currentClass", currentClass, "studentEmail", studentEmail);
 
         let feedback;
         let attemptScore;
@@ -22,16 +22,17 @@ function getFeedbackIO(socket) {
         let transcription;
         try {
             feedback = await getFeedback(curWord, audioFile, currentAssignment, currentClass, studentEmail); // Assuming this function is implemented in flashcards.js
-            
+
             attemptScore = feedback.attemptScore;
             newAverage = feedback.newAverage;
             transcription = feedback.transcription;
+            socket.emit("feedback", attemptScore, newAverage, transcription);
+            console.log("getFeedback called and returned", feedback);
         } catch (error) {
             console.log("Error getting feedback");
             attemptScore, newAverage, transcription = "";
         }
-        socket.emit("feedback", attemptScore, newAverage, transcription);
-        console.log("getFeedback called and returned", feedback);
+
 
         return feedback;
     })

@@ -87,7 +87,7 @@ export const viewAssignmentStudent = (className, assignmentName, userEmail, fetc
 
 export const getFeedback = (curWord, audioFile, currentAssignment, currentClass, studentEmail, feedback) => {
   console.log("get feedback called with", audioFile)
-  socket.emit("getFeedback", curWord, audioFile, currentAssignment, currentClass);
+  socket.emit("getFeedback", curWord, audioFile, currentAssignment, currentClass, studentEmail);
   
 
   socket.once("feedback", feedback);

@@ -360,70 +360,109 @@ async function getClassesTeacher(teacherEmail) {
   }
 
   // Quoc
-async function enrollClass(classID, studentEmail){
-  try{
-  const neededData =  await find_class_based_on_ID(classID);
-   if(neededData && checkValid(neededData)){
-    await client.connect();
-  db = client.db("UserData");
-  col = await db.collection("students");
-  db1 = client.db(neededData);
-  col1 = await db1.collection("assignments");
-  col2 = await db1.collection("metrics");
-  array_of_assignment = await col1.find().toArray();
-  array_of_assignment = await col1.find().toArray();
-  array_of_assignment = array_of_assignment.map(e => {
-    const object = {"studentEmail": studentEmail, "assignment": e.assignment, "card" : e.card, "timesPracticed": 0, "score": 0}
-    return object;
-   });
-   if(array_of_assignment.length >0){
-  await col2.insertMany(array_of_assignment);
-   }
-     let student_Data = await col.find({email: studentEmail}).toArray();
-     let student_courses = student_Data[0].courseList;
-     if(student_courses.indexOf(neededData) == -1){
-       student_courses.push(neededData);
-        await col.updateOne({email:studentEmail}, {$set:{courseList: student_courses}});
-        db1 = client.db(neededData);
-        col1 = await db1.collection("students");
-        await col1.insertOne(student_Data[0]);
+  async function enrollClass(classID, studentEmail) {
+    try {
+      const neededData = await find_class_based_on_ID(classID);
+      if (!neededData || !checkValid(neededData)) {
+        throw new Error("Invalid class");
       }
-      else{
-        throw("The class already exist");
+  
+      await client.connect();
+      const db = client.db("UserData");
+      const studentsCollection = db.collection("students");
+      const classDb = client.db(neededData);
+      const assignmentsCollection = classDb.collection("assignments");
+      const metricsCollection = classDb.collection("metrics");
+  
+      const assignments = await assignmentsCollection.find().toArray();
+      if (assignments.length === 0) {
+        throw new Error("No assignments found for this class.");
       }
+  
+      const metricsUpdatePromises = assignments.map(assignment => {
+        const metricQuery = {
+          studentEmail: studentEmail,
+          assignment: assignment.assignment,
+          card: assignment.card
+        };
+        const metricUpdate = {
+          $setOnInsert: { timesPracticed: 0, score: 0 }
+        };
+        return metricsCollection.updateOne(metricQuery, metricUpdate, { upsert: true });
+      });
+  
+      await Promise.all(metricsUpdatePromises);
+  
+      const studentData = await studentsCollection.findOne({ email: studentEmail });
+      if (!studentData.courseList.includes(neededData)) {
+        const updatedCourseList = [...studentData.courseList, neededData];
+        await studentsCollection.updateOne({ email: studentEmail }, { $set: { courseList: updatedCourseList } });
+        await classDb.collection("students").insertOne(studentData);
+      } else {
+        console.log("The student is already enrolled in this class.");
+      }
+    } catch (err) {
+      console.log(err);
+      throw err;
+    } finally {
+      await client.close();
+    }
+  }
+  
+  async function updateFlashcardForStudent(className, assignmentName, flashcardName, newScore, studentEmail) {
+    try {
+        await client.connect();
+        const db = client.db(className);
+        const assignmentsCollection = db.collection("assignments");
+        const metricsCollection = db.collection("metrics");
 
-  }
-  else{
-    throw("Invalid class");
-  }
-  } catch(err){
-  console.log(err);
-   }
-  finally{
-  await client.close();
-  }
+        // Fetch the flashcard
+        const flashcards = await assignmentsCollection.find({
+            $and: [{ "assignment": assignmentName }, { "text": flashcardName }]
+        }).toArray();
+        if (flashcards.length === 0) {
+            throw new Error("Flashcard not found.");
+        }
+        const flashcard = flashcards[0];
 
-  }
-async function updateFlashcardForStudent(className, assignmentName, flashcardName, newScore, studentEmail){
-   try{
-    await client.connect();
-    db1 = client.db(className);
-   col = await db1.collection("assignments");
-   col1 = await db1.collection("metrics");
-   const flash_card = await col.find({$and:[{"assignment": assignmentName},{"text": flashcardName}]}).toArray();
-   const student_flash_card = (await col1.find({$and:[{"assignment": assignmentName},{"card": flash_card[0].card}]}).toArray())[0];
-   const new_time_practice = student_flash_card.timesPracticed + 1;
-   const update_Score = (student_flash_card.score * student_flash_card.timesPracticed + newScore)/new_time_practice;
-   //update flash_card
-   await col1.updateOne({$and:[{"studentEmail" : studentEmail},{"assignment": assignmentName},{"card": flash_card[0].card}]},{$set:{"timesPracticed" : new_time_practice, "score": update_Score}});
-   }
-  catch(err){
-    console.log(err);
-  }
-finally{
-  await client.close();
+        // Fetch the student's metrics for the flashcard
+        const metrics = await metricsCollection.find({
+            $and: [
+                { "studentEmail": studentEmail },
+                { "assignment": assignmentName },
+                { "card": flashcard.card }
+            ]
+        }).toArray();
+        if (metrics.length === 0) {
+            throw new Error("Student metrics not found.");
+        }
+        const studentMetrics = metrics[0];
+
+        // Calculate the new metrics
+        const newTimesPracticed = studentMetrics.timesPracticed + 1;
+        const updatedScore = (studentMetrics.score * studentMetrics.timesPracticed + newScore) / newTimesPracticed;
+
+        // Update the metrics in the database
+        await metricsCollection.updateOne({
+            $and: [
+                { "studentEmail": studentEmail },
+                { "assignment": assignmentName },
+                { "card": flashcard.card }
+            ]
+        }, {
+            $set: { "timesPracticed": newTimesPracticed, "score": updatedScore }
+        });
+
+        console.log("Successful update of student flashcard!");
+        return updatedScore; // Return the new score after update
+    } catch (err) {
+        console.log(err);
+        throw err; // Rethrow the error so it can be caught or handled by the calling function
+    } finally {
+        await client.close(); // Ensure the client is always closed, even if an error occurs
+    }
 }
-  }
+
 module.exports = { create_unique_id_for_class,
     enrollClass, getClassesStudent, getClassesTeacher, createClass, getStudentsInClass, getTeachersInClass, updateClassForGivenTeacher, find_class_based_on_ID, updateFlashcardForStudent
 };

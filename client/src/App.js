@@ -23,14 +23,14 @@ const App = () => {
     // const [isTeacher, setIsTeacher] = useState(true);
 
     //Student
-    const [userEmail, setUserEmail] = useState("jasonhuangStudent@umass.edu");  // Hardcoded email
-    const [isTeacher, setIsTeacher] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    // const [userEmail, setUserEmail] = useState("jasonhuangStudent@umass.edu");  // Hardcoded email
+    // const [isTeacher, setIsTeacher] = useState(false);
+    // const [isLoggedIn, setIsLoggedIn] = useState(true);
 
     //Production
-    // const [isTeacher, setIsTeacher] = useState(false);
-    // const [isLoggedIn, setIsLoggedIn] = useState(false);
-    // const [userEmail, setUserEmail] = useState("");
+    const [isTeacher, setIsTeacher] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userEmail, setUserEmail] = useState("");
 
     useEffect(() => {
         getClassesForUser(userEmail);  // Fetch classes for the hardcoded user
@@ -110,7 +110,7 @@ const App = () => {
 
     const handleFeedbackClick = (curWord, audioFile ) => {
         try {
-            getFeedback(curWord, audioFile, currentAssignment, currentClass, userEmail, (attemptScore, newAverage, transcription) => {
+            getFeedback(curWord, audioFile, currentAssignmentName, currentClass, userEmail, (attemptScore, newAverage, transcription) => {
                 setAttemptScore(attemptScore);
                 setCurrentAverage(newAverage);
                 setTranscription(transcription);
