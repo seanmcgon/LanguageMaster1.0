@@ -1,6 +1,8 @@
 const { audioRecognition } = require("./transcription/audioToText.js");
 const {stringComparisonPercentage} = require("./transcription/stringSimilarity.js")
 const {updateFlashcardForStudent} = require("./classes.js")
+const {getClassLanguage} = require("./assignments.js")
+
 const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 const keyFilename = path.join(__dirname, 'key.json');
@@ -58,7 +60,9 @@ async function getFeedback(curWord, audioBuffer, currentAssignment, currentClass
         let signedUrl = await generateSignedUrl('languagemaster', fileName);
         // const encodings = ['LINEAR16', 'FLAC', 'MULAW', 'AMR', 'AMR_WB', 'OGG_OPUS', 'SPEEX_WITH_HEADER_BYTE'];
         // const sampleRatesHertz = [8000, 12000, 16000, 24000, 48000];
-        const transcription = await audioRecognition(signedUrl, 'English (United States)', 'LINEAR16', 16000);
+        const language = await getClassLanguage(currentClass)
+        console.log("language for class is", language)
+        const transcription = await audioRecognition(signedUrl, language, 'LINEAR16', 16000);
         console.log(transcription)
         let newScore = await stringComparisonPercentage(transcription, curWord);
         console.log(newScore)

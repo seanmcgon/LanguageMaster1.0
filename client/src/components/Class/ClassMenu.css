@@ -1,3 +1,4 @@
+
 .class-card-container {
   border: 7px solid maroon; /* This sets a maroon red border */
   position: relative;
@@ -19,14 +20,19 @@
 }
 
 .class-txt {
-  font-size: 40px;  
+  font-size: 10px;  
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  width: 100%; /* Ensure the text container takes the full width */
+  width: 90%; /* Adjust the width to your desired percentage */
+  max-width: 500px; /* Optional: Set a maximum width to prevent excessive stretching */
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Show ellipsis (...) for overflow text */
 }
+
 
 .project h2 {
   text-align: center;

@@ -265,7 +265,26 @@ async function viewStudentAssignment(className, assignmentName, email){
 }
 
 
+async function getClassLanguage(className) {
+
+    try {
+        await client.connect();
+        const db = client.db(className);
+        const col = db.collection("teachers");
+
+        // Fetch the last document in the "teachers" collection
+        const lastEntry = await col.find().sort({_id: -1}).limit(1).toArray();
+        if (lastEntry.length > 0) {
+            languageName = lastEntry[0].language_name;
+        }
+    } catch (err) {
+        console.log(err);
+    } finally {
+        await client.close();
+    }
+    return languageName;
+}
 
 module.exports = {
-    createAssignment, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment, getAllStudentData, viewStudentAssignment
+    createAssignment, getClassLanguage, addToAssignment, viewAssignment, deleteAssignment, getAllAssignments, convertAssignmentToDtbForm, deleteFromAssignment, getAllStudentData, viewStudentAssignment
 };

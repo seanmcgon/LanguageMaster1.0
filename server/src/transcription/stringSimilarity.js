@@ -36,31 +36,24 @@
 //     return similarityRate < 0 ? 0 : similarityRate;
 // }
 function normalizeString(str) {
-    return str.toLowerCase().replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g, "");
-}
-
-function similarity(given, expected) {
-    if (given === expected) return 1;
-    const maxLen = Math.max(given.length, expected.length);
-    const editDistance = levenshteinDistance(given, expected);
-    return (maxLen - editDistance) / maxLen;
+    // Add Chinese punctuation to the regex and trim the string to remove leading and trailing spaces
+    return str.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()，。、；：？！“”‘’]/g, "").trim();
 }
 
 function levenshteinDistance(s1, s2) {
+    if (s1 === s2) return 0;  // Adding explicit check for identical strings
     const costs = new Array();
     for (let i = 0; i <= s1.length; i++) {
         let lastValue = i;
         for (let j = 0; j <= s2.length; j++) {
             if (i === 0)
                 costs[j] = j;
-            else {
-                if (j > 0) {
-                    let newValue = costs[j - 1];
-                    if (s1.charAt(i - 1) !== s2.charAt(j - 1))
-                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                    costs[j - 1] = lastValue;
-                    lastValue = newValue;
-                }
+            else if (j > 0) {
+                let newValue = costs[j - 1];
+                if (s1.charAt(i - 1) !== s2.charAt(j - 1))
+                    newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                costs[j - 1] = lastValue;
+                lastValue = newValue;
             }
         }
         if (i > 0)
@@ -68,6 +61,28 @@ function levenshteinDistance(s1, s2) {
     }
     return costs[s2.length];
 }
+
+function logByteLength(str) {
+    console.log(`Original: ${str}`);
+    console.log(`Buffer length: ${Buffer.from(str, 'utf8').length}`);
+    console.log(`Hex: ${Buffer.from(str, 'utf8').toString('hex')}`);
+}
+function normalizeUnicode(str) {
+    return str.normalize('NFC'); // NFC is usually what you want; other forms are NFD, NFKC, NFKD
+}
+
+function similarity(givenInput, expectedInput) {
+    let given = normalizeUnicode(givenInput);
+    let expected = normalizeUnicode(expectedInput)
+    if (given === expected) return 1;  // Adding explicit check for identical strings
+    logByteLength(given)
+    logByteLength(expected)
+    const maxLen = Math.max(given.length, expected.length);
+    const editDistance = levenshteinDistance(given, expected);
+    return (maxLen - editDistance) / maxLen;
+}
+
+
 
 async function stringComparisonPercentage(given, expected) {
     return new Promise((resolve, reject) => {
@@ -84,5 +99,4 @@ async function stringComparisonPercentage(given, expected) {
         resolve(parseFloat(percentage.toFixed(2)));
     });
 }
-
 module.exports = { similarity, stringComparisonPercentage};

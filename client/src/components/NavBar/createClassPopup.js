@@ -1,39 +1,14 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 
-const languages = {
-  'Arabic': 'ar-SA',
-  'Chinese (Simplified)': 'zh-CN',
-  'Chinese (Traditional)': 'zh-TW',
-  'Danish': 'da-DK',
-  'Dutch': 'nl-NL',
-  'English (Australia)': 'en-AU',
-  'English (United Kingdom)': 'en-GB',
-  'English (India)': 'en-IN',
-  'English (United States)': 'en-US',
-  'Finnish': 'fi-FI',
-  'French': 'fr-FR',
-  'German': 'de-DE',
-  'Greek': 'el-GR',
-  'Hebrew': 'he-IL',
-  'Hindi': 'hi-IN',
-  'Hungarian': 'hu-HU',
-  'Indonesian': 'id-ID',
-  'Italian': 'it-IT',
-  'Japanese': 'ja-JP',
-  'Korean': 'ko-KR',
-  'Norwegian': 'no-NO',
-  'Polish': 'pl-PL',
-  'Portuguese (Brazil)': 'pt-BR',
-  'Portuguese (Portugal)': 'pt-PT',
-  'Russian': 'ru-RU',
-  'Spanish (Spain)': 'es-ES',
-  'Spanish (Mexico)': 'es-MX',
-  'Swedish': 'sv-SE',
-  'Thai': 'th-TH',
-  'Turkish': 'tr-TR',
-  'Vietnamese': 'vi-VN'
-};
+const languages = [
+  'Arabic', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Danish', 'Dutch',
+  'English (Australia)', 'English (United Kingdom)', 'English (India)', 'English (United States)',
+  'Finnish', 'French', 'German', 'Greek', 'Hebrew', 'Hindi', 'Hungarian',
+  'Indonesian', 'Italian', 'Japanese', 'Korean', 'Norwegian', 'Polish',
+  'Portuguese (Brazil)', 'Portuguese (Portugal)', 'Russian', 'Spanish (Spain)',
+  'Spanish (Mexico)', 'Swedish', 'Thai', 'Turkish', 'Vietnamese', 'Romanian'  // Include Romanian
+];
 
 export default function CreateClassPopup(props) {
   const [input, setInput] = useState('');
@@ -43,7 +18,6 @@ export default function CreateClassPopup(props) {
 
   const handleCreate = (e) => {
     e.preventDefault();
-    // Check if input is empty, longer than 50 characters, or contains spaces
     if (input.length < 1 || input.length > 50 || /\s/.test(input)) {
       setShowError(true);  // Show error if class name is invalid
       setInput('');         // Clear the input after showing error
@@ -87,9 +61,8 @@ export default function CreateClassPopup(props) {
             onChange={(e) => setSelectedLanguage(e.target.value)}
           >
             <option value="">Choose...</option>
-            {/* Map through the languages object to create dropdown options */}
-            {Object.keys(languages).map((langName) => (
-              <option key={languages[langName]} value={languages[langName]}>
+            {languages.map((langName) => (
+              <option key={langName} value={langName}>
                 {langName}
               </option>
             ))}
