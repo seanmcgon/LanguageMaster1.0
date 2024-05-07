@@ -8,6 +8,8 @@ body, html {
 
 .flashcardBody {
     padding-top: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2); /* Subtle shadow for the whole container */
+
 }
 
 button {
@@ -22,6 +24,8 @@ button {
 .actionButtons {
     display: flex;
     justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    outline: none;
 }
 button:hover {
     background-color: #e2e2e2;
@@ -46,8 +50,8 @@ button:hover {
 }
 
 .flashcard {
-    width: 450px;  /* Further increased width */
-    height: 350px; /* Further increased height */
+    width: 750px;  /* Further increased width */
+    height: 400px; /* Further increased height */
     perspective: 1500px;
     cursor: pointer;
     border-radius: 15px;
@@ -76,7 +80,7 @@ button:hover {
 }
 
 .flashcard .back {
-    background-color: #f7f7f7;
+    background-color: #ffffff;
     transform: rotateY(180deg);
 }
 

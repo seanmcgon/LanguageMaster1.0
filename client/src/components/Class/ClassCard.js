@@ -1,5 +1,5 @@
 import { Col } from 'react-bootstrap';
-import class_bg from './class-bg.jpg';
+import class_bg from './class-bg.png';
 
 const ClassCard = ({ title, onClassClick }) => {
   return (
