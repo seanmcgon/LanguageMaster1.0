@@ -1,4 +1,6 @@
 const { audioRecognition } = require("./transcription/audioToText.js");
+const {stringComparisonPercentage} = require("./transcription/stringSimilarity.js")
+const {updateFlashcardForStudent} = require("./classes.js")
 const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 const keyFilename = path.join(__dirname, 'key.json');
@@ -45,34 +47,24 @@ async function generateSignedUrl(bucketName, fileName) {
     }
 }
 
-async function getFeedback(audioBuffer) {
+
+
+async function getFeedback(curWord, audioBuffer, currentAssignment, currentClass, studentEmail) {
     if (audioBuffer === null) {
         return;
     }
     try {
         const fileName = await uploadAudioToBucket(audioBuffer, 'languagemaster');
         let signedUrl = await generateSignedUrl('languagemaster', fileName);
-        
         // const encodings = ['LINEAR16', 'FLAC', 'MULAW', 'AMR', 'AMR_WB', 'OGG_OPUS', 'SPEEX_WITH_HEADER_BYTE'];
         // const sampleRatesHertz = [8000, 12000, 16000, 24000, 48000];
-        const encodings = ['LINEAR16'];
-        const sampleRatesHertz = [8000]
+        const results = await audioRecognition(signedUrl, 'English (United States)', 'LINEAR16', 16000);
+        console.log(results)
+        let newScore = await stringComparisonPercentage(results, curWord);
+        console.log(newScore)
+        updateFlashcardForStudent(currentClass, currentAssignment, curWord, newScore, studentEmail)
 
-        for (let encoding of encodings) {
-            for (let sampleRateHertz of sampleRatesHertz) {
-                console.log("-----------------------------------------------------");
-                console.log(`Testing Encoding: ${encoding}, Sample Rate: ${sampleRateHertz}`);
-                try {
-                    const results = await audioRecognition(signedUrl, 'English (United States)', encoding, sampleRateHertz);
-
-                    console.log('Transcription results:', results);
-                    return;
-                } catch (error) {
-                    console.error(`Error with Encoding: ${encoding}, Sample Rate: ${sampleRateHertz}:`, error.message);
-                    return;
-                }
-            }
-        }
+                   
     } catch (error) {
         console.error('Error in getting feedback:', error);
         return;

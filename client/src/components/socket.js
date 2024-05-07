@@ -80,14 +80,14 @@ export const getClasses = (email, teacherBool, fetchedClasses) => {
   socket.on("getClassesStatus", fetchedClasses);
 }
 
-export const viewAssignmentStudent = (className, assignmentName, fetchedAssignment) => {
-  socket.emit("viewAssignmentStudent", className, assignmentName);
+export const viewAssignmentStudent = (className, assignmentName, userEmail, fetchedAssignment) => {
+  socket.emit("viewAssignmentStudent", className, assignmentName, userEmail);
   socket.on("assignmentFetched", fetchedAssignment);
 }
 
-export const getFeedback = (curWord, audioFile, feedback) => {
+export const getFeedback = (curWord, audioFile, currentAssignment, currentClass, studentEmail, feedback) => {
   console.log("get feedback called with", audioFile)
-  socket.emit("getFeedback", curWord, audioFile);
+  socket.emit("getFeedback", curWord, audioFile, currentAssignment, currentClass);
   
 
   socket.once("feedback", feedback);

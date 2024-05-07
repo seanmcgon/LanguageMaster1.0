@@ -3,7 +3,7 @@ const { TextEncoder } = require('util');
 const connectionString = "mongodb+srv://mkandeshwara:0CgF5I8hwXaf88dy@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&ssl=true";
 const client = new MongoClient(connectionString);
 const {
- createAssignment, addToAssignment, viewAssignment, viewAssignmentStudent, deleteAssignment, getAllAssignments, getStudentGrades
+ createAssignment, addToAssignment, viewAssignment, viewStudentAssignment, deleteAssignment, getAllAssignments, getAllStudentData
 } = require('../src/assignments.js')
 
 //TODO:write the IO functions for all functions above
@@ -70,12 +70,12 @@ function viewAssignmentIO(socket) {
 // New function for student viewing an assignment (so scores are included)
 // Assuming viewAssignmentStudent gets created in assignments.js
 function viewAssignmentStudentIO(socket) {
-  socket.on("viewAssignmentStudent", async (className, assignmentName) => {
-    console.log("className", className, "assignmentName", assignmentName)
+  socket.on("viewAssignmentStudent", async (className, assignmentName, userEmail) => {
+    console.log("className", className, "assignmentName", assignmentName, userEmail)
 
     let assignment;
     try {
-      assignment = await viewAssignmentStudent(className, assignmentName);
+      assignment = await viewStudentAssignment(className, assignmentName, userEmail);
     } catch (error) {
       console.log("Error fetching assignment");
       assignment = [];
@@ -93,7 +93,7 @@ function getStudentGradesIO(socket) {
 
     let grades;
     try {
-      grades = await getStudentGrades(className, assignmentName);
+      grades = await getAllStudentData(className, assignmentName);
     } catch (error) {
       console.log("Error fetching student grades");
       grades = [];

@@ -26,41 +26,41 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
       setTimeout(() => setIndex(index + 1), 250);
     }
   };
-
   const handleRecord = () => {
     if (!recording) {
-      setTimeout(() => {navigator.mediaDevices.getUserMedia({ audio: true })
-          .then(stream => {
-              const options = {
-                  mimeType: 'audio/webm',
-                  bitsPerSecond: 256000
-              };
-              const mediaRecorder = new MediaRecorder(stream, options);
-              mediaRecorderRef.current = mediaRecorder;
-              mediaRecorder.start();
-              setRecording(true);
-              const audioChunks = [];
-              mediaRecorder.addEventListener("dataavailable", event => {
-                  audioChunks.push(event.data);
-              });
-              mediaRecorder.addEventListener("stop", () => {
-                  const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                  setAudioBlob(audioBlob);
-                  stream.getTracks().forEach(track => track.stop());
-                  setSubmitEnabled(true);  // Enable the submit button when recording stops
-              });
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          const options = {
+            mimeType: 'audio/webm',
+            bitsPerSecond: 256000
+          };
+          const mediaRecorder = new MediaRecorder(stream, options);
+          mediaRecorderRef.current = mediaRecorder;
+          mediaRecorder.start();
+          setRecording(true);
+          setSubmitEnabled(false); // Disable submit when recording starts
+          const audioChunks = [];
+          mediaRecorder.addEventListener("dataavailable", event => {
+            audioChunks.push(event.data);
+          });
+          mediaRecorder.addEventListener("stop", () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            setAudioBlob(audioBlob);
+            stream.getTracks().forEach(track => track.stop());
+            setSubmitEnabled(true);  // Enable the submit button when recording stops
           });
         })
+        .catch(error => {
+          console.error('Error accessing media devices:', error);
+        });
     } else {
-      // Adding a 1-second delay to the stop recording process
-      setTimeout(() => {
-        mediaRecorderRef.current.stop();
-        setRecording(false);
-      }, 500);
+      mediaRecorderRef.current.stop();
+      setRecording(false);
     }
   };
-
+  
   const handleSubmit = (blob = audioBlob) => {
+    console.log("I am clicked")
     const word = flashcards[index].wordName;
     const score = Math.random() * 100;  // Simulate score calculation
     setCurrentScore(score);

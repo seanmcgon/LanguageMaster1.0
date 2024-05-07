@@ -19,11 +19,11 @@ const App = () => {
   //development credentials
     //Teacher
     // const [isLoggedIn, setIsLoggedIn] = useState(true);  // Set to true for development
-    // const [userEmail, setUserEmail] = useState("jasonhuang685@gmail.com");  // Hardcoded email
+    // const [userEmail, setUserEmail] = useState("jasonhuangTeacher@umass.edu");  // Hardcoded email
     // const [isTeacher, setIsTeacher] = useState(true);
 
     //Student
-    const [userEmail, setUserEmail] = useState("studentJason@gmail.com");  // Hardcoded email
+    const [userEmail, setUserEmail] = useState("jasonhuangStudent@umass.edu");  // Hardcoded email
     const [isTeacher, setIsTeacher] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(true);
 
@@ -98,7 +98,8 @@ const App = () => {
                     setCurrentAssignment(fetchedAssignment);
                 }) 
             } else {
-                viewAssignmentStudent(currentClass, assignmentName, (fetchedAssignment) => {
+                console.log(userEmail)
+                viewAssignmentStudent(currentClass, assignmentName, userEmail, (fetchedAssignment) => {
                     setCurrentAssignment(fetchedAssignment);
                 })
             }
@@ -108,10 +109,8 @@ const App = () => {
     };
 
     const handleFeedbackClick = (curWord, audioFile ) => {
-        //TODO: Sean- pass these in, have a callback(s) which will be these three things: attemptScore(double), newAverage(double), transcription(string)
-        //Set the states of these three things, we will link this with the flashcard UI
         try {
-            getFeedback(curWord, audioFile, (attemptScore, newAverage, transcription) => {
+            getFeedback(curWord, audioFile, currentAssignment, currentClass, userEmail, (attemptScore, newAverage, transcription) => {
                 setAttemptScore(attemptScore);
                 setCurrentAverage(newAverage);
                 setTranscription(transcription);
@@ -262,7 +261,7 @@ const App = () => {
                     
                      showFlashcardView ? (
                         <Flashcard
-                            flashcards={dummyFlashcards}
+                            flashcards={currentAssignment}
                             onBack= {goBackToAssignment}
                             onSubmit = {handleFeedbackClick}
                         />
@@ -288,10 +287,10 @@ const App = () => {
                             />
                         ) : (
                             <ViewAssignmentStudent
-                                // lessonName={currentAssignmentName}
-                                // flashcards={currentAssignment}
-                                lessonName = {lessonName}
-                                flashcards={ dummyFlashcards}
+                                lessonName={currentAssignmentName}
+                                flashcards={currentAssignment}
+                                // lessonName = {lessonName}
+                                // flashcards={ dummyFlashcards}
                                 onBack={goBackToAssignmentList}
                                 onShowFlashcardView={handleShowFlashcardView}
                             />

@@ -226,7 +226,7 @@ async function getAllStudentData(className, assignmentName){
     }
     finally{
         await client.close();
-        return grades.map(e => {return {studentEmail: e.studentEmail, wordName: e.text, englishTranslation: e.translation, grade: e.score};});
+        return grades.map(e => {return {studentName: e.studentEmail, wordName: e.text, englishTranslation: e.translation, grade: e.score};});
     }
 }
 
