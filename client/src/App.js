@@ -28,9 +28,19 @@ const App = () => {
     // const [isLoggedIn, setIsLoggedIn] = useState(true);
 
     //Production
-    const [isTeacher, setIsTeacher] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userEmail, setUserEmail] = useState("");
+    if (!window.localStorage.getItem("isTeacher")) {
+        window.localStorage.setItem("isTeacher", "false");
+    }
+    if (!window.localStorage.getItem("isLoggedIn")) {
+        window.localStorage.setItem("isLoggedIn", "false");
+    }
+    if (!window.localStorage.getItem("userEmail")) {
+        window.localStorage.setItem("userEmail", "");
+    }
+
+    const [isTeacher, setIsTeacher] = useState(window.localStorage.getItem("isTeacher") === "true");
+    const [isLoggedIn, setIsLoggedIn] = useState(window.localStorage.getItem("isLoggedIn") === "true");
+    const [userEmail, setUserEmail] = useState(window.localStorage.getItem("userEmail"));
 
     useEffect(() => {
         getClassesForUser(userEmail);  // Fetch classes for the hardcoded user
@@ -129,10 +139,12 @@ const App = () => {
             console.log("Error fetching student grades:", error);
         }
     }
-
+    //TODO
     const handleLoginSuccess = (email, name) => {
         setIsLoggedIn(true);
+        window.localStorage.setItem("isLoggedIn", "true");
         setUserEmail(email);
+        window.localStorage.setItem("userEmail", email);
         getClassesForUser(email);
         console.log("is Teacher", isTeacher)
     };
@@ -151,12 +163,14 @@ const App = () => {
             }
         });
     }
-
+    //TODO
     const handleSignOut = () => {
         setShowLogoutMessage(true);
         setTimeout(() => {
             setIsLoggedIn(false);
+            window.localStorage.setItem("isLoggedIn", "false");
             setUserEmail("");
+            window.localStorage.setItem("userEmail", "");
             setClassList([]);
             setShowLogoutMessage(false);
         }, 1000); 

@@ -31,7 +31,9 @@ function LoginForm({ setIsTeacher, onLoginSuccess }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Login attempt: ", { role: role ? "Teacher" : "Student", email, password });  // Log login attempt details
+    //TODO
     setIsTeacher(role);  // Update the global isTeacher state
+    window.localStorage.setItem("isTeacher", role ? "true" : "false");
     console.log("setIsTeacher called with: ", role);  // Log when setIsTeacher is called
 
     const verificationFunction = role ? verifyTeacher : verifyStudent;

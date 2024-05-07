@@ -54,6 +54,7 @@
     margin-bottom: 20px;
     color: maroon;
     margin-left: 3%;
+    white-space: nowrap;
 }
 
 /* Container for tables with scrolling capability */
