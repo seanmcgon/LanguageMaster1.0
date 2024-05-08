@@ -23,20 +23,27 @@ function CreateAssignment({ onBack, onCreateAssignment }) {
     const submit = (e) => {
         e.preventDefault(); // Prevent form from submitting via HTTP request
         
+        // Check if the title is filled
+        if (!title.trim()) {
+            setError("Please enter an assignment title.");
+            return;
+        }
+    
         // Check if all required fields are filled
         const allFieldsComplete = assignFields.every(field => 
-            field.wordName && field.englishTranslation
+            field.wordName.trim() && field.englishTranslation.trim()
         );
         
         if (!allFieldsComplete) {
             setError("Please fill out all word and translation fields.");
             return;
         }
-
+    
         if (onCreateAssignment) {
             onCreateAssignment({ title, assignFields });
         }
     };
+    
 
     const addFields = () => {
         setAssignFields([...assignFields, { wordName: "", englishTranslation: "" }]);
