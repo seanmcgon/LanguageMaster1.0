@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Flashcard.css';
 
-function Flashcard({ flashcards, onBack, onSubmit }) {
+function Flashcard({ flashcards, onBack, onSubmit, getSignedUrl }) {
   const [flip, setFlip] = useState(false);
   const [index, setIndex] = useState(0);
   const [recording, setRecording] = useState(false);
@@ -11,6 +11,8 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
   const [transcription, setTranscription] = useState("");
   const [averageScore, setAverageScore] = useState(flashcards[0].score);
   const mediaRecorderRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false); // New loading state
+
 
   useEffect(() => {
     setCurrentScore(0);
@@ -68,8 +70,17 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
       setRecording(false);
     }
   };
+ 
+
+
+  const handlePlayStoredAudio = () => {
+      const audio = new Audio(flashcards[index].audioFile);
+      audio.play();
+  };
 
   const handleSubmit = (blob = audioBlob) => {
+    setIsLoading(true); // Set loading true when starting the request
+
     const word = flashcards[index].wordName;
     onSubmit(word, blob).then(feedback => {
       console.log("Feedback received:", feedback);
@@ -77,7 +88,12 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
       setTranscription(feedback.transcription);
       setAverageScore(feedback.newAverage);
       localStorage.setItem(`averageScore_${flashcards[index].id}`, feedback.newAverage.toString());
-    }).catch(error => console.error("Failed to get feedback:", error));
+      setIsLoading(false); // Set loading false after receiving the response
+
+    }).catch(error => {
+      console.error("Failed to get feedback:", error);
+      setIsLoading(false); // Set loading false if there is an error
+    });
     setSubmitEnabled(false);
   };
 
@@ -91,6 +107,7 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
 
   return (
     <div className='flashcardBody'>
+      {isLoading && <div className="loading-overlay"><div className="loader"></div></div>}
       <button className="backButton" onClick={onBack}>Back to Assignment</button>
       <div className="card-container">
         <button className="left" onClick={handleLeft} disabled={index <= 0}>Left</button>
@@ -103,6 +120,8 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
         <button className="right" onClick={handleRight} disabled={index >= flashcards.length - 1}>Right</button>
       </div>
       <div className="d-flex justify-content-center">
+      <button className="actionButtons" onClick={handlePlayStoredAudio}>Play Reference</button>
+
         <button className={`actionButtons ${recording ? "recording" : ""}`} onClick={handleRecord}>
           {recording ? 'Stop Recording' : 'Record'}
         </button>
@@ -110,9 +129,9 @@ function Flashcard({ flashcards, onBack, onSubmit }) {
         <button className="actionButtons debugButton" onClick={() => handleSubmit()} disabled={!submitEnabled}>Submit</button>
       </div>
       <div className="scores-container">
+        <p>Transcription: {transcription}</p>
         <p>Current Attempt Score: {currentScore.toFixed(2)}</p>
         <p>Average Score: {averageScore.toFixed(2)}</p>
-        <p>Transcription: {transcription}</p>
       </div>
     </div>
   );

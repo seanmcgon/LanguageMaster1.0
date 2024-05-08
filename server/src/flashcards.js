@@ -78,4 +78,4 @@ async function getFeedback(curWord, audioBuffer, currentAssignment, currentClass
 }
 
 
-module.exports = { getFeedback };
+module.exports = { getFeedback, generateSignedUrl };

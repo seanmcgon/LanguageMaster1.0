@@ -1,7 +1,7 @@
 //TODO:-Sean Import necessary functions (all of them don't exist exist for audioRecognition in src/transcription/audioToText)
 //You might have to put in dummy functions in flashcards.js
-//import { getFeedback } from "../src/flashcards.js";
-const {getFeedback} = require("../src/flashcards");
+//import { getFeedback }from "../src/flashcards.js";
+const {getFeedback, generateSignedUrl} = require("../src/flashcards");
 
 //TODO: write IO functions
 function getFeedbackIO(socket) {
@@ -49,7 +49,17 @@ function adderIO(socket) {
     })
 }
 
+function getSignedUrl(socket) {
+    let signedUrl;
+    socket.on("getSignedUrl", async(url) => {
+        console.log("url to be sent to generate signedURL",url)
+        signedUrl = generateSignedUrl("languageMaster", url)
+
+    })
+    socket.emit("signedUrl", signedUrl)
+}
+
 
 
 //TODO: export functions
-module.exports = {getFeedbackIO, adderIO};
+module.exports = {getFeedbackIO, adderIO, getSignedUrl};

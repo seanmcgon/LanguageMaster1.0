@@ -11,10 +11,12 @@ import { Modal } from 'bootstrap';
 import ClassAsgmts from './components/ClassAssignments/classAsgmts.js';
 import ViewAssignment from './components/viewAssignments/viewAssignments.js';
 import { createAssignment, viewAllAssignments, viewAssignment, viewAssignmentStudent, getFeedback } from './components/socket.js';
-import { createClass, getClasses, enrollInClass, getStudentGrades } from './components/socket.js';
+import { createClass, getClasses, enrollInClass, getStudentGrades, getSignedURL } from './components/socket.js';
 import ViewAssignmentStudent from "./components/ViewAssignmentStudent/ViewAssignmentStudent.js";
 import Flashcard  from './components/Flashcard/Flashcard.js';
 import StudentGrades from './components/StudentGrades/studentGrades.js';
+// import { getAllAssignments } from '../../server/src/assignments.js';
+// import { getAllAssignments } from '../../server/src/assignments.js';
 const App = () => {
   //development credentials
     //Teacher
@@ -187,8 +189,13 @@ const App = () => {
     };
   
     const handleHideCreateAssignment = () => {
-      setShowCreateAssignment(false); 
-      setShowCreateAssignment(false); 
+            // Check if user really wants to go back
+            const confirmBack = window.confirm("Are you sure you want to go back? Any unsaved changes will be lost.");
+            if (confirmBack) {
+                setShowCreateAssignment(false); 
+                handleClassClick(currentClass)
+            }
+     
     };
 
     const handleCreateClass = (className, language) => {
@@ -226,28 +233,11 @@ const App = () => {
         return retValue;
     }
 
-    const dummyFlashcards = 
-        [
-            {
-              wordName: "苹果",
-              englishTranslation: "Apple",
-              audioFile: "path/to/apple.mp3", // Ensure you have a valid path for audio files
-              score: 95
-            },
-            {
-              wordName: "书",
-              englishTranslation: "Book",
-              audioFile: "path/to/book.mp3",
-              score: 88
-            },
-            {
-              wordName: "汽车",
-              englishTranslation: "Car",
-              audioFile: "path/to/car.mp3",
-              score: 78
-            }
-        ]
-        const lessonName = "ChineseTest";
+    const getSignedUrl = async (url) => {
+        await getSignedURL(url, (singedUrl) => {
+            console.log("signedUrl",singedUrl)
+        })
+    }
  
     return (
         <>
@@ -270,6 +260,7 @@ const App = () => {
                             flashcards={currentAssignment}
                             onBack= {goBackToAssignment}
                             onSubmit = {handleFeedbackClick}
+                            getSignedUrl={getSignedUrl}
                         />
                     ) : curGrades ? (
                         <StudentGrades

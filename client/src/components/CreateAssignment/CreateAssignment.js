@@ -3,7 +3,7 @@ import "./CreateAssignment.css";
 
 function CreateAssignment({ onBack, onCreateAssignment }) {
     const [assignFields, setAssignFields] = useState([
-        { wordName: "", englishTranslation: "", audioFile: "" },
+        { wordName: "", englishTranslation: "" }, // Removed audioFile
     ]);
     const [title, setTitle] = useState("");
     const [error, setError] = useState(""); // State to store the error message
@@ -39,19 +39,23 @@ function CreateAssignment({ onBack, onCreateAssignment }) {
     };
 
     const addFields = () => {
-        setAssignFields([...assignFields, { wordName: "", englishTranslation: "", audioFile: "" }]);
+        setAssignFields([...assignFields, { wordName: "", englishTranslation: "" }]);
     };
 
     const removeFields = (index) => {
-        let data = [...assignFields];
-        data.splice(index, 1);
-        setAssignFields(data);
+        // Check if user really wants to remove the card
+        const confirmRemove = window.confirm("Are you sure you want to remove this card?");
+        if (confirmRemove) {
+            let data = [...assignFields];
+            data.splice(index, 1);
+            setAssignFields(data);
+        }
     };
 
     return (
         <div className="CreateAsgmts container d-flex justify-content-center">
             <h1 id="assignmentTitle">Create Assignment</h1>
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className="w-100"> {/* Ensuring form is wide */}
                 <div className="form-group">
                     <button type="button" onClick={onBack} className="backButtonCreate">Back to Assignments</button>
                 </div>
@@ -70,26 +74,20 @@ function CreateAssignment({ onBack, onCreateAssignment }) {
                     <div key={index} className="card-entry">
                         <span className="card-number">{index + 1}.</span>
                         <div className="input-group">
-                            <input
+                            <textarea
                                 className="form-control"
                                 name="wordName"
                                 placeholder="Word"
                                 value={form.wordName}
                                 onChange={(event) => handleFormChange(event, index)}
-                            />
-                            <input
+                            ></textarea>
+                            <textarea
                                 className="form-control"
                                 name="englishTranslation"
                                 placeholder="Translation"
                                 value={form.englishTranslation}
                                 onChange={(event) => handleFormChange(event, index)}
-                            />
-                            <input
-                                type="file"
-                                name="audioFile"
-                                className="form-control-file"
-                                onChange={(event) => handleFormChange(event, index)}
-                            />
+                            ></textarea>
                             <button type="button" className="removeCardButton" onClick={() => removeFields(index)}>Remove</button>
                         </div>
                     </div>

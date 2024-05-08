@@ -36,9 +36,9 @@
 //     return similarityRate < 0 ? 0 : similarityRate;
 // }
 function normalizeString(str) {
-    // Add Chinese punctuation to the regex and trim the string to remove leading and trailing spaces
-    return str.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()，。、；：？！“”‘’]/g, "").trim();
+    return str.replace(/[.,-/#$%^&*;:{}=_`~()，。、；：？！“”‘’]/g, "").trim();
 }
+
 
 function levenshteinDistance(s1, s2) {
     if (s1 === s2) return 0;  // Adding explicit check for identical strings

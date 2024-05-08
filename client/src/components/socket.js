@@ -103,4 +103,10 @@ export const getStudentGrades = (className, assignmentName, grades) => {
   socket.on("studentGrades", grades);
 }
 
+export const getSignedURL = (url, signedURL) => {
+  console.log("url", url)
+  socket.emit("getSignedUrl", url)
+  socket.on("signedUrl", signedURL)
+}
+
 

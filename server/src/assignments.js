@@ -1,9 +1,60 @@
 const e = require('cors');
 const { MongoClient } = require('mongodb');
 const { TextEncoder } = require('util');
+const {processItems} = require("./textToSpeech.js")
+
 
 const connectionString = "mongodb+srv://mkandeshwara:1234@cluster0.tefxjrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const client = new MongoClient(connectionString);
+
+//Created by Shuto
+//Updated by Jason 5/7/2024
+//Updated to update student metrics when a new assignment is created
+async function createAssignment(className, assignmentName, assignmentArray) {
+    let language = await getClassLanguage(className)
+    let urlsAddedArray = await processItems(assignmentArray, "languagemasterreference", language)
+    let createdAssignment = false;
+    try {
+        await client.connect();
+        const db = client.db(className);
+        const assignmentsCollection = db.collection("assignments");
+        const studentsCollection = db.collection("students");
+        const metricsCollection = db.collection("metrics");
+
+        if ((await assignmentsCollection.find({ assignment: assignmentName }).toArray()).length === 0 && assignmentArray.length > 0) {
+            const flashcards = convertAssignmentToDtbForm(assignmentName, urlsAddedArray);
+            for (const flashcard of flashcards) {
+                await assignmentsCollection.insertOne(flashcard);
+            }
+            createdAssignment = true;
+
+            // Fetch all enrolled students
+            const students = await studentsCollection.find().toArray();
+
+            // Update metrics for all enrolled students
+            const metricsUpdatePromises = students.map(student => {
+                return flashcards.map(flashcard => {
+                    const metricQuery = {
+                        studentEmail: student.email,
+                        assignment: assignmentName,
+                        card: flashcard.card
+                    };
+                    const metricUpdate = {
+                        $setOnInsert: { timesPracticed: 0, score: 0 }
+                    };
+                    return metricsCollection.updateOne(metricQuery, metricUpdate, { upsert: true });
+                });
+            }).flat();
+
+            await Promise.all(metricsUpdatePromises);
+        }
+    } catch (err) {
+        console.log(err);
+    } finally {
+        await client.close();
+    }
+    return createdAssignment;
+}
 
 // Quoc
 function checkValid(className) {
@@ -15,25 +66,6 @@ function checkValid(className) {
 }
 
 // Shuto
-async function createAssignment(className, assignmentName, assignmentArray) {
-    let createdAssignment = false;
-    try {
-        await client.connect();
-        const db = client.db(className);
-        const col = db.collection("assignments");
-        if ((await col.find({ assignment: assignmentName }).toArray()).length === 0 && assignmentArray.length > 0) {
-            for (const flashcard of convertAssignmentToDtbForm(assignmentName, assignmentArray)) {
-                await col.insertOne(flashcard);
-            }
-            createdAssignment = true;
-        }
-    } catch (err) {
-        console.log(err);
-    } finally {
-        await client.close();
-    }
-    return createdAssignment;
-}
 
 // Shuto
 function convertAssignmentToDtbForm(assignmentName, assignmentArray) {
@@ -266,7 +298,7 @@ async function viewStudentAssignment(className, assignmentName, email){
 
 
 async function getClassLanguage(className) {
-
+    console.log(className)
     try {
         await client.connect();
         const db = client.db(className);
@@ -282,6 +314,7 @@ async function getClassLanguage(className) {
     } finally {
         await client.close();
     }
+    console.log(languageName)
     return languageName;
 }
 
