@@ -31,16 +31,15 @@ function LoginForm({ setIsTeacher, onLoginSuccess }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Login attempt: ", { role: role ? "Teacher" : "Student", email, password });  // Log login attempt details
-    //TODO
-    setIsTeacher(role);  // Update the global isTeacher state
-    window.localStorage.setItem("isTeacher", role ? "true" : "false");
+    //Changed this to just pass role as an arg to onLoginSuccess
+    //setIsTeacher(role);  // Update the global isTeacher state
     console.log("setIsTeacher called with: ", role);  // Log when setIsTeacher is called
 
     const verificationFunction = role ? verifyTeacher : verifyStudent;
     verificationFunction(email, password, (verificationStatus) => {
         if (verificationStatus) {
             handleCloseClick();  // Hide the login modal on successful login
-            onLoginSuccess(email);  // Call onLoginSuccess with the email
+            onLoginSuccess(email, role);  // Call onLoginSuccess with the email
         } else {
             setErrorMessage("Login failed. Please check your email and password.");
             console.log("Login failed");  // Log when login fails
