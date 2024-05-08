@@ -36,7 +36,7 @@
 //     return similarityRate < 0 ? 0 : similarityRate;
 // }
 function normalizeString(str) {
-    return str.replace(/[.,-/#$%^&*;:{}=_`~()，。、；：？！“”‘’]/g, "").trim();
+    return str.replace(/[.,-/#$%^&*;:{}=_`~()，。、；：？！“”‘’]/g, "").trim().toLowerCase();
 }
 
 

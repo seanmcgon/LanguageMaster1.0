@@ -6,8 +6,8 @@ const languages = [
   'English (Australia)', 'English (United Kingdom)', 'English (India)', 'English (United States)',
   'Finnish', 'French', 'German', 'Greek', 'Hebrew', 'Hindi', 'Hungarian',
   'Indonesian', 'Italian', 'Japanese', 'Korean', 'Norwegian', 'Polish',
-  'Portuguese (Brazil)', 'Portuguese (Portugal)', 'Russian', 'Spanish (Spain)',
-  'Spanish (Mexico)', 'Swedish', 'Thai', 'Turkish', 'Vietnamese', 'Romanian'  // Include Romanian
+  'Portuguese (Brazil)', 'Portuguese (Portugal)', 'Romanian', 'Russian', 'Spanish (Spain)',
+  'Spanish (Mexico)', 'Swedish', 'Thai', 'Turkish', 'Vietnamese',
 ];
 
 export default function CreateClassPopup(props) {
@@ -18,7 +18,7 @@ export default function CreateClassPopup(props) {
 
   const handleCreate = (e) => {
     e.preventDefault();
-    if (input.length < 1 || input.length > 50 || /\s/.test(input)) {
+    if (input.length < 1 || input.length > 31 || /\s/.test(input)) {
       setShowError(true);  // Show error if class name is invalid
       setInput('');         // Clear the input after showing error
     } else if (!selectedLanguage) {
@@ -73,7 +73,7 @@ export default function CreateClassPopup(props) {
             </p>
           )}
           <Form.Text id="helpBlock" muted>
-            Class names must be 1-50 characters long and cannot contain spaces.
+            Class names must be 1-31 characters long and cannot contain spaces.
           </Form.Text>
           <br/><br/>
           <Button className="createButton" type="submit">

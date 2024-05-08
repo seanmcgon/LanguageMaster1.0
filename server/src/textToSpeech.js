@@ -3,7 +3,6 @@ const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 const fs = require('fs');
 const util = require('util');
-const {getClassLanguage} = require("./assignments.js")
 
 const keyFilename = path.join(__dirname, 'key.json'); // Path to your JSON key file
 const client = new textToSpeech.TextToSpeechClient({ keyFilename });

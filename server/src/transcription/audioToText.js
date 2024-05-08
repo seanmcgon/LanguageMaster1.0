@@ -37,6 +37,7 @@ const languageConfigs = {
     'Thai': { languageCode: 'th-TH', sampleRate: 16000, encoding: 'LINEAR16' },
     'Turkish': { languageCode: 'tr-TR', sampleRate: 16000, encoding: 'LINEAR16' },
     'Vietnamese': { languageCode: 'vi-VN', sampleRate: 16000, encoding: 'LINEAR16' },
+    'Romanian': { languageCode: 'ro-RO', sampleRate: 16000, encoding: 'LINEAR16' }
 
 };
 
