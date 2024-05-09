@@ -62,7 +62,7 @@ function SignUp(props) {
             document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
 
             document.body.classList.remove('modal-open');
-            props.onLoginSuccess(email);
+            props.onLoginSuccess(email, isTeach);
         } else {
             setErrorMessage("Account creation failed!");
         }
