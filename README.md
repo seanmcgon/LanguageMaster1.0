@@ -1,41 +1,36 @@
-Part 1: Featureless Live Product Website: 
-Once you complete the steps in part 2, the website should be running at http://localhost:3000/. 
+# Language Master
 
-Features that can be used and tested:
-  Login
-  Signup
+Language Master is a web application designed to help students improve their foreign language pronunciation in a classroom setting. Similar to Quizlet, it uses flashcards to guide students through vocabulary practice, but with a unique feature: instant automated pronunciation feedback. This makes it an ideal tool for both students and teachers aiming to enhance language learning through practice and evaluation.
 
-Persistence is built in and UI and terminal feedback is incorporated for all user actions
+---
 
+## Features
+- **Teacher and Student Views**: Separate interfaces tailored for each role.
+- **Class Management**: Teachers can create and manage multiple classes and assignments.
+- **Flashcard Assignments**: Practice foreign language terms/phrases with instant scoring.
+- **Pronunciation Feedback**: Uses Google Speech-to-Text and Levenshtein distance to evaluate pronunciation accuracy in real time.
+- **Customization**: Teachers can create custom assignments for their students.
 
-Part 2: Usage and Development Material
+---
 
-Source control and build process instructions:
+## Contributions
+- Developed React components for key user interface elements, including:
+  - Home page banner
+  - Pop-up window for creating new classes
+  - Assignments page
+- Integrated front-end React components with the back-end Express server using Socket.IO.
+- Deployed beta and 1.0 releases of the app using Render.com.
 
-Go to: https://github.com/musicApprentice/LanguageMasterSource
-Download the repository as an offline copy
-Open the folder in VS Code
-In the terminal, ensure you are in the same directory as your folder
-In the root directory run npm install
-cd into the server directory
-Run npm install
-cd into the client directory
-Run npm install
-Back in the main directory: run npm start to start the entire application
-[0]- indicates terminal messages from the backend
-[1]- indicates terminal messages from the frontend
-Bug Tracking:
-Database access instructions: .
-The data is stored in the cluster0 in the MongoDB. We have created several databases including UserData, and a database for each course. The following steps will help you to access our database successfully.
+---
 
-Follow Source control and build process above
-In the “databaseUsers.js” in server directory, we have 2 active functions in total (the rest are just helpers
+## Technologies Used
+- **Frontend**: React, Bootstrap (for styling)
+- **Backend**: Express, Socket.IO
+- **Database**: MongoDB
+- **Speech Processing**: Google Speech-to-Text API
+- **Hosting**: Render.com
 
-The function verifyTeacher: this function takes two arguments: teacherEmail, and password. This function will check whether the given information matches any data in our database. It returns the boolean value of whether it found a matching teacher user.
+---
 
-The function createTeacher: this function will return true if it successfully creates a student, and it will update the new teacher to the database. This function needs two supporting functions: checkValidityOfEmail and checkValidityOfPassword to make sure the given email and password are correct forms. If one of them is not valid, the function logs the message error.
-
-To run these functions:
-Option 1: run via server.test.js : This file is the place where we add tests for functions, so you could add your own test if you want. Run “npm run test”
-Option 2: Call and execute the functions yourself: At the end of the file, you can simply write the order for which function you want to run: for example createTeacher(“FirstName”, “LastName”, “Email”, “Password”). Run “node function.js”
-Remember: When you test the webpage, these functions are called as well
+## Demo
+While the app is no longer live, you can watch a [video demo of Language Master](https://www.youtube.com/watch?v=krgkt4E6cWg&ab_channel=JasonHuang%E9%BB%83%E5%AE%87%E6%81%86) to see its features in action.
